@@ -1,0 +1,34 @@
+services:
+  mariadb:
+    build:
+      context: ./docker/mariadb
+    volumes:
+      - ./db:/etc/mysql
+      - type: bind
+        source: "./docker/log/mysql/mysql-error.log"
+        target: "/var/log/mysql/mysql-error.log"
+    environment:
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    ports:
+      - 3306:3306
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mariadb
+    environment:
+      - PMA_ARBITRARY=1
+    ports:
+      - "8080:80"
+    volumes:
+      - ./phpmyadmin/sessions:/sessions
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+
