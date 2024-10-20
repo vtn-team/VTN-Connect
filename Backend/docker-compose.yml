@@ -1,11 +1,11 @@
 services:
   mariadb:
     build:
-      context: ./docker/mariadb
+      context: ./mariadb
     volumes:
       - ./db:/etc/mysql
       - type: bind
-        source: "./docker/log/mysql/mysql-error.log"
+        source: "./log/mysql/mysql-error.log"
         target: "/var/log/mysql/mysql-error.log"
     environment:
       - MYSQL_USER=${DB_USERNAME}
