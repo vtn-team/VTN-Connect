@@ -26,12 +26,26 @@ function getPDOInstance() {
 $app->get('/', function (Request $request, Response $response, array $args) {
     $response->getBody()->write("Hello");
     $pdo = getPDOInstance();
+    
+    //最新のイベントデータ10件読み出し
+    $pp = $pdo->prepare("SELECT * FROM Event ORDER BY id DESC LIMIT 0, 10;");
+    $result = $pp->fetchAll();
+    
     return $response;
 });
 
-$app->get('/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
+$app->get('/event/{id}/{action}', function (Request $request, Response $response, array $args) {
+    $id = $args['id'];
+    $action = $args['action'];
+    
+    $pdo = getPDOInstance();
+    
+    //イベントデータのテスト書き込み
+    $pp = $pdo->prepare("INSERT INTO `Event` (`userId`, `targetId`, `action`, `createdAt`) VALUES (?, ?, ?, CURRENT_TIMESTAMP);");
+    $pp->execute(array($id, 0, $action));
+    //$result = $pp->fetchAll();
+    
+    $response->getBody()->write("write done, $id, $action");
     return $response;
 });
 
@@ -39,4 +53,3 @@ $app->run();
 
 //ini_set('display_errors', "Off");
 //error_reporting(E_ERROR | E_PARSE);
-
