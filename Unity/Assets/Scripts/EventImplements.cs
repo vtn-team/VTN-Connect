@@ -18,6 +18,11 @@ public class NecoEvent : EventData
 
     public Neco NecoData = default;
 
+    public NecoEvent()
+    {
+        base.EventId = 1;
+    }
+
     //独自のやり方でパースして良い
     public override void Marshal()
     {
