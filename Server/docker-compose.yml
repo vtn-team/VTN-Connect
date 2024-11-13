@@ -1,7 +1,28 @@
+version: '3'
+
 services:
-  mariadb:
+  nginx:
     build:
-      context: ./mariadb
+      context: ./nginx
+    links:
+      - php
+    ports:
+      - "80:4649"
+    container_name: nginx
+
+  php:
+    build:
+      context: ./php
+      args:
+        - environment=local
+    domainname: localhost
+    volumes:
+      - ../src/vtn-connect:/var/www/slim
+      - ../src/vendor:/var/www/vendor
+    container_name: php
+
+  mariadb:
+    image: mariadb
     volumes:
       - ./db:/etc/mysql
       - type: bind
@@ -31,4 +52,3 @@ services:
     restart: always
     ports:
       - "6379:6379"
-
