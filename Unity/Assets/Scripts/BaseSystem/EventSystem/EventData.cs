@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VTNConnect
 {
@@ -8,7 +9,7 @@ namespace VTNConnect
     /// データクラス
     /// </summary>
     [Serializable]
-    public abstract class EventData
+    public class EventData
     {
         [Serializable]
         public class ParamData
@@ -22,8 +23,6 @@ namespace VTNConnect
         public int FromId = -1;
         [SerializeField] protected List<ParamData> Payload = new List<ParamData>();
 
-        public abstract void Marshal();
-
         public void DataPack<T>(string Key, T data)
         {
             Payload.Add(new ParamData()
@@ -34,9 +33,23 @@ namespace VTNConnect
             });
         }
 
-        public void Send()
+        public ParamData GetData(string Key)
         {
-            //TBD
+            var target = Payload.Where(p => p.Key == Key);
+            if (target.Count() == 0) return null;
+            return target.First();
+        }
+
+        public int GetIntData(string Key)
+        {
+            var target = Payload.Where(p => p.Key == Key);
+            if (target.Count() == 0) return 0;
+            var data = target.First();
+            if(data.TypeName != "Integer")
+            {
+                Debug.LogWarning($"Intじゃない値かもしれません:{data.Data}({data.TypeName })");
+            }
+            return int.Parse(data.Data);
         }
     }
 }

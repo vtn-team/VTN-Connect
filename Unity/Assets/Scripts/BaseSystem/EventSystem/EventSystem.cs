@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace VTNConnect
 {
@@ -14,13 +15,22 @@ namespace VTNConnect
 
         //
         public delegate void EventDataCallback(EventData data);
+        List<EventDataCallback> _sender = new List<EventDataCallback>();
         List<EventDataCallback> _eventListener = new List<EventDataCallback>();
 
+        static private void DataReceive(EventData data)
+        {
+            foreach (var ev in _instance._eventListener)
+            {
+                ev.Invoke(data);
+            }
+        }
 
-        //TBD
-        //public async UniTask<int> Setup()
-        //{
-        //}
+        static public void Setup(EventDataCallback send, out EventDataCallback recv)
+        {
+            _instance._sender.Add(send);
+            recv = DataReceive;
+        }
 
         static public void AddListener(EventDataCallback callback)
         {
@@ -30,10 +40,7 @@ namespace VTNConnect
 #if UNITY_EDITOR
         static public void RunEvent(EventData data)
         {
-            foreach(var ev in _instance._eventListener)
-            {
-                ev.Invoke(data);
-            }
+            DataReceive(data);
         }
 #endif
     }
