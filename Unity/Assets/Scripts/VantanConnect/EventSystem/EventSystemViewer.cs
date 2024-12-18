@@ -8,22 +8,23 @@ using VTNConnect;
 /// </summary>
 public class EventSystemViewer : MonoBehaviour
 {
-    [SerializeField, SerializeReference, SubclassSelector] List<EventData> _testData;
+    [SerializeField] int _eventId;
+    [SerializeField] EventData _testData;
 
     //test
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            NecoEvent n = new NecoEvent();
+            EventData n = new EventData();
             n.DataPack<float>("X", this.transform.position.x);
             n.DataPack("Pos", this.transform.position);
             n.DataPack("Rot", this.transform.rotation);
-
+            EventSystem.SendEvent(_eventId, n);
         }
     }
 
 #if UNITY_EDITOR
-    public List<EventData> TestData => _testData;
+    public EventData TestData => _testData;
 #endif
 }

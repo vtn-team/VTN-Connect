@@ -14,8 +14,9 @@ namespace VTNConnect
         private EventSystem() { }
 
         //
+        public delegate void EventDataSender(int eventId, EventData data);
         public delegate void EventDataCallback(EventData data);
-        List<EventDataCallback> _sender = new List<EventDataCallback>();
+        EventDataSender _sender = null;
         List<EventDataCallback> _eventListener = new List<EventDataCallback>();
 
         static private void DataReceive(EventData data)
@@ -26,9 +27,9 @@ namespace VTNConnect
             }
         }
 
-        static public void Setup(EventDataCallback send, out EventDataCallback recv)
+        static public void Setup(EventDataSender send, out EventDataCallback recv)
         {
-            _instance._sender.Add(send);
+            _instance._sender = send;
             recv = DataReceive;
         }
 
@@ -36,6 +37,12 @@ namespace VTNConnect
         {
             _instance._eventListener.Add(callback);
         }
+
+        static public void SendEvent(int eventId, EventData data)
+        {
+            _instance._sender?.Invoke(eventId, data);
+        }
+
 
 #if UNITY_EDITOR
         static public void RunEvent(EventData data)

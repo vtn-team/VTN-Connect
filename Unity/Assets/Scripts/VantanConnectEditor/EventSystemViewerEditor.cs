@@ -17,12 +17,13 @@ public class EventSystemViewerEditor : Editor
 
         EventSystemViewer view = target as EventSystemViewer;
         if (view.TestData == null) return;
-        for(int i=0; i<view.TestData.Count; ++i)
+        if (GUILayout.Button(@"オリジナルイベント送信"))
         {
-            if (GUILayout.Button(@"イベント${(i+1)}実行"))
-            {
-                EventSystem.RunEvent(view.TestData[i]);
-            }
+            EventSystem.SendEvent(view.TestData.EventId, view.TestData);
+        }
+        if (GUILayout.Button(@"オリジナルイベント実行"))
+        {
+            EventSystem.RunEvent(view.TestData);
         }
     }
 }

@@ -20,8 +20,10 @@ namespace VTNConnect
         }
 
         public int EventId = -1;
-        public int FromId = -1;
+        [HideInInspector] public int FromId = -1;
         [SerializeField] protected List<ParamData> Payload = new List<ParamData>();
+
+        public List<ParamData> GetPayLoad => Payload; //test
 
         public void DataPack<T>(string Key, T data)
         {

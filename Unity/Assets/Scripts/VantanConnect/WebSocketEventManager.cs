@@ -20,6 +20,7 @@ public class WebSocketEventManager : MonoBehaviour
     Queue<EventData> _eventQueue = new Queue<EventData>();
 
     EventSystem.EventDataCallback _event = null;
+    string _sessionId = null;
 
 
     void Start()
@@ -46,7 +47,9 @@ public class WebSocketEventManager : MonoBehaviour
 
         if (_sendQueue.Count == 0) return;
 
-        var data = _sendQueue.Dequeue();
+        var d = _sendQueue.Dequeue();
+        WSPS_Event data = new WSPS_Event(d);
+        data.SessionId = _sessionId;
         client.Send(JsonUtility.ToJson(data));
     }
 
@@ -57,8 +60,11 @@ public class WebSocketEventManager : MonoBehaviour
         EventSystem.Setup(Send, out _event);
     }
 
-    void Send(EventData data)
+    //最終的な設計には悩んでいる
+    void Send(int eventId, EventData data)
     {
+        data.EventId = eventId;
+        data.FromId = _gameId;
         _sendQueue.Enqueue(data);
     }
 
@@ -82,13 +88,14 @@ public class WebSocketEventManager : MonoBehaviour
         {
             switch ((WebSocketCommand)data.Command)
             {
-            case WebSocketCommand.JOIN:
+            case WebSocketCommand.WELCOME:
             {
                 var welcome = JsonUtility.FromJson<WSPR_Welcome>(data.Data);
                 var join = new WSPS_Join();
                 join.SessionId = welcome.SessionId;
                 join.GameId = _gameId;
                 client.Send(JsonUtility.ToJson(join));
+                _sessionId = welcome.SessionId;
             }
             break;
 
