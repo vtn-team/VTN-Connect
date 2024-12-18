@@ -9,7 +9,7 @@ using VTNConnect;
 
 public class WebSocketEventManager : MonoBehaviour
 {
-    [SerializeField] string _host = "ws://localhost:3000/"; //ws://35.72.48.33:3000/
+    [SerializeField] int _gameId = 1;
     [SerializeField] int _eventIndex = -1; 
 
     public bool IsConnecting { get; private set; } = false;
@@ -24,7 +24,13 @@ public class WebSocketEventManager : MonoBehaviour
 
     void Start()
     {
-        Connect();
+        Setup();
+    }
+
+    async void Setup()
+    {
+        string address = await GameAPI.API.GetAddress();
+        Connect(address);
     }
 
     void Update()
@@ -45,9 +51,9 @@ public class WebSocketEventManager : MonoBehaviour
     }
 
 
-    void Connect()
+    void Connect(string address)
     {
-        client.Connect(_host, Message);
+        client.Connect(address, Message);
         EventSystem.Setup(Send, out _event);
     }
 
@@ -58,12 +64,12 @@ public class WebSocketEventManager : MonoBehaviour
 
     void Message(byte[] msg)
     {
-        EventData data = null;
+        WebSocketPacket data = null;
         try
         {
             //data = MessagePackSerializer.Deserialize<ServerResult>(msg);
             string json = Encoding.UTF8.GetString(msg);
-            data = JsonUtility.FromJson<EventData>(json);
+            data = JsonUtility.FromJson<WebSocketPacket>(json);
         }
         catch(Exception ex)
         {
@@ -74,7 +80,25 @@ public class WebSocketEventManager : MonoBehaviour
 
         try
         {
-            _eventQueue.Enqueue(data);
+            switch ((WebSocketCommand)data.Command)
+            {
+            case WebSocketCommand.JOIN:
+            {
+                var welcome = JsonUtility.FromJson<WSPR_Welcome>(data.Data);
+                var join = new WSPS_Join();
+                join.SessionId = welcome.SessionId;
+                join.GameId = _gameId;
+                client.Send(JsonUtility.ToJson(join));
+            }
+            break;
+
+            case WebSocketCommand.EVENT:
+            {
+                var evt = JsonUtility.FromJson<WSPR_Event>(data.Data);
+                _eventQueue.Enqueue(evt);
+            }
+            break;
+            }
         }
         catch (Exception ex)
         {

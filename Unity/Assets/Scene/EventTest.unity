@@ -133,6 +133,8 @@ GameObject:
   m_Component:
   - component: {fileID: 246754544}
   - component: {fileID: 246754543}
+  - component: {fileID: 246754546}
+  - component: {fileID: 246754545}
   m_Layer: 0
   m_Name: Event
   m_TagString: Untagged
@@ -153,19 +155,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _testData:
-  - rid: 890801515580096513
+  - rid: -2
   references:
     version: 2
     RefIds:
-    - rid: 890801515580096513
-      type: {class: NecoEvent, ns: , asm: Assembly-CSharp}
-      data:
-        EventId: 1
-        FromId: -1
-        Payload:
-        - Key: 
-          TypeName: 
-          Data: 
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!4 &246754544
 Transform:
   m_ObjectHideFlags: 0
@@ -181,6 +176,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &246754545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246754542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f732a4758525af46af10f3dfb17d799, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameId: 1
+  _eventIndex: -1
+--- !u!114 &246754546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246754542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 237f100a7a5756e468e0bf7c9c76048f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inplements:
+    rid: 4713601259230199808
+  references:
+    version: 2
+    RefIds:
+    - rid: 4713601259230199808
+      type: {class: AWSAPIImplement, ns: , asm: VantanConnect}
 --- !u!1 &596206451
 GameObject:
   m_ObjectHideFlags: 0
