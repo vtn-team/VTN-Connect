@@ -75,15 +75,19 @@ export async function getGameUsers(req: any,res: any,route: any)
 {
 	let player = await query("SELECT Id FROM User ORDER BY LastPlayedAt ASC LIMIT 0,?",[3]);
 	let ids:Array<number> = [];
+	let join:Array<string> = [];
 	for(let d of player) {
 		if(d.Id < 999) continue;
 		ids.push(d.Id);
+		join.push("?");
 	}
 	
 	let results = [];
 	if(ids.length > 0) {
-		results = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id IN (?,?,?);", ids);
-		await query("UPDATE User SET LastPlayedAt = CURRENT_TIMESTAMP() WHERE Id IN (?,?,?);", ids);
+		console.log(ids);
+		console.log(join.join(','));
+		results = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id IN ("+join.join(',')+");", ids);
+		await query("UPDATE User SET LastPlayedAt = CURRENT_TIMESTAMP() WHERE Id IN ("+join.join(',')+");", ids);
 	}
 	
 	results = results.concat(getUniqueUsers(4-ids.length));
