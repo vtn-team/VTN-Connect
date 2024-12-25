@@ -1,4 +1,4 @@
-import { GameConnect, CMD, TARGET, createMessage } from "./contents"
+import { GameConnect, CMD, TARGET, createMessage } from "./gamecon"
 import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'

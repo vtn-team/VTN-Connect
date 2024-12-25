@@ -1,5 +1,5 @@
 import { client } from 'websocket'
-import { CMD } from "./gameserver/contents"
+import { CMD } from "./gameserver/gamecon"
 
 export enum TARGET {
 	ALL = 0,

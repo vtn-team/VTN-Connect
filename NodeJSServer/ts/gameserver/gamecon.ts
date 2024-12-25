@@ -44,6 +44,9 @@ class GameContainer {
 	}
 }
 
+
+//ゲームコネクト
+//NOTE: ゲーム同士でイベントのやり取りをするサービス
 export class GameConnect {
 	games: any;
 	sessionDic: any;
@@ -108,6 +111,7 @@ export class GameConnect {
 			}
 			}
 			this.execCommand(data);
+			//this.broadcast(createMessage(userId, CMD.EVENT, TARGET.ALL, data));
 		}
 		break;
 		}
