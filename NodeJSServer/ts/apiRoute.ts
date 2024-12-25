@@ -1,6 +1,7 @@
 exports.Routes = {
 	GET: {
 		"/"				: "index#index",
+		"/route"		: "index#route",
 		"/favicon.ico"	: "resource#favicon",
 		"/stat" : {
 			"/" : "stat#check"
@@ -30,7 +31,7 @@ exports.Routes = {
 exports.Auth = {
 	UseSessionAuth: false,
 	PassThroughRoute: {
-		GET: ["stat","gacha","info","ranking","cm"],
-		POST: ["ranking","cm"]
+		GET: [],
+		POST: []
 	}
 };
