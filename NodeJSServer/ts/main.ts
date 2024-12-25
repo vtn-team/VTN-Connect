@@ -6,6 +6,7 @@ import { connect } from "./lib/database"
 import { HTTP_SERVER_PORT, GAME_SERVER_PORT } from "./config/config"
 import { loadMaster, loadMasterFromCache } from "./lib/masterDataCache"
 import { loadInformation, loadInformationFromCache } from "./lib/InformationCache"
+import { preloadUniqueUsers } from "./vclogic/vcuser"
 
 (async function() {
 	//起動引数を処理する
@@ -30,6 +31,9 @@ import { loadInformation, loadInformationFromCache } from "./lib/InformationCach
 	
 	//自分のIPを取得する
 	findElasticIP();
+	
+	//ユニークユーザの準備
+	await preloadUniqueUsers();
 	
 	//HTTPサーバ起動
 	launch(HTTP_SERVER_PORT);

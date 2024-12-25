@@ -13,6 +13,7 @@ exports.Routes = {
 				"@id%d" : "vc#getUser#ユーザ取得",
 				"@hash%s" : "vc#getUser#ユーザ取得",
 			},
+			"/gameusers" : "vc#getGameUsers#ゲーム参加ユーザの取得",
 			"/usercreate" : "vc#createUser#ユーザ生成(テスト用)",
 		},
 		"/tools" : {

@@ -4,13 +4,54 @@ import { query } from "./../lib/database"
 const { v4: uuidv4 } = require('uuid')
 
 let userSession:any = {};
+let uniqueUsers:any = [];
 
+/*
 export class UserStatus {
 	public Name:string;
 	public PromptA :string;
 	public PromptB:string;
 	public PromptC:string;
 	public PromptD:string;
+}
+*/
+
+//ユニークユーザをあっためておく
+export async function preloadUniqueUsers() {
+	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?",[999]);
+	uniqueUsers = result;
+	//console.log(uniqueUsers);
+}
+
+//ユニークユーザを特定数分取得
+export function getUniqueUsers(num: number) {
+	let reserve:any = [];
+	let stock:any = [];
+	
+	for(let i=0; i<num; ++i){
+		if(stock.length == 0) {
+			let playCount = 9999;
+			for(var d of uniqueUsers){
+				if(d.PlayCount < playCount)
+					playCount = d.PlayCount;
+			}
+			
+			for(var d of uniqueUsers){
+				if(d.PlayCount == playCount){
+					stock.push(d);
+				}
+			}
+		}
+		
+		let idx = Math.floor(Math.random()*stock.length);
+		reserve.push(stock.splice(idx,1)[0]);
+	}
+	
+	for(var d of reserve) {
+		d.PlayCount++;
+	}
+	
+	return reserve;
 }
 
 //ユーザを作成する

@@ -1,7 +1,7 @@
 import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
 import { chatWithSession } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
-import { createUserWithAI } from "./../vclogic/vcuser"
+import { getUniqueUsers, createUserWithAI } from "./../vclogic/vcuser"
 
 //デフォルト関数
 export async function index(req: any,res: any,route: any)
@@ -67,6 +67,25 @@ export async function getUser(req: any,res: any,route: any)
 	return {
 		status: 200,
 		result: result
+	};
+}
+
+//4人ランダム取得
+export async function getGameUsers(req: any,res: any,route: any)
+{
+	let player = await query("SELECT Id FROM User ORDER BY LastPlayedAt ASC LIMIT 0,?",[3]);
+	let ids:Array<number> = [];
+	for(let d of player) {
+		ids.push(d.Id);
+	}
+	let results = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id IN (?,?,?);", ids);
+	await query("UPDATE User SET LastPlayedAt = CURRENT_TIMESTAMP() WHERE Id IN (?,?,?);", ids);
+	
+	results = results.concat(getUniqueUsers(1));
+	
+	return {
+		status: 200,
+		result: results
 	};
 }
 
