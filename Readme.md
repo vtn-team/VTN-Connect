@@ -8,7 +8,7 @@
 5. 「SQL」を選択、vtn-connect.sqlファイルの中身をコピペして実行する
 
 ## nodejsサーバ
-1. nodejs公式[https://nodejs.org/en]にアクセスし、22.12(LTS)をダウンロード
+1. [nodejs公式](https://nodejs.org/en)にアクセスし、22.12(LTS)をダウンロード
 2. NodeJSServerフォルダ内で右クリック、「ターミナルで開く」を選択
 3. npm install コマンドを実行
 4. ts\config\config.ts.sample をコピーしts\config\config.ts を作成。それぞれ必要な設定を入力する。
