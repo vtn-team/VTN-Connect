@@ -7,5 +7,5 @@ export async function index(req: any,res: any,route: any)
 export async function route(req: any,res: any,route: any)
 {
 	const Route = require("./../apiRoute");
-	return JSON.stringify(Route.Routes, null, 2);
+	return Route.Routes; //JSON.stringify(Route.Routes, null, 2);
 }

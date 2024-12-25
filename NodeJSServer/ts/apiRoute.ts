@@ -1,28 +1,28 @@
 exports.Routes = {
 	GET: {
-		"/"				: "index#index",
-		"/route"		: "index#route",
-		"/favicon.ico"	: "resource#favicon",
+		"/"				: "index#index#トップページ",
+		"/route"		: "index#route#APIリスト羅列",
+		"/favicon.ico"	: "resource#favicon#favicon",
 		"/stat" : {
-			"/" : "stat#check"
+			"/" : "stat#check#状態確認"
 		},
 		"/vc" : {
-			"/stat" : "vc#stat",
-			"/getaddr" : "vc#getaddr",
+			"/stat" : "vc#stat#ゲームの状況確認",
+			"/getaddr" : "vc#getaddr#ゲームサーバ接続情報取得",
 			"/user" : {
-				"@id%d" : "vc#getUser",
-				"@hash%s" : "vc#getUser",
+				"@id%d" : "vc#getUser#ユーザ取得",
+				"@hash%s" : "vc#getUser#ユーザ取得",
 			},
-			"/usercreate" : "vc#createUser",
+			"/usercreate" : "vc#createUser#ユーザ生成(テスト用)",
 		},
-		"tools" : {
-			"/masterupdate" : "tools#masterupdate"
+		"/tools" : {
+			"/masterupdate" : "tools#masterupdate#マスタデータ更新"
 		}
 	},
 	POST: {
 		"/login" : "user#login",
 		"/vc" : {
-			"/usercreate" : "vc#createUser",
+			"/usercreate" : "vc#createUser#ユーザ生成(テスト用)",
 		},
 		
 	}
