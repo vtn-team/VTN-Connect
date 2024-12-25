@@ -5,7 +5,7 @@ let elasticIP:string = "localhost";
 export function findElasticIP() {
 	try {
 		const result =  execSync("aws ec2 describe-addresses --query '*[].PublicIp' --output text | tr '\t' '\n'");
-		elasticIP = result;
+		elasticIP = result.trim();
 		return result;
 	}catch(ex){
 		//console.log(ex);
