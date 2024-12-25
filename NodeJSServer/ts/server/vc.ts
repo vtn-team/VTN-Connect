@@ -81,7 +81,7 @@ export async function getGameUsers(req: any,res: any,route: any)
 	let results = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id IN (?,?,?);", ids);
 	await query("UPDATE User SET LastPlayedAt = CURRENT_TIMESTAMP() WHERE Id IN (?,?,?);", ids);
 	
-	results = results.concat(getUniqueUsers(1));
+	results = results.concat(getUniqueUsers(4-ids.length));
 	
 	return {
 		status: 200,
