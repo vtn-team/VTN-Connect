@@ -1,15 +1,20 @@
-import { VantanConnect, CMD, TARGET, createMessage } from "./contents"
+import { GameConnect, CMD, TARGET, createMessage } from "./contents"
+import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
 
-let gServer:Server|null = null;
-let gPort: number = 0;
 
+//サーバキャッシュ
+let gServer:Server|null = null;
+
+
+//接続するユーザを管理する構造体
 class UserSession {
-	protected userId: string;
-	protected client: WebSocket;
-	protected isPingAlive: boolean;
+	protected userId: string;		//ユーザ特定用のハッシュ
+	protected client: WebSocket;	//WebSocket接続クライアント
+	protected isPingAlive: boolean;	//生きているか
 	
+	//コンストラクタ
 	constructor(userId: string, ws: WebSocket) {
 		this.userId = userId;
 		this.client = ws;
@@ -50,14 +55,19 @@ class UserSession {
 };
 
 
+//サーバ本体
+//NOTE: ここは特にいじる必要はない部分
+//NOTE: 必要なコンテンツを増やす時はここから増やす
 class Server {
 	
-	protected sessions: any;
-	protected server: any;
-	protected roomCheck: any;
-	protected contents: VantanConnect;
-	protected lastActiveNum: number;
+	protected sessions: any;			//各接続のセッション
+	protected server: any;				//WebSocketサーバ本体
+	protected roomCheck: any;			//ルーム監視用のタイマー
+	protected contents: GameConnect;	//ゲームコネクター(ゲーム同士をつなげるGameServerの本体)
+	protected lastActiveNum: number;	//現在のアクティブ人数キャッシュ
+	protected port: number;				//接続するポート
 
+	//データ送信
 	broadcast(data: any) {
 		let msg = JSON.stringify(data);
 		//let msg = msgpack.pack(data);
@@ -70,13 +80,12 @@ class Server {
 		}
 	};
 	
-	
+	//コンストラクタ
 	constructor(port: number) {
-		gPort = port;
-		
 		this.sessions = {};
+		this.port = port;
 		this.server = new WebSocketServer({ port });
-		this.contents = new VantanConnect((data: any)=>{ this.broadcast(data); });
+		this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
 		this.lastActiveNum = 0;
 		this.server.on ('connection', (ws: any) => {
 			let uuid = randomUUID();
@@ -144,33 +153,46 @@ class Server {
 		console.log("delete session :" + uuid);
 	}
 	
+	public getPort() {
+		return this.port;
+	}
+	
+	//アクティブ人数を返す
 	public getActiveSessionNum() {
 		return this.lastActiveNum;
 	}
 	
+	//アクティブなゲーム数を返す
 	public getActiveGames() {
 		return this.contents.getActiveGames();
 	}
 }
 
+
+
+
+//(公開関数)サーバを起動する
 export function launchDGS(port: number) {
 	if(gServer != null) return;
 	
 	gServer = new Server(port);
 }
 
+//(公開関数)WebSocketに接続するホストアドレスとポートを返す
 export function getConnectionAddress() {
 	if(gServer == null) return null;
 	
 	return { host: getElasticIP(), port: gServer.getPort() };
 }
 
+//(公開関数)接続中のユーザ数を返す
 export function getActiveSessionNum() {
 	if(gServer == null) return 0;
 	
 	return gServer.getActiveSessionNum();
 }
 
+//(公開関数)アクティブなゲーム数を返す
 export function getActiveGames() {
 	if(gServer == null) return 0;
 	
