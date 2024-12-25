@@ -7,6 +7,12 @@ export const INFORMATION_NOTION_DB_TOKEN = "notion token";
 //chat gpt
 export const CHATGPT_API_TOKEN = "chatgpt token";
 
+//http server port
+export const HTTP_SERVER_PORT = 80;
+
+//game server port
+export const GAME_SERVER_PORT = 3000;
+
 //db host
 export const DATABASE_HOST = "db host";
 

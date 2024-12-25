@@ -245,7 +245,7 @@ async function run(req: any, res: any, route: any) {
 }
 
 // サーバを起動する
-export function launch() {
+export function launch(port: number) {
 	var app = http.createServer(async function (req: any, res: any) {
 		if(!req) return res.end();
 		if(!req.method) return res.end();
@@ -294,7 +294,7 @@ export function launch() {
 			return ;
 		}
 		await run(req,res,route);
-	}).listen('4649', '127.0.0.1');
+	}).listen(port, '127.0.0.1');
 
 	app.on('uncaughtException', function(err: any) {
 		console.log("Caught exception: " + err);
