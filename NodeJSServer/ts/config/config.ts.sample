@@ -7,8 +7,14 @@ export const INFORMATION_NOTION_DB_TOKEN = "notion token";
 //chat gpt
 export const CHATGPT_API_TOKEN = "chatgpt token";
 
+//db host
+export const DATABASE_HOST = "db host";
+
 //db user
 export const DATABASE_USERNAME = "db name";
 
 //db password
 export const DATABASE_PASSWORD = "db pass";
+
+//db select
+export const DATABASE_SELECT = "db use";
