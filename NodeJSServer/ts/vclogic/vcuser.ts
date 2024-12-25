@@ -33,7 +33,7 @@ export function getUniqueUsers(num: number) {
 		if(stock.length == 0) {
 			let playCount = 9999;
 			for(var d of uniqueUsers){
-				if(reserveId.contains(d.Id))
+				if(reserveId.indexOf(d.Id) != -1)
 					continue;
 				
 				if(d.PlayCount < playCount)
