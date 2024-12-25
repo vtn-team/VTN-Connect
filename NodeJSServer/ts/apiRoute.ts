@@ -8,6 +8,10 @@ exports.Routes = {
 		"/vc" : {
 			"/stat" : "vc#stat",
 			"/getaddr" : "vc#getaddr",
+			"/user" : {
+				"@id%d" : "vc#getUser",
+				"@hash%s" : "vc#getUser",
+			},
 			"/usercreate" : "vc#createUser",
 		},
 		"tools" : {

@@ -1,5 +1,6 @@
 import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
 import { chatWithSession } from "./../lib/chatgpt"
+import { query } from "./../lib/database"
 import { createUserWithAI } from "./../vclogic/vcuser"
 
 //デフォルト関数
@@ -49,6 +50,26 @@ export async function chat(req: any,res: any,route: any)
 		result: result
 	};
 }
+
+//ユーザーを取得する
+export async function getUser(req: any,res: any,route: any)
+{
+	let id = route.query.id;
+	let hash = route.query.hash;
+	let result = null;
+	
+	if(id) {
+		result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id = ?", [id]);
+	}else{
+		result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE UserHash = ?", [hash]);
+	}
+	
+	return {
+		status: 200,
+		result: result
+	};
+}
+
 
 //ユーザーを作成する
 export async function createUser(req: any,res: any,route: any)
