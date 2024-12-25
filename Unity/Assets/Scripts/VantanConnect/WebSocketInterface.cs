@@ -7,7 +7,7 @@ enum WebSocketCommand
     JOIN = 2,
     EVENT = 3,
     SEND_JOIN = 100,
-    SEND_EVENT = 101,
+    SEND_EVENT = 101
 };
 
 public class WebSocketPacket
