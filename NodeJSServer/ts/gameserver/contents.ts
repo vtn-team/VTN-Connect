@@ -1,3 +1,4 @@
+import { chat, chatWithSession } from "./../lib/chatgpt"
 
 export enum TARGET {
 	ALL = 0,
@@ -11,6 +12,10 @@ export enum CMD {
 	EVENT = 3,
 	SEND_JOIN = 100,
 	SEND_EVENT = 101,
+};
+
+export enum SP_EVENT {
+	AI_CHAT = 10000,
 };
 
 export function createMessage(senderId: string, command: CMD, target:TARGET, data: any) {
@@ -39,7 +44,7 @@ class GameContainer {
 	}
 }
 
-export class VantanConnect {
+export class GameConnect {
 	games: any;
 	sessionDic: any;
 	broadcast: any;
@@ -52,8 +57,39 @@ export class VantanConnect {
 		this.sessionDic = {};
 		this.broadcast = bc;
 	}
+	
+	parsePayload(payload: any) {
+		let data:any = {};
+		let types:any = {};
+		if(payload) {
+			for(var d of payload) {
+				types[d.Key] = d.TypeName;
+				
+				switch(d.TypeName)
+				{
+				case "Integer":
+					data[d.Key] = Number(d.Data);
+					break;
+					
+				case "String":
+					data[d.Key] = d.Data;
+					break;
+					
+				default:
+					data[d.Key] = d.Data;
+					break;
+				}
+			}
+		}
+		return {
+			data: data,
+			types: types
+		};
+	}
 
 	public execMessage(data: any) {
+		let payload = this.parsePayload(data["Payload"]);
+		
 		switch(data["Command"])
 		{
 		case CMD.SEND_JOIN:
@@ -62,8 +98,16 @@ export class VantanConnect {
 		
 		case CMD.SEND_EVENT:
 		{
-			let userId = data["UserID"];
-			createMessage(userId, CMD.EVENT, TARGET.ALL, data);
+			switch(data.EventId)
+			{
+			case SP_EVENT.AI_CHAT:
+			{
+				let data = payload.data;
+				let result = chatWithSession(data.ThreadId, data.Prompt);
+				return;
+			}
+			}
+			this.execCommand(data);
 		}
 		break;
 		}
@@ -119,5 +163,10 @@ export class VantanConnect {
 		}
 		
 		return games;
+	}
+	
+	//処理
+	execCommand(data: any) {
+		
 	}
 };

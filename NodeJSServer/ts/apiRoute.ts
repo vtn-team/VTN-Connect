@@ -8,6 +8,7 @@ exports.Routes = {
 		"/vc" : {
 			"/stat" : "vc#stat",
 			"/getaddr" : "vc#getaddr",
+			"/usercreate" : "vc#createUser",
 		},
 		"tools" : {
 			"/masterupdate" : "tools#masterupdate"
@@ -15,6 +16,10 @@ exports.Routes = {
 	},
 	POST: {
 		"/login" : "user#login",
+		"/vc" : {
+			"/usercreate" : "vc#createUser",
+		},
+		
 	}
 }
 
