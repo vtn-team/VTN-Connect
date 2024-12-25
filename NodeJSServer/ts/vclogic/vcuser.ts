@@ -26,12 +26,16 @@ export async function preloadUniqueUsers() {
 //ユニークユーザを特定数分取得
 export function getUniqueUsers(num: number) {
 	let reserve:any = [];
+	let reserveId:any = [];
 	let stock:any = [];
 	
 	for(let i=0; i<num; ++i){
 		if(stock.length == 0) {
 			let playCount = 9999;
 			for(var d of uniqueUsers){
+				if(reserveId.contains(d.Id))
+					continue;
+				
 				if(d.PlayCount < playCount)
 					playCount = d.PlayCount;
 			}
@@ -44,7 +48,9 @@ export function getUniqueUsers(num: number) {
 		}
 		
 		let idx = Math.floor(Math.random()*stock.length);
-		reserve.push(stock.splice(idx,1)[0]);
+		let data = stock.splice(idx,1)[0];
+		reserve.push(data);
+		reserveId.push(data.Id)
 	}
 	
 	for(var d of reserve) {
