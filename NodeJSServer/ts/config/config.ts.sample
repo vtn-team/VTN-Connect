@@ -1,0 +1,14 @@
+
+//いろいろなトークンとか
+
+//notion db
+export const INFORMATION_NOTION_DB_TOKEN = "notion token";
+
+//chat gpt
+export const CHATGPT_API_TOKEN = "chatgpt token";
+
+//db user
+export const DATABASE_USERNAME = "db name";
+
+//db password
+export const DATABASE_PASSWORD = "db pass";
