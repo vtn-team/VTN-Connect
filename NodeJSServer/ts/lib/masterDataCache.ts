@@ -5,7 +5,7 @@ let mCache:any = {};
 let mDicCache:any = {};
 let versionInfo:any = {};
 
-let masterFiles = ["GameInfo", "GameEvent"];
+let masterFiles = ["GameInfo", "GameEvent", "AIRule"];
 const sheetUri = "https://script.google.com/macros/s/AKfycbyxclLktfu7L4q12Ak8bpS9EJtNFIYlL8c3sseezVJFGv1bJC8Tx00z5R_YJNhl9Qr0eQ/exec";
 
 async function getSheetJson(sheet: string)
@@ -24,10 +24,10 @@ async function getSheetJson(sheet: string)
 async function getSheetJsonFromCache(sheet: string)
 {
 	const text = fs.readFileSync(`json/${sheet}.json`);
-    var json = JSON.parse(text);
-    mCache[sheet] = json.Data;
-    versionInfo[sheet] = json.Version;
-    console.log("load master:" + sheet);
+	var json = JSON.parse(text);
+	mCache[sheet] = json.Data;
+	versionInfo[sheet] = json.Version;
+	console.log("load master:" + sheet);
 }
 
 //IDをキーにした辞書配列にする
@@ -100,6 +100,7 @@ function constructDicMaster()
 	
 	createDicMaster("GameInfo");
 	createDicMaster("GameEvent");
+	createDicMaster("AIRule", "RuleId")
 }
 
 export function getMaster(sheet: string)
@@ -115,6 +116,11 @@ export function getGameInfo(id: number)
 export function getGameEvent(id: number)
 {
 	return mDicCache["GameEvent"][id];
+}
+
+export function getAIRule(ruleId: string)
+{
+	return mDicCache["AIRule"][ruleId];
 }
 
 export function getVersionInfo()
