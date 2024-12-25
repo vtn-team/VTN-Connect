@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class AWSAPIImplement : INetworkImplement
 {
-    const string URI = "http://node.vtn-game.com/vc/{Command}";
+    const string URI = "https://vc.vtn-game.com/vc/{Command}";
 
     class GetAddrResult
     {

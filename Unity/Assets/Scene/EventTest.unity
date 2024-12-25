@@ -306,7 +306,7 @@ MonoBehaviour:
     EventId: -1
     FromId: -1
     Payload: []
-  _inputText: {fileID: 0}
+  _inputText: {fileID: 203174103}
 --- !u!4 &246754544
 Transform:
   m_ObjectHideFlags: 0
@@ -349,12 +349,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inplements:
-    rid: 4713601424407920640
+    rid: 4713601424407920642
   references:
     version: 2
     RefIds:
-    - rid: 4713601424407920640
-      type: {class: LocalAPIImplement, ns: , asm: VantanConnect}
+    - rid: 4713601424407920642
+      type: {class: AWSAPIImplement, ns: , asm: VantanConnect}
 --- !u!1 &596206451
 GameObject:
   m_ObjectHideFlags: 0
