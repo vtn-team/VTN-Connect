@@ -162,7 +162,7 @@ export function launchDGS(port: number) {
 export function getConnectionAddress() {
 	if(gServer == null) return null;
 	
-	return { host: "localhost", port: gPort };
+	return { host: getElasticIP(), port: gServer.getPort() };
 }
 
 export function getActiveSessionNum() {

@@ -16,9 +16,7 @@ export async function getaddr(req: any,res: any,route: any)
 		};
 	}
 	
-	//addrInfo.host
-	//TODO アサインされているElasticIPを見る
-	let ret = "ws://35.72.48.33:" + addrInfo.port;
+	let ret = `ws://${addrInfo.host}:${addrInfo.port}`;
 	
 	return {
 		status: 200,
