@@ -19,9 +19,15 @@
   display: flex;
   align-items: baseline;
   max-width: 980px;
-  margin: 0 auto;
+  //margin: 0 auto;
   padding-top: 1rem;
   transition: all 0.2s ease;
+}
+
+.status {
+	width:320px;
+	max-width: 980px;
+	margin: 0 auto;
 }
 
 /* Header-sticky */
@@ -39,7 +45,7 @@ header.nav p {
   font-size: 0.6rem;
 }
 
-.main { grid-area: main; background-color: rgb(128,128,128); }
+.main { grid-area: main; }
 .footer { grid-area: footer; }
 .sidebar {  }
 .long { height: 800px; }
@@ -58,6 +64,7 @@ const CMD = {
 	SEND_EVENT: 101,
 };
 
+let userData = {};
 let ws = null;
 window.addEventListener("load", (event) => {
 	console.log("ページが完全に読み込まれました");
@@ -75,11 +82,15 @@ window.addEventListener("load", (event) => {
 	
 	connectDGS("wss:/d2yxx4bel49ygi.cloudfront.net");
 	
+	/*
 	if(!cookie.user_hash || cookie.user_hash === "undefined") {
 		enableUIById("usercreate");
 	}else{
 		loadUser(cookie.user_hash);
 	}
+	*/
+	debugLoad();
+	createUserInfoUI();
 });
 
 function onScanSuccess(decodedText, decodedResult) {
@@ -149,6 +160,25 @@ async function connectDGS(addr) {
 	};
 }
 
+function debugLoad() {
+	userData = {
+		"userId": 1058,
+		"userHash": "e74a75f4-78b1-4d91-8b72-e83946cc21ae",
+		"Type": 1,
+		"Level": 1,
+		"Gold": 500,
+		"FullName": "ルフィ・D・エース",
+		"DisplayName": "モンキー・D・ルフィ",
+		"Gender": "男性",
+		"Age": 19,
+		"Job": "海賊",
+		"Personality": "活発で無邪気だが、仲間思いで責任感が強い",
+		"Motivation": "海賊王になるため、仲間と共に冒険すること",
+		"Weaknesses": "熱い感情に流されやすく、戦略的思考に欠ける",
+		"Background": "東の海出身で、ゴムゴムの実を食べて超人間の能力を得た。仲間と共に冒険し、様々な敵と戦いながら成長している。"
+	};
+}
+
 //ユーザ読み込み
 async function loadUser(userHash) {
 	let req = await fetch("https://vc.vtn-game.com/vc/user/" + userHash, {
@@ -158,7 +188,7 @@ async function loadUser(userHash) {
 	let result = await req.json();
 	console.log(result);
 	
-	
+	userData = result.result;
 }
 
 //ユーザ作成
@@ -172,6 +202,7 @@ async function createUser() {
 	if(result.success) {
 		saveUserSession(result.result.userHash);
 	}
+	userData = result.result;
 }
 
 // 連想配列に格納
@@ -215,6 +246,13 @@ function disableUIById(elmId) {
 	elm.style.display = "none";
 }
 
+function createUserInfoUI() {
+	getElm("level").innerText = userData.Level;
+	getElm("gender").innerText = userData.Gender;
+	getElm("age").innerText = userData.Age;
+	getElm("job").innerText = userData.Job;
+}
+
 </script>
 </head>
 <body>
@@ -224,7 +262,34 @@ function disableUIById(elmId) {
 	</div>
 	<div class="main">
 		<button type="button" id="usercreate" class="nes-btn is-primary" onclick=”javascript:createUser();”>冒険者登録</button>
-		<div style="width: 500px" id="reader"></div>
+		<div class="nes-container with-title status">
+			<p class="title">あなたのステータス</p>
+			<div class="nes-table-responsive">
+				<table class="nes-table is-bordered is-centered">
+				<tbody>
+					<tr>
+						<td>レベル</td>
+						<td id="level"></td>
+					</tr>
+					<tr>
+						<td>性別</td>
+						<td id="gender"></td>
+					</tr>
+					<tr>
+						<td>年齢</td>
+						<td id="age"></td>
+					</tr>
+					<tr>
+						<td>職業</td>
+						<td id="job"></td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<div style="width: 500px" id="reader"></div>
 	</div>
 	<div class="footer">
 	</div>
