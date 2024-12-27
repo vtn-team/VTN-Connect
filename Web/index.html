@@ -73,6 +73,7 @@ const CMD = {
 let userData = {};
 let ws = null;
 let wsSessionId = "";
+let qrReader = null;
 
 window.addEventListener("load", (event) => {
 	console.log("ページが完全に読み込まれました");
@@ -81,8 +82,8 @@ window.addEventListener("load", (event) => {
 	console.log(cookie)
 
 	//セットアップ
-	var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-	html5QrcodeScanner.render(onScanSuccess);
+	qrReader = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+	qrReader.render(onScanSuccess);
 	
 	getElm("usercreate").addEventListener('click', () => {
 		disableUIById("usercreate");
@@ -104,10 +105,12 @@ window.addEventListener("load", (event) => {
 	createUserInfoUI();
 });
 
-function onScanSuccess(decodedText, decodedResult) {
+async function onScanSuccess(decodedText, decodedResult) {
     // Handle on success condition with the decoded text or result.
 	getElm("qr-result").innerText = `Scan result: ${decodedText} - ${decodedResult}`;
-	disableUIById("reader")
+	disableUIById("reader");
+	
+	await qrReader.clear();
 	
 	//SessionIdをキーにしてJoinを返す
 	let json = {
@@ -150,7 +153,7 @@ function execMessage(data) {
 	
 	case CMD.EVENT:
 	{
-		consoler.log(data);
+		console.log(data);
 	}
 	break;
 	
