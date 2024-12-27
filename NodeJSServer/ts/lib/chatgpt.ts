@@ -45,7 +45,9 @@ export async function chatWithSession(sessionId:string|null, prompt:any) {
 		contexts.push(c);
 	}
 	contexts.push({ role: "user", content: prompt });
+	chatSession[session].contexts.push({ role: "user", content: prompt });
 	
+	console.log(contexts);
 	const completion = await openai.chat.completions.create({
 		messages: contexts,
 		model : dataModel,
