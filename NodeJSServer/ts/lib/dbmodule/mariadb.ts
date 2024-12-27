@@ -14,10 +14,9 @@ let conn: any = null;
 
 export async function connect()
 {
-	if(conn) return ;
+	if(conn && conn.isValid()) return ;
 
 	conn = await pool.getConnection();
-	
 	return;
 	let cnInfo = {
 		host: DATABASE_HOST,
