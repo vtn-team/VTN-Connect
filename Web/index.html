@@ -1,5 +1,7 @@
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
 <style>
 .layout {
   width: 100%;
@@ -18,7 +20,7 @@
   top: 0px;
   display: flex;
   align-items: baseline;
-  max-width: 980px;
+  max-width: 375px;
   //margin: 0 auto;
   padding-top: 1rem;
   transition: all 0.2s ease;
@@ -26,7 +28,7 @@
 
 .status {
 	width:320px;
-	max-width: 980px;
+	max-width: 375px;
 	margin: 0 auto;
 }
 
@@ -49,7 +51,11 @@ header.nav p {
 .footer { grid-area: footer; }
 .sidebar {  }
 .long { height: 800px; }
-#reader { display:none; }
+.center { text-align:center; margin: 0 auto; }
+#reader { 
+  display:none;
+  width: 320px;
+}
 #usercreate { display:none; }
 </style>
 <link href="https://unpkg.com/nes.css/css/nes-core.min.css" rel="stylesheet" />
@@ -66,6 +72,8 @@ const CMD = {
 
 let userData = {};
 let ws = null;
+let wsSessionId = "";
+
 window.addEventListener("load", (event) => {
 	console.log("ページが完全に読み込まれました");
 
@@ -75,12 +83,14 @@ window.addEventListener("load", (event) => {
 	//セットアップ
 	var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
 	html5QrcodeScanner.render(onScanSuccess);
+	
 	getElm("usercreate").addEventListener('click', () => {
 		disableUIById("usercreate");
 		createUser();
 	});
 	
-	connectDGS("wss:/d2yxx4bel49ygi.cloudfront.net");
+	enableUIById("reader");
+	connectDGS("wss://wss.vtn-game.com/ws/");
 	
 	/*
 	if(!cookie.user_hash || cookie.user_hash === "undefined") {
@@ -89,13 +99,24 @@ window.addEventListener("load", (event) => {
 		loadUser(cookie.user_hash);
 	}
 	*/
+	
 	debugLoad();
 	createUserInfoUI();
 });
 
 function onScanSuccess(decodedText, decodedResult) {
     // Handle on success condition with the decoded text or result.
-    console.log(`Scan result: ${decodedText}`, decodedResult);
+	getElm("qr-result").innerText = `Scan result: ${decodedText} - ${decodedResult}`;
+	disableUIById("reader")
+	
+	//SessionIdをキーにしてJoinを返す
+	let json = {
+		SessionId: wsSessionId,
+		Command: CMD.SEND_EVENT,
+		GameId: 101,
+		Data: decodedText
+	};
+	ws.send(json);
 }
 
 //接続先取得
@@ -119,15 +140,17 @@ function execMessage(data) {
 		let json = {
 			SessionId: data.Data.SessionId,
 			Command: CMD.SEND_JOIN,
-			GameId: 1,
+			GameId: 101,
 		};
 		ws.send(JSON.stringify(json));
+		wsSessionId = data.Data.SessionId;
+		getElm("ws-state").innerText = "接続";
 	}
 	break;
 	
 	case CMD.EVENT:
 	{
-		
+		consoler.log(data);
 	}
 	break;
 	
@@ -143,7 +166,8 @@ async function connectDGS(addr) {
 	};
 	
 	ws.onerror = (error) => {
-		console.log("Connection Error: " + error.toString());
+		console.log("Connection Error");
+		console.log(error)
 	};
 		
 	ws.onclose = (event) => {
@@ -158,6 +182,20 @@ async function connectDGS(addr) {
 		json.Data = data;
 		execMessage(json);
 	};
+}
+
+async function testEvent() {
+	//SessionIdをキーにしてJoinを返す
+	let data = {
+		message: getElm("msg").value
+	};
+	let json = {
+		SessionId: wsSessionId,
+		Command: CMD.SEND_EVENT,
+		GameId: 101,
+		Data: data
+	};
+	ws.send(json);
 }
 
 function debugLoad() {
@@ -260,8 +298,24 @@ function createUserInfoUI() {
 	<div class="header">
 	<h1 class="nes-balloon from-left nes-pointer">冒険者たちの集会場</h1>
 	</div>
+	
 	<div class="main">
-		<button type="button" id="usercreate" class="nes-btn is-primary" onclick=”javascript:createUser();”>冒険者登録</button>
+		<div class="nes-container with-title status">
+			<p class="title">ツウシンジョウタイ</p>
+			<div id="ws-state" class="center">未接続</div>
+		</div>
+		
+		<div style="height:50px;"></div>
+		
+		<div class="nes-container with-title">
+			<p class="title">QR読み込み</p>
+			<div id="reader"></div>
+			<div id="qr-result">読み込み結果</div>
+		</div>
+		
+		<div style="height:50px;"></div>
+		
+		<button type="button" id="usercreate" class="nes-btn is-primary" onclick="createUser();">冒険者登録</button>
 		<div class="nes-container with-title status">
 			<p class="title">あなたのステータス</p>
 			<div class="nes-table-responsive">
@@ -289,7 +343,11 @@ function createUserInfoUI() {
 		</div>
 	</div>
 	
-	<div style="width: 500px" id="reader"></div>
+	<button type="button" id="test" class="nes-btn is-primary" onclick="testEvent();">テスト</button>
+	<div class="nes-field">
+		<label for="name_field">オウエン</label>
+		<input type="text" id="msg" class="nes-input">
+	</div>
 	</div>
 	<div class="footer">
 	</div>
