@@ -60,10 +60,8 @@ export function getUniqueUsers(num: number) {
 	return reserve;
 }
 
-//ユーザを作成する
-export async function createUserWithAI() { //status: UserStatus
-	let prompt = getAIRule("CreateUser");
-	
+async function createUserFromChatGPT(sessionId:string|null) {
+	let prompt = getAIRule("CreateUser").RuleText;
 	prompt += `
 # 出力例(JSON)\n
 {
@@ -76,18 +74,51 @@ export async function createUserWithAI() { //status: UserStatus
 	"Motivation":$[モチベーション],
 	"Weaknesses":$[弱点],
 	"Background":$[簡潔なバックストーリー]
-};`;
+}`;
 
+	let chatres:any = await chatWithSession(sessionId, prompt);
+	return chatres;
+}
+
+async function checkCreateUserFromChatGPT(sessionId:string) {
+	let prompt = getAIRule("CheckUser").RuleText;
+	prompt += `
+# 出力例(JSON)\n
+{
+    judge: [OK/NG],
+    reason: [判断理由]
+}`;
+	
+	let chatres:any = await chatWithSession(sessionId, prompt);
+	let json = JSON.parse(chatres.content);
+	return json;
+}
+
+
+//ユーザを作成する
+export async function createUserWithAI() { //status: UserStatus
 	let userHash = uuidv4();
 	let success = false;
 	let result: any = {};
 	
 	try {
-		let chatres:any = await chatWithSession(null, prompt);
-		let json = JSON.parse(chatres.content);
+		let json:any = {};
+		let session:string|null = null;
+		for(let i=0; i<5; ++i) {
+			let data:any = await createUserFromChatGPT(session);
+			json = JSON.parse(data.content);
+			session = data.sessionId;
+			if(session == null) throw new Error("session無効");
+			let check = await checkCreateUserFromChatGPT(session);
+			if(check.judge="OK"){
+				console.log(check);
+				break;
+			}
+		}
+		if(session == null) throw new Error("session無効");
 		
 		//threadIdと同期させる
-		userHash = chatres.sessionId;
+		userHash = session;
 		
 		//DBに保存
 		let ins = await query("INSERT INTO User (UserHash, Type, Name) VALUES (?, 1, ?)", [userHash, json.FullName]);
@@ -110,7 +141,7 @@ export async function createUserWithAI() { //status: UserStatus
 		
 		success = true;
 	} catch(ex) {
-		
+		console.log(ex);
 	}
 	
 	return {
