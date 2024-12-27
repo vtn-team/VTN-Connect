@@ -1,4 +1,5 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
+import { getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 
 export enum TARGET {
 	ALL = 0,
@@ -51,9 +52,6 @@ export class GameConnect {
 	games: any;
 	sessionDic: any;
 	broadcast: any;
-
-	gameInfoMaster: any;
-	gameEventMaster: any;
 
 	constructor(bc: any) {
 		this.games = {};
@@ -111,7 +109,7 @@ export class GameConnect {
 			}
 			}
 			this.execCommand(data);
-			//this.broadcast(createMessage(userId, CMD.EVENT, TARGET.ALL, data));
+			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.SELF, data));
 		}
 		break;
 		}
@@ -129,16 +127,8 @@ export class GameConnect {
 		}
 		
 		let find = false;
-		let master = null;
-		for(var m of this.gameInfoMaster){
-			if(parseInt(m.Id) == gameId){
-				find = true;
-				master = m;
-				break;
-			}
-		}
-		
-		if(find) {
+		let master = getGameInfo(gameId);
+		if(master) {
 			this.games[gameId] = new GameContainer(master);
 			this.sessionDic[data.SessionId] = gameId;
 			console.log(`GAME ID:${gameId} - ${master.Name} join.`);
