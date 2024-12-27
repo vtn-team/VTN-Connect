@@ -109,7 +109,7 @@ export class GameConnect {
 			}
 			}
 			this.execCommand(data);
-			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.SELF, data));
+			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
 		}
 		break;
 		}

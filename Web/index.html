@@ -116,7 +116,7 @@ function onScanSuccess(decodedText, decodedResult) {
 		GameId: 101,
 		Data: decodedText
 	};
-	ws.send(json);
+	ws.send(JSON.stringify(json));
 }
 
 //接続先取得
@@ -195,7 +195,7 @@ async function testEvent() {
 		GameId: 101,
 		Data: data
 	};
-	ws.send(json);
+	ws.send(JSON.stringify(json));
 }
 
 function debugLoad() {
