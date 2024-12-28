@@ -9,6 +9,7 @@
   display: grid;
   grid:
     "header" auto
+    "important" 1fr
     "main" 1fr
     "footer" auto
     / 1fr;
@@ -24,10 +25,11 @@
   //margin: 0 auto;
   padding-top: 1rem;
   transition: all 0.2s ease;
+  z-index: 10;
 }
 
 .status {
-	width:320px;
+	width:375px;
 	max-width: 375px;
 	margin: 0 auto;
 }
@@ -47,16 +49,30 @@ header.nav p {
   font-size: 0.6rem;
 }
 
+.important { grid-area: important; }
 .main { grid-area: main; }
 .footer { grid-area: footer; }
 .sidebar {  }
 .long { height: 800px; }
 .center { text-align:center; margin: 0 auto; }
+.right { text-align:right; margin: 0 0 0 auto; }
+.face { border-radius: 10px; width: 80px; height: 80px; border: solid 2px #000; background-color: #eee; }
+.faceicon { float: right; width: 80px; height: 100px; }
+.chatmsg { float: left; width: 200px; }
+.nameplate { top:-25px; left:-8px; }
 #reader { 
   display:none;
   width: 320px;
 }
-#usercreate { display:none; }
+#userinfo {
+  display:none;
+}
+#qrresult { 
+  display:none;
+}
+#qrscancancel{ 
+  display:none;
+}
 </style>
 <link href="https://unpkg.com/nes.css/css/nes-core.min.css" rel="stylesheet" />
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript" ></script>
@@ -80,32 +96,32 @@ window.addEventListener("load", (event) => {
 
 	var cookie = getCookieArray();
 	console.log(cookie)
-
-	//セットアップ
-	//qrReader = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-	//qrReader.render(onScanSuccess);
 	
 	getElm("usercreate").addEventListener('click', () => {
 		disableUIById("usercreate");
 		createUser();
 	});
 	
-	enableUIById("reader");
+	//addSysLog("冒険者が魔法を使った", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+	
 	connectDGS("wss://wss.vtn-game.com/ws/");
 	
-	/*
 	if(!cookie.user_hash || cookie.user_hash === "undefined") {
-		enableUIById("usercreate");
+		
 	}else{
 		loadUser(cookie.user_hash);
 	}
-	*/
 	
-	debugLoad();
-	createUserInfoUI();
+	////
+//	debugLoad();
+//	createUserInfoUI();
 });
 
 async function readQR() {
+	disableUIById("qrscancancel");
+	enableUIById("qrscancancel");
+	enableUIById("reader");
+	
 	let devices = await Html5Qrcode.getCameras();
 	console.log(devices)
 	let cameraId = devices[0].id;
@@ -132,13 +148,20 @@ async function readQR() {
 }
 
 async function cencelQR() {
+	disableUIById("qrscancancel");
+	disableUIById("qrresult");
+	enableUIById("qrscancancel");
+	
 	if(!qrReader) return;
 	await qrReader.stop();
+	
+	disableUIById("reader");
 }
 
 async function onScanSuccess(decodedText, decodedResult) {
     // Handle on success condition with the decoded text or result.
-	getElm("qr-result").innerText = `Scan result: ${decodedText} - ${decodedResult}`;
+	enableUIById("qrresult");
+	getElm("qrresult").innerText = `Scan result: ${decodedText} - ${decodedResult}`;
 	await qrReader.stop();
 	
 	//SessionIdをキーにしてJoinを返す
@@ -146,9 +169,69 @@ async function onScanSuccess(decodedText, decodedResult) {
 		SessionId: wsSessionId,
 		Command: CMD.SEND_EVENT,
 		GameId: 101,
+		EventId: 102,
 		Data: decodedText
 	};
 	ws.send(JSON.stringify(json));
+}
+
+function addSysLog(evtName, evtMessage) {
+	var log=`
+					<section style="height:120px;">
+						<div class="nes-container is-rounded with-title" style="height:80px;">
+						<p class="title">${evtName}</p>
+						<p style="overflow: hidden;text-overflow: ellipsis;">${evtMessage}</p>
+						</div>
+					</section>
+`;
+	var elm = getElm("msglog");
+	elm.innerHTML += log;
+	while(elm.children.length > 10)
+	{
+		elm.children[0].remove();
+	}
+}
+
+function addLog(evtData) {
+	let isSelf = wsSessionId == evtData.SessionId
+	let name = evtData.Data.name;
+	let text = evtData.Data.message;
+	var left=`
+					<section class="message -left" style="height:120px;">
+						<div style="display:flex;">
+							<div class="faceicon">
+								<div class="face"></div>
+								<div class="nes-badge nameplate" style="width:80px;">
+									<span class="is-dark">${name}</span>
+								</div>
+							</div>
+							<div class="nes-balloon from-left chatmsg" style="height:70px;top:-10px;padding: 5px;">
+								<p style="width: 180px;height:60px;overflow: hidden;text-overflow: ellipsis;">${text}</p>
+							</div>
+						</div>
+					</section>
+`;
+	var right=`
+					<section class="message -right" style="height:120px;">
+						<div style="display:flex;">
+							<div class="nes-balloon from-right chatmsg" style="height:70px;top:-10px;padding: 5px;">
+								<p style="width: 180px;height:60px;overflow: hidden;text-overflow: ellipsis;">${text}</p>
+							</div>
+							<div class="faceicon">
+								<div class="face"></div>
+								<div class="nes-badge nameplate" style="width:80px;">
+									<span class="is-dark">${name}</span>
+								</div>
+							</div>
+						</div>
+					</section>
+`;
+	var elm = getElm("msglog");
+	elm.innerHTML += isSelf ? right : left;
+	while(elm.children.length > 10)
+	{
+		elm.children[0].remove();
+	}
 }
 
 //接続先取得
@@ -182,7 +265,20 @@ function execMessage(data) {
 	
 	case CMD.EVENT:
 	{
-		console.log(data);
+		switch(data.Data.EventId)
+		{
+		case 100:
+		{
+			addLog(data.Data);
+		}
+		break;
+		
+		case 102:
+		{
+			addSysLog("冒険者が魔法を使った", data.Data.Data);
+		}
+		break;
+		}
 	}
 	break;
 	
@@ -217,14 +313,21 @@ async function connectDGS(addr) {
 }
 
 async function testEvent() {
+	let name = "nanashi";
+	if(userData.DisplayName) {
+		name = userData.DisplayName;
+	}
 	//SessionIdをキーにしてJoinを返す
 	let data = {
+		avatar: 1,
+		name: name,
 		message: getElm("msg").value
 	};
 	let json = {
 		SessionId: wsSessionId,
 		Command: CMD.SEND_EVENT,
 		GameId: 101,
+		EventId: 100,
 		Data: data
 	};
 	ws.send(JSON.stringify(json));
@@ -237,7 +340,7 @@ function debugLoad() {
 		"Type": 1,
 		"Level": 1,
 		"Gold": 500,
-		"FullName": "ルフィ・D・エース",
+		"Name": "ルフィ・D・エース",
 		"DisplayName": "モンキー・D・ルフィ",
 		"Gender": "男性",
 		"Age": 19,
@@ -251,14 +354,29 @@ function debugLoad() {
 
 //ユーザ読み込み
 async function loadUser(userHash) {
-	let req = await fetch("https://vc.vtn-game.com/vc/user/" + userHash, {
-		mode: 'cors'
-	});
-	console.log(req);
-	let result = await req.json();
-	console.log(result);
+	let user = localStorage.getItem("UserData");
+	if(user) {
+		try{
+			user = JSON.parse(user);
+		}catch(ex){
+		}
+	}
 	
-	userData = result.result;
+	if(user && user.UserHash) {
+		userData = user;
+	}else{
+		let req = await fetch("https://vc.vtn-game.com/vc/user/" + userHash, {
+			mode: 'cors'
+		});
+		console.log(req);
+		let result = await req.json();
+		console.log(result);
+		
+		userData = result.result[0];
+		localStorage.setItem("UserData", JSON.stringify(userData));
+	}
+	createUserInfoUI();
+	enableUIById("userinfo");
 }
 
 //ユーザ作成
@@ -273,6 +391,8 @@ async function createUser() {
 		saveUserSession(result.result.userHash);
 	}
 	userData = result.result;
+	createUserInfoUI();
+	enableUIById("userinfo");
 }
 
 // 連想配列に格納
@@ -317,10 +437,15 @@ function disableUIById(elmId) {
 }
 
 function createUserInfoUI() {
+	getElm("fullname").innerText = userData.Name;
 	getElm("level").innerText = userData.Level;
 	getElm("gender").innerText = userData.Gender;
 	getElm("age").innerText = userData.Age;
 	getElm("job").innerText = userData.Job;
+	getElm("personality").innerText = userData.Personality;
+	getElm("motivation").innerText = userData.Motivation;
+	getElm("weakness").innerText = userData.Weaknesses;
+	getElm("backstory").innerText = userData.Background;
 }
 
 </script>
@@ -331,7 +456,7 @@ function createUserInfoUI() {
 	<h1 class="nes-balloon from-left nes-pointer">冒険者たちの集会場</h1>
 	</div>
 	
-	<div class="main">
+	<div class="important">
 		<div class="nes-container with-title status">
 			<p class="title">ツウシンジョウタイ</p>
 			<div id="ws-state" class="center">未接続</div>
@@ -339,19 +464,45 @@ function createUserInfoUI() {
 		
 		<div style="height:50px;"></div>
 		
-		<div class="nes-container with-title">
+		<div class="nes-container with-title status">
 			<p class="title">QR読み込み</p>
-		<button type="button" id="scan" class="nes-btn is-primary" onclick="readQR();">読み込み</button><br /><br />
-		<button type="button" id="scan" class="nes-btn is-primary" onclick="cencelQR();">キャンセル</button>
-			<div id="reader"></div>
-			<div id="qr-result">読み込み結果</div>
+			<div class="center">
+				<button type="button" id="qrscan" class="nes-btn is-primary" onclick="readQR();">読み込み</button><br /><br />
+				<button type="button" id="qrscancancel" class="nes-btn is-primary" onclick="cencelQR();">キャンセル</button>
+				<div id="reader"></div>
+				<div id="qrresult">読み込み結果</div>
+			</div>
 		</div>
 		
 		<div style="height:50px;"></div>
 		
-		<button type="button" id="usercreate" class="nes-btn is-primary" onclick="createUser();">冒険者登録</button>
 		<div class="nes-container with-title status">
+			<p class="title">メニュー</p>
+			<div class="center">
+				<button type="button" id="usercreate" class="nes-btn is-primary">冒険者登録</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary">最新の冒険を見る</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary">過去の冒険を見る</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary">冒険者を見る</button>
+			</div>
+		</div>
+		
+		<div style="height:50px;"></div>
+	</div>
+	
+	<div class="main">
+		<div id ="userinfo" class="nes-container with-title status">
 			<p class="title">あなたのステータス</p>
+			
+			<div class="nes-container with-title">
+				<p class="title">名前</p>
+				<div id="fullname"></div>
+			</div>
+			
+			<div style="height:25px;"></div>
+			
 			<div class="nes-table-responsive">
 				<table class="nes-table is-bordered is-centered">
 				<tbody>
@@ -373,23 +524,120 @@ function createUserInfoUI() {
 					</tr>
 				</tbody>
 				</table>
+				
+				<div style="height:10px;"></div>
+				
+				<div class="nes-container with-title;padding:5px;">
+					<p class="title">個性</p>
+					<div id="personality"></div>
+				</div>
+				
+				<div style="height:10px;"></div>
+				
+				<div class="nes-container with-title;padding:5px;">
+					<p class="title">やる気</p>
+					<div id="motivation"></div>
+				</div>
+				
+				<div style="height:10px;"></div>
+				
+				<div class="nes-container with-title;padding:5px;">
+					<p class="title">弱点</p>
+					<div id="weakness"></div>
+				</div>
+				
+				<div style="height:10px;"></div>
+				
+				<div class="nes-container with-title;padding:5px;">
+					<p class="title">バックストーリー</p>
+					<div id="backstory"></div>
+				</div>
 			</div>
 		</div>
+		
+		<div style="height:50px;"></div>
+		
+		<div class="nes-container with-title status">
+			<p class="title">オウエン</p>
+			<div class="nes-field">
+				<label for="name_field">オウエン</label>
+				<input type="text" id="msg" class="nes-input">
+			</div>
+			<div style="height:10px;"></div>
+			<div class="right">
+				<button type="button" id="test" class="nes-btn is-primary" onclick="testEvent();">ソウシン</button>
+			</div>
+		</div>
+		
+		<div style="height:50px;"></div>
+		
+		<div class="nes-container with-title status">
+			<p class="title">ログ</p>
+			<div class="nes-field">
+				<section id="msglog" class="message-list">
+					<!--
+					<section style="height:120px;">
+						<div class="nes-container is-rounded with-title" style="height:80px;">
+						<p class="title" style="float: none;">冒険者が魔法を使った</p>
+						<p>{Event:1, Value:500}</p>
+						</div>
+					</section>
+					<section class="message -left" style="height:120px;">
+						<div style="display:flex;">
+							<div class="faceicon">
+								<div class="face"></div>
+								<div class="nes-badge nameplate" style="width:80px;">
+									<span class="is-dark">ああああ</span>
+								</div>
+							</div>
+							<div class="nes-balloon from-left chatmsg" style="height:70px;top:-10px;padding: 5px;">
+								<p style="width: 180px;height:60px;overflow: hidden;text-overflow: ellipsis;">Hello NES.cssHello NES.cssHello NES.cssHello NES.css</p>
+							</div>
+						</div>
+					</section>
+					<section style="height:120px;">
+						<div class="nes-container is-rounded with-title" style="height:80px;">
+						<p class="title" style="max-width:240px;">冒険者が魔法を使った</p>
+						<p>{Event:1, Value:500}</p>
+						</div>
+					</section>
+					<section style="height:100px;">
+						<div class="nes-container is-rounded with-title" style="height:80px;">
+						<p class="title" style="float: none;">冒険者が魔法を使った</p>
+						<p>{Event:1, Value:500}</p>
+						</div>
+					</section>
+					<section class="message -right" style="height:100px;">
+						<div style="display:flex;">
+							<div class="nes-balloon from-right chatmsg" style="height:70px;top:-10px;padding: 5px;">
+								<p style="width: 180px;height:60px;overflow: hidden;text-overflow: ellipsis;">Hello NES.cssHello NES.cssHello NES.cssHello NES.css</p>
+							</div>
+							<div class="faceicon">
+								<div class="face"></div>
+								<div class="nes-badge nameplate" style="width:80px;">
+									<span class="is-dark">ああああ</span>
+								</div>
+							</div>
+						</div>
+					</section>
+					<section style="height:100px;">
+						<div class="nes-container is-rounded with-title" style="height:80px;">
+						<p class="title" style="float: none;">冒険者が魔法を使った</p>
+						<p>{Event:1, Value:500}</p>
+						</div>
+					</section>
+					-->
+				</section>
+				<div style="height:50px;"></div>
+			</div>
+		</div>
+		<div style="height:50px;"></div>
 	</div>
 	
-	<button type="button" id="test" class="nes-btn is-primary" onclick="testEvent();">テスト</button>
-	<div class="nes-field">
-		<label for="name_field">オウエン</label>
-		<input type="text" id="msg" class="nes-input">
+	<div class="adventure">
 	</div>
-	</div>
+	
 	<div class="footer">
-	</div>
-	<div class="long">
-	</div>
-	<div class="long">
-	</div>
-	<div class="long">
 	</div>
 </section>
 <div class="sidebar">1</div>
