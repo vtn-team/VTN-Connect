@@ -1,5 +1,8 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getGameInfo, getGameEvent } from "./../lib/masterDataCache"
+import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
+
+
 
 export enum TARGET {
 	ALL = 0,
@@ -107,7 +110,15 @@ export class GameConnect {
 				let result = chatWithSession(data.ThreadId, data.Prompt);
 				return;
 			}
+			
+			case 100:
+			{
+				this.messageRelay(data);
+				return;
 			}
+			break;
+			}
+			
 			this.execCommand(data);
 			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
 		}
@@ -162,5 +173,27 @@ export class GameConnect {
 	//処理
 	execCommand(data: any) {
 		
+	}
+	
+	async messageRelay(data: any) {
+		let to = data.Data.ToUserId;
+		let from = data.Data.FromUserId;
+		if(!to) {
+			to = -1;
+		}
+		if(!from) {
+			from = -1;
+		}
+		
+		let message = {
+			ToUserId: to,
+			FromUserId: from,
+			Name: data.Data.Name,
+			Message: data.Data.Message
+		}
+		
+		let result = await checkMessageAndWrite(message);
+		data.Data = result.result;
+		this.broadcast(createMessage(from, CMD.EVENT, TARGET.ALL, data));
 	}
 };
