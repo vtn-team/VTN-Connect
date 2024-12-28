@@ -64,6 +64,8 @@ export async function getUser(req: any,res: any,route: any)
 		result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE UserHash = ?", [hash]);
 	}
 	
+	result = result[0];
+	
 	return {
 		status: 200,
 		result: result
