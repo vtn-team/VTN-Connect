@@ -68,6 +68,7 @@ async function createUserFromChatGPT(sessionId:string|null) {
 	"FullName":$[キャラクターの本名],
 	"DisplayName":$[キャラクターの表示名],
 	"Gender":$[性別],
+	"AvatarType":$[0-11],
 	"Age":$[年齢],
 	"Job":$[職業],
 	"Personality":$[性格],
@@ -127,7 +128,7 @@ export async function createUserWithAI() { //status: UserStatus
 		//let data = await query("SELECT Id FROM User WHERE UserHash = ?", [userHash]);
 		//console.log(data);
 		
-		let status: Array<any> = [userId, json.DisplayName, 1, json.Gender, json.Age, json.Job, json.Personality, json.Motivation,json.Weaknesses, json.Background];
+		let status: Array<any> = [userId, json.DisplayName, json.AvatarType, json.Gender, json.Age, json.Job, json.Personality, json.Motivation,json.Weaknesses, json.Background];
 		query("INSERT INTO UserGameStatus (UserId, DisplayName, AvatarType, Gender, Age, Job, Personality, Motivation, Weaknesses, Background) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", status);
 		
 		result.userId = userId;
