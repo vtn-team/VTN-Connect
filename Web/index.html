@@ -194,13 +194,14 @@ function addSysLog(evtName, evtMessage) {
 
 function addLog(evtData) {
 	let isSelf = wsSessionId == evtData.SessionId
-	let name = evtData.Data.name;
-	let text = evtData.Data.message;
+	let name = evtData.Data.Name;
+	let text = evtData.Data.Message;
+	let emo = evtData.Data.Emotion;
 	var left=`
 					<section class="message -left" style="height:120px;">
 						<div style="display:flex;">
 							<div class="faceicon">
-								<div class="face"></div>
+								<div class="face">${emo}</div>
 								<div class="nes-badge nameplate" style="width:80px;">
 									<span class="is-dark">${name}</span>
 								</div>
@@ -218,7 +219,7 @@ function addLog(evtData) {
 								<p style="width: 180px;height:60px;overflow: hidden;text-overflow: ellipsis;">${text}</p>
 							</div>
 							<div class="faceicon">
-								<div class="face"></div>
+								<div class="face">${emo}</div>
 								<div class="nes-badge nameplate" style="width:80px;">
 									<span class="is-dark">${name}</span>
 								</div>
@@ -313,15 +314,23 @@ async function connectDGS(addr) {
 }
 
 async function testEvent() {
+	let toUserId = -1;
+	let fromUserId = -1;
 	let name = "nanashi";
 	if(userData.DisplayName) {
 		name = userData.DisplayName;
 	}
+	if(userData.UserId) {
+		fromUserId = userData.UserId;
+	}
+	
 	//SessionIdをキーにしてJoinを返す
 	let data = {
-		avatar: 1,
-		name: name,
-		message: getElm("msg").value
+		ToUserId: toUserId,
+		FromUserId: fromUserId,
+		Avatar: 1,
+		Name: name,
+		Message: getElm("msg").value
 	};
 	let json = {
 		SessionId: wsSessionId,

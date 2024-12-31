@@ -38,10 +38,11 @@ export async function checkMessageAndWrite(message: MessagePacket) {
 		let json = JSON.parse(data.content);
 		
 		//DBに保存
-		let ins = await query("INSERT INTO Message (ToUserId, FromUserId, Message, Emotion) VALUES (?, 1, ?)", [message.ToUserId, message.FromUserId, json.Message, json.Emotion]);
+		let ins = await query("INSERT INTO Message (ToUserId, FromUserId, Message, Emotion) VALUES (?, ?, ?, ?)", [message.ToUserId, message.FromUserId, json.Message, json.Emotion]);
 		
 		result.ToUserId = message.ToUserId;
 		result.FromUserId = message.FromUserId;
+		result.Name = message.Name;
 		result.Message = json.Message;
 		result.Emotion = json.Emotion;
 		

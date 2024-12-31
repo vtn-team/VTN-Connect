@@ -176,24 +176,29 @@ export class GameConnect {
 	}
 	
 	async messageRelay(data: any) {
-		let to = data.Data.ToUserId;
-		let from = data.Data.FromUserId;
-		if(!to) {
-			to = -1;
+		try {
+			let json = JSON.parse(data.Data);
+			let to = json.ToUserId;
+			let from = json.FromUserId;
+			if(!to) {
+				to = -1;
+			}
+			if(!from) {
+				from = -1;
+			}
+			
+			let message = {
+				ToUserId: to,
+				FromUserId: from,
+				Name: json.Name,
+				Message: json.Message
+			}
+			
+			let result = await checkMessageAndWrite(message);
+			data.Data = result.result;
+			this.broadcast(createMessage(from, CMD.EVENT, TARGET.ALL, data));
+		}catch(ex){
+			console.log(ex);
 		}
-		if(!from) {
-			from = -1;
-		}
-		
-		let message = {
-			ToUserId: to,
-			FromUserId: from,
-			Name: data.Data.Name,
-			Message: data.Data.Message
-		}
-		
-		let result = await checkMessageAndWrite(message);
-		data.Data = result.result;
-		this.broadcast(createMessage(from, CMD.EVENT, TARGET.ALL, data));
 	}
 };
