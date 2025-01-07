@@ -1,7 +1,11 @@
 <html>
 <head>
+<link rel="manifest" href="/manifest.json" />
+<link rel="apple-touch-icon" href="/icon.png"></link>
+<meta name="theme-color" content="#fff" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
+<title>VANTAN - CONNECT</title>
 <style>
 .layout {
   width: 100%;
@@ -90,6 +94,33 @@ let userData = {};
 let ws = null;
 let wsSessionId = "";
 let qrReader = null;
+
+if ('serviceWorker' in navigator) {
+   navigator.serviceWorker.register("/serviceworker.js");
+}
+function notifyMe() {
+  if (!("Notification" in window)) {
+    // ブラウザーが通知に対応しているか調べる
+    alert("このブラウザーはデスクトップ通知に対応していません。");
+  } else if (Notification.permission === "granted") {
+    // 通知権限が既に付与されているかどうかを調べる。
+    // そうであれば、通知を作成
+    const notification = new Notification("こんにちは！");
+    // …
+  } else if (Notification.permission !== "denied") {
+    // ユーザーにその権限を要求する必要がある
+    Notification.requestPermission().then((permission) => {
+      // ユーザーが許可したら、通知を作成
+      if (permission === "granted") {
+        const notification = new Notification("こんにちは！");
+        // …
+      }
+    });
+  }
+
+  // 最後に、ユーザーが通知を拒否していて、あなたが敬意を
+  // 払いたい場合は、これ以上相手を煩わせることはありません。
+}
 
 window.addEventListener("load", (event) => {
 	console.log("ページが完全に読み込まれました");
@@ -495,6 +526,8 @@ function createUserInfoUI() {
 				<button type="button" id="" class="nes-btn is-primary">過去の冒険を見る</button>
 				<div style="height:10px;"></div>
 				<button type="button" id="" class="nes-btn is-primary">冒険者を見る</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
 			</div>
 		</div>
 		
