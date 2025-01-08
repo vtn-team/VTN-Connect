@@ -11,6 +11,7 @@ public class EventSystemViewer : MonoBehaviour
     [SerializeField] int _eventId;
     [SerializeField] EventData _testData;
     [SerializeField] InputField _inputText;
+    [SerializeField] RawImage _outQRImage;
 
     //test
     void Update()
@@ -27,10 +28,12 @@ public class EventSystemViewer : MonoBehaviour
 
     public void SendChat()
     {
-        EventData n = new EventData();
+        _outQRImage.texture = QRCodeMaker.BakeCode(_inputText.text);
+        _outQRImage.Rebuild(CanvasUpdate.Layout);
+        //EventData n = new EventData();
         //n.DataPack("ThreadId", );
-        n.DataPack("Prompt", _inputText.text);
-        EventSystem.SendEvent(10000, n);
+        //n.DataPack("Prompt", _inputText.text);
+        //EventSystem.SendEvent(10000, n);
     }
 
 #if UNITY_EDITOR

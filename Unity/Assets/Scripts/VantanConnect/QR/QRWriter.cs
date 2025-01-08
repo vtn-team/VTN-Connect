@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using ZXing.Common;
 using System.Net.NetworkInformation;
+using ZXing;
 
 /// <summary>
 /// 
