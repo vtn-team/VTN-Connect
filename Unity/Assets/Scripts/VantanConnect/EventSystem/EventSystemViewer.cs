@@ -8,12 +8,22 @@ using UnityEngine.UI;
 /// </summary>
 public class EventSystemViewer : MonoBehaviour
 {
+    [SerializeField] int _gameId;
     [SerializeField] int _eventId;
     [SerializeField] EventData _testData;
     [SerializeField] InputField _inputText;
     [SerializeField] RawImage _outQRImage;
+    [SerializeField] GameObject _connect;
 
-    //test
+
+    private void Start()
+    {
+        _outQRImage.texture = QRCodeMaker.BakeCode(""+_gameId);
+        _outQRImage.Rebuild(CanvasUpdate.Layout);
+
+        EventSystem.AddListener(OnEventCall);
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -26,10 +36,23 @@ public class EventSystemViewer : MonoBehaviour
         }
     }
 
+    void OnEventCall(EventData data)
+    {
+        Debug.Log(JsonUtility.ToJson(data));
+        if (data.EventId == 1000)
+        {
+            var gameId = data.GetIntData("GameId");
+            if (gameId == _gameId)
+            {
+                _connect.SetActive(true);
+            }
+        }
+    }
+
     public void SendChat()
     {
-        _outQRImage.texture = QRCodeMaker.BakeCode(_inputText.text);
-        _outQRImage.Rebuild(CanvasUpdate.Layout);
+        //_outQRImage.texture = QRCodeMaker.BakeCode(_inputText.text);
+        //_outQRImage.Rebuild(CanvasUpdate.Layout);
         //EventData n = new EventData();
         //n.DataPack("ThreadId", );
         //n.DataPack("Prompt", _inputText.text);
