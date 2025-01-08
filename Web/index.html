@@ -95,31 +95,41 @@ let ws = null;
 let wsSessionId = "";
 let qrReader = null;
 
+
 if ('serviceWorker' in navigator) {
    navigator.serviceWorker.register("/serviceworker.js");
 }
-function notifyMe() {
-  if (!("Notification" in window)) {
-    // ブラウザーが通知に対応しているか調べる
-    alert("このブラウザーはデスクトップ通知に対応していません。");
-  } else if (Notification.permission === "granted") {
-    // 通知権限が既に付与されているかどうかを調べる。
-    // そうであれば、通知を作成
-    const notification = new Notification("こんにちは！");
-    // …
-  } else if (Notification.permission !== "denied") {
-    // ユーザーにその権限を要求する必要がある
-    Notification.requestPermission().then((permission) => {
-      // ユーザーが許可したら、通知を作成
-      if (permission === "granted") {
-        const notification = new Notification("こんにちは！");
-        // …
-      }
-    });
-  }
 
-  // 最後に、ユーザーが通知を拒否していて、あなたが敬意を
-  // 払いたい場合は、これ以上相手を煩わせることはありません。
+function notifyMe() {
+	if (!("Notification" in window)) {
+		// ブラウザーが通知に対応しているか調べる
+		alert("このブラウザーはデスクトップ通知に対応していません。");
+	} else if (Notification.permission === "granted") {
+		// 通知権限が既に付与されているかどうかを調べる。
+		// そうであれば、通知を作成
+		const notification = new Notification("こんにちは！");
+	} else if (Notification.permission !== "denied") {
+		// ユーザーにその権限を要求する必要がある
+		Notification.requestPermission().then((permission) => {
+			// ユーザーが許可したら、通知を作成
+			if (permission === "granted") {
+				const notification = new Notification("こんにちは！");
+			}
+		});
+	}
+	
+	//SessionIdをキーにしてJoinを返す
+	let json = {
+		SessionId: wsSessionId,
+		Command: CMD.SEND_EVENT,
+		EventId: 1000,
+		Payload: [{
+			Key: "GameId",
+			TypeName: "Integer",
+			Data: "2",
+		}]
+	};
+	ws.send(JSON.stringify(json));
 }
 
 window.addEventListener("load", (event) => {
@@ -164,7 +174,7 @@ async function readQR() {
 	qrReader.start(
 		cameraId, 
 	{
-		fps: 10,// Optional, frame per seconds for qr code scanning
+		fps: 10,	// Optional, frame per seconds for qr code scanning
 		qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
 	},
 	onScanSuccess,
@@ -192,18 +202,28 @@ async function cencelQR() {
 async function onScanSuccess(decodedText, decodedResult) {
     // Handle on success condition with the decoded text or result.
 	enableUIById("qrresult");
-	getElm("qrresult").innerText = `Scan result: ${decodedText} - ${decodedResult}`;
+	getElm("qrresult").innerText = `Scan result: ${decodedText}`;
 	await qrReader.stop();
 	
-	//SessionIdをキーにしてJoinを返す
-	let json = {
-		SessionId: wsSessionId,
-		Command: CMD.SEND_EVENT,
-		GameId: 101,
-		EventId: 102,
-		Data: decodedText
-	};
-	ws.send(JSON.stringify(json));
+	try{
+		//let data = JSON.parse(decodedText);
+		
+		//SessionIdをキーにしてJoinを返す
+		let json = {
+			SessionId: wsSessionId,
+			Command: CMD.SEND_EVENT,
+			EventId: 1000,
+			Payload: [{
+				Key: "GameId",
+				TypeName: "Integer",
+				Data: decodedText,
+			}]
+		};
+		ws.send(JSON.stringify(json));
+		
+	}catch(ex){
+		console.log(ex);
+	}
 }
 
 function addSysLog(evtName, evtMessage) {
@@ -297,6 +317,7 @@ function execMessage(data) {
 	
 	case CMD.EVENT:
 	{
+		//addSysLog("冒険者が魔法を使った", data.Data.Data);
 		switch(data.Data.EventId)
 		{
 		case 100:
@@ -305,9 +326,21 @@ function execMessage(data) {
 		}
 		break;
 		
-		case 102:
+		case 1000:
 		{
-			addSysLog("冒険者が魔法を使った", data.Data.Data);
+
+		}
+		break;
+		
+		case 1001:
+		{
+			addSysLog(data.Data.Data.Name, data.Data.Data.Message);
+		}
+		break;
+		
+		case 1002:
+		{
+			
 		}
 		break;
 		}
