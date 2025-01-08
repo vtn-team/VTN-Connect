@@ -15,6 +15,13 @@ exports.Routes = {
 			},
 			"/gameusers" : "vc#getGameUsers#ゲーム参加ユーザの取得",
 			"/usercreate" : "vc#createUser#ユーザ生成(テスト用)",
+			
+			"/gamestart" : "vc#gameStart#ゲーム開始",
+			"/gameend" : "vc#gamEend#ゲーム終了",
+			"/ai" :{
+				"/gamestart" : "vc#gameStartAI#ゲーム開始",
+				"/gameend" : "vc#gameEndAI#ゲーム終了",
+			}
 		},
 		"/tools" : {
 			"/masterupdate" : "tools#masterupdate#マスタデータ更新"

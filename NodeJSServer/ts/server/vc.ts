@@ -2,6 +2,7 @@ import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/serve
 import { chatWithSession } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
 import { getUniqueUsers, createUserWithAI } from "./../vclogic/vcuser"
+import { gameStartAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
 
 //デフォルト関数
 export async function index(req: any,res: any,route: any)
@@ -112,3 +113,34 @@ export async function createUser(req: any,res: any,route: any)
 		result: result.result
 	};
 }
+
+//AIゲーム開始
+export async function gameStartAI(req: any,res: any,route: any)
+{
+	let result:any = await gameStartAIGame();
+	
+	result.Status = 200;
+	
+	return result;
+}
+
+//ゲーム開始
+export async function gameStart(req: any,res: any,route: any)
+{
+	let result:any = await gameStartVC(route.query.hash);
+	
+	result.Status = 200;
+	
+	return result;
+}
+
+//ゲーム終了
+export async function gameEnd(req: any,res: any,route: any)
+{
+	let result:any = await gameEndVC(route.query);
+	
+	result.Status = 200;
+	
+	return result;
+}
+
