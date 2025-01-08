@@ -328,10 +328,12 @@ async function connectDGS(addr) {
 	ws.onerror = (error) => {
 		console.log("Connection Error");
 		console.log(error)
+		getElm("ws-state").innerText = "エラー";
 	};
 		
 	ws.onclose = (event) => {
 		console.log("close");
+		getElm("ws-state").innerText = "切断";
 	};
 
 	ws.onmessage = (event) => {
@@ -494,6 +496,7 @@ function createUserInfoUI() {
 <section class="layout">
 	<div class="header">
 	<h1 class="nes-balloon from-left nes-pointer">冒険者たちの集会場</h1>
+	<button type="button" id=""class="nes-btn is-primary" onclick="window.location.reload();">更新</button>
 	</div>
 	
 	<div class="important">
