@@ -1,6 +1,8 @@
 import { WebSocket, WebSocketServer } from "ws";
 import { GameConnect, createMessage, TARGET, CMD } from "./gamecon";
 import { MessagePacket } from "./../vclogic/vcmessage";
+import { query } from "./../lib/database";
+import crypto from "crypto";
 
 const delay = (waitTime: number) =>
     new Promise((resolve) => setTimeout(resolve, waitTime));
@@ -8,7 +10,7 @@ const delay = (waitTime: number) =>
 /**
  * @summary BOT的なユーザのふるまいをするサービス
  */
-export class SakuraConnect implements MessagePacket  {
+export class SakuraConnect implements MessagePacket {
     // games: any;
     // sessionDic: any;
     // broadcast: any;
@@ -20,22 +22,30 @@ export class SakuraConnect implements MessagePacket  {
 
     public constructor() {
         // MessagePacketの初期化
-        this.ToUserId = 0;
-        this.FromUserId = 0;
+        this.ToUserId = -1;
+        this.FromUserId = -1;
         this.Name = "";
         this.Message = "";
     }
 
-
     /**
-     * @summary 応援ユーザ(BOT)の名前とメッセージを読み込む
-     * @param {string} filepath ユーザデータファイルのパス
+     * @summary ユニークユーザを取得するメソッド
+     * @param {number} userId 取得したいユニークユーザのID (デフォルトはランダム)
+     * @returns {Promise<any>} ユニークユーザの情報
      */
-    private async readUserDataFile(filepath: string) {
-        // NOTE: BOTユーザーのデータをひとまずテキストファイルから読み込む
+    private async getUniqueUsers(userId: string = crypto.randomInt(1, 1000).toString()): Promise<any> {
+        // TODO: ts/vclogic/vcuser.tsにユニークユーザーを格納している変数があるので、それを使ってもいいかもしれない
         try {
-        } catch (err) {
-            console.error(err);
+            let botUserData = await query(
+                "SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?",
+                [999]
+            ); 
+            let users: any = [];
+            users = botUserData;
+
+            return users[userId];
+        } catch (ex) {
+            console.log(ex);
         }
     }
 
@@ -50,18 +60,22 @@ export class SakuraConnect implements MessagePacket  {
         await delay(waitTime);
 
         // NOTE: ここでデータベースからBOTユーザーのデータを読み込む
+
+        // これは仮データ
         let botUserData: MessagePacket = {
-            ToUserId: 0,
-            FromUserId: 0,
+            ToUserId: -1,
+            FromUserId: -1,
             Name: "サクラ",
-            Message: "サクラです。よろしくお願いします。"
+            Message: "サクラです。よろしくお願いします。",
         };
         this.ToUserId = botUserData.ToUserId;
         this.FromUserId = botUserData.FromUserId;
         this.Name = botUserData.Name;
-        this.Message = botUserData.Message
-        
+        this.Message = botUserData.Message;
+
         // NOTE: ここで応援処理を呼び出す
-        createMessage(this.ToUserId.toString(), CMD.WELCOME, TARGET.OTHER, { "UserId": toUserId });
+        createMessage(this.ToUserId.toString(), CMD.WELCOME, TARGET.OTHER, {
+            UserId: toUserId,
+        });
     }
 }
