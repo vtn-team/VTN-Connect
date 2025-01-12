@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using VTNConnect;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// シーン依存系設定のエディタ拡張
@@ -24,6 +25,48 @@ public class EventSystemViewerEditor : Editor
         if (GUILayout.Button(@"オリジナルイベント実行"))
         {
             EventSystem.RunEvent(view.TestData);
+        }
+        GUILayout.Space(50);
+
+        if (GUILayout.Button(@"API: GetAddress実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                Debug.Log(await GameAPI.GetAddress());
+            }).Forget();
+        }
+
+        if (GUILayout.Button(@"API: GameStart実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                Debug.Log(await GameAPI.GameStart());
+            }).Forget();
+        }
+
+        if (GUILayout.Button(@"API: GameEnd実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                Debug.Log(await GameAPI.GameEnd(true));
+            }).Forget();
+        }
+
+
+        if (GUILayout.Button(@"API: (AIGAME)GameStart実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                Debug.Log(await GameAPI.GameStartAIGame());
+            }).Forget();
+        }
+
+        if (GUILayout.Button(@"API: (AIGAME)GameEnd実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                Debug.Log(await GameAPI.GameEndAIGame());
+            }).Forget();
         }
     }
 }

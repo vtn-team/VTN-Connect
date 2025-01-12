@@ -30,7 +30,7 @@ public class WebSocketEventManager : MonoBehaviour
 
     async void Setup()
     {
-        string address = await GameAPI.API.GetAddress();
+        string address = await GameAPI.GetAddress();
         Connect(address);
     }
 
