@@ -523,6 +523,65 @@ function createUserInfoUI() {
 	getElm("backstory").innerText = userData.Background;
 }
 
+let debugData = {};
+async function reqCheck(reqKey) {
+	let host = "http://localhost:4649"; //"https://vc.vtn-game.com";
+	switch(reqKey) {
+	case "gameStart":
+	{
+		let req = await fetch(host + "/vc/gamestart", {
+			mode: 'cors'
+		});
+		let result = await req.json();
+		console.log(result);
+		debugData.gameStart = result;
+	}
+	break;
+	
+	case "gameEnd":
+	{
+		let sample = {
+			GameHash: 
+			UserResults: [
+				{
+					UserId: 1
+					GameResult: true,   //脱出
+					MissionClear: true, //ミッション成功
+				},
+				{
+					UserId: 35
+					GameResult: false,  //志望
+					MissionClear: false,//ミッション失敗
+				},
+				{
+					UserId: 40
+					GameResult: true,   //脱出
+					MissionClear: false,//ミッション失敗
+				},
+				{
+					UserId: 42
+					GameResult: false,  //脱出
+					MissionClear: true, //ミッション成功
+				}
+			]
+		};
+		
+		let req = await fetch(host + "/vc/gamestart", {
+			mode: 'cors',
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(sample)
+		});
+		let result = await req.json();
+		console.log(result);
+		debugData.gameStart = result;
+	}
+	break;
+	}
+}
+
 </script>
 </head>
 <body>
@@ -568,6 +627,16 @@ function createUserInfoUI() {
 		</div>
 		
 		<div style="height:50px;"></div>
+		
+		<div class="nes-container with-title status">
+			<p class="title">リクエストチェック</p>
+			<div class="center">
+				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameStart");>gamestart</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameEnd");>gameend</button>
+				<div style="height:10px;"></div>
+			</div>
+		</div>
 	</div>
 	
 	<div class="main">
