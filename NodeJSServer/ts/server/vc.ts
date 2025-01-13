@@ -2,7 +2,7 @@ import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/serve
 import { chatWithSession } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
 import { getUniqueUsers, createUserWithAI } from "./../vclogic/vcuser"
-import { gameStartAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
+import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
 
 //デフォルト関数
 export async function index(req: any,res: any,route: any)
@@ -25,8 +25,8 @@ export async function getaddr(req: any,res: any,route: any)
 	let ret = `ws://${addrInfo.host}:${addrInfo.port}`;
 	
 	return {
-		status: 200,
-		address: ret
+		Status: 200,
+		Address: ret
 	};
 }
 
@@ -34,9 +34,9 @@ export async function getaddr(req: any,res: any,route: any)
 export async function stat(req: any,res: any,route: any)
 {
 	return {
-		status: 200,
-		isServerAlive: getConnectionAddress() != null,
-		activeNum: getActiveSessionNum(),
+		Status: 200,
+		IsServerAlive: getConnectionAddress() != null,
+		ActiveNum: getActiveSessionNum(),
 	};
 }
 
@@ -47,8 +47,8 @@ export async function chat(req: any,res: any,route: any)
 	let result = await chatWithSession(threadHash, route.query.prompt);
 	
 	return {
-		status: 200,
-		result: result
+		Status: 200,
+		Result: result
 	};
 }
 
@@ -68,8 +68,8 @@ export async function getUser(req: any,res: any,route: any)
 	result = result[0];
 	
 	return {
-		status: 200,
-		result: result
+		Status: 200,
+		UserData: result
 	};
 }
 
@@ -108,9 +108,9 @@ export async function createUser(req: any,res: any,route: any)
 	let result = await createUserWithAI();
 	
 	return {
-		status: 200,
-		success: result.success,
-		result: result.result
+		Status: 200,
+		Success: result.success,
+		UserData: result.result
 	};
 }
 
@@ -124,10 +124,20 @@ export async function gameStartAI(req: any,res: any,route: any)
 	return result;
 }
 
+//ゲーム終了
+export async function gameEndAI(req: any,res: any,route: any)
+{
+	let result:any = await gameEndAIGame(route.query);
+	
+	result.Status = 200;
+	
+	return result;
+}
+
 //ゲーム開始
 export async function gameStart(req: any,res: any,route: any)
 {
-	let result:any = await gameStartVC(route.query.hash);
+	let result:any = await gameStartVC(route.query.GameId, route.query.UserId);
 	
 	result.Status = 200;
 	

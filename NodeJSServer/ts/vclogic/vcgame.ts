@@ -42,12 +42,28 @@ export async function gameStartAIGame() {
 }
 
 //ゲーム開始
-export async function gameStartVC(userHash: string) {
+export async function gameStartVC(gameId: number, userId: number) {
 	let result = {
 		Success: false,
+		GameHash: "",
+		GameInfo: []
 	};
 	
 	try {
+		let gameHash = uuidv4();
+		
+		//Gameにプレイ開始したゲームの情報を記録
+		if(userId > 0)
+		{
+			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
+			await query("INSERT INTO Adventure (GameHash, UserId) VALUES (?, ?)", [gameHash, userId]);
+		}
+		else
+		{
+			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 3)", [gameHash, gameId]);
+		}
+		
+		result.GameHash = gameHash;
 		result.Success = true;
 	} catch(ex) {
 		console.log(ex);
