@@ -7,10 +7,14 @@ using System;
 using System.Text;
 using VTNConnect;
 
+/// <summary>
+/// WebSocketのイベント処理や監視をするクラス
+/// </summary>
 public class WebSocketEventManager : MonoBehaviour
 {
-    [SerializeField] int _gameId = 1;
-    [SerializeField] int _eventIndex = -1; 
+    [SerializeField] bool _isConnected;
+    [SerializeField] int _gameId;
+    [SerializeField] int _eventIndex = -1;
 
     public bool IsConnecting { get; private set; } = false;
 
@@ -23,13 +27,16 @@ public class WebSocketEventManager : MonoBehaviour
     string _sessionId = null;
 
 
-    void Start()
+    private void Start()
     {
         Setup();
     }
 
-    async void Setup()
+    async public void Setup()
     {
+        if (IsConnecting) return;
+
+        _gameId = ProjectSettings.GameID;
         string address = await GameAPI.GetAddress();
         Connect(address);
     }
@@ -77,7 +84,7 @@ public class WebSocketEventManager : MonoBehaviour
             string json = Encoding.UTF8.GetString(msg);
             data = JsonUtility.FromJson<WebSocketPacket>(json);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Debug.Log(ex.Message);
         }
@@ -88,23 +95,23 @@ public class WebSocketEventManager : MonoBehaviour
         {
             switch ((WebSocketCommand)data.Command)
             {
-            case WebSocketCommand.WELCOME:
-            {
-                var welcome = JsonUtility.FromJson<WSPR_Welcome>(data.Data);
-                var join = new WSPS_Join();
-                join.SessionId = welcome.SessionId;
-                join.GameId = _gameId;
-                client.Send(JsonUtility.ToJson(join));
-                _sessionId = welcome.SessionId;
-            }
-            break;
+                case WebSocketCommand.WELCOME:
+                    {
+                        var welcome = JsonUtility.FromJson<WSPR_Welcome>(data.Data);
+                        var join = new WSPS_Join();
+                        join.SessionId = welcome.SessionId;
+                        join.GameId = _gameId;
+                        client.Send(JsonUtility.ToJson(join));
+                        _sessionId = welcome.SessionId;
+                    }
+                    break;
 
-            case WebSocketCommand.EVENT:
-            {
-                var evt = JsonUtility.FromJson<WSPR_Event>(data.Data);
-                _eventQueue.Enqueue(evt);
-            }
-            break;
+                case WebSocketCommand.EVENT:
+                    {
+                        var evt = JsonUtility.FromJson<WSPR_Event>(data.Data);
+                        _eventQueue.Enqueue(evt);
+                    }
+                    break;
             }
         }
         catch (Exception ex)

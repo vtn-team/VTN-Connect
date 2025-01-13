@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using VTNConnect;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 /// <summary>
-/// イベント管理クラス
+/// イベントテスト用クラス
 /// </summary>
 public class EventSystemViewer : MonoBehaviour
 {
@@ -18,9 +19,8 @@ public class EventSystemViewer : MonoBehaviour
 
     private void Start()
     {
-        _outQRImage.texture = QRCodeMaker.BakeCode(""+_gameId);
-        _outQRImage.Rebuild(CanvasUpdate.Layout);
-
+        //_outQRImage.texture = QRCodeMaker.BakeCode(""+_gameId);
+        //_outQRImage.Rebuild(CanvasUpdate.Layout);
         EventSystem.AddListener(OnEventCall);
     }
 
@@ -57,6 +57,11 @@ public class EventSystemViewer : MonoBehaviour
         //n.DataPack("ThreadId", );
         //n.DataPack("Prompt", _inputText.text);
         //EventSystem.SendEvent(10000, n);
+    }
+
+    public void SceneChange(string scene)
+    {
+        SceneManager.LoadScene(scene);
     }
 
 #if UNITY_EDITOR
