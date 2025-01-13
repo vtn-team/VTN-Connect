@@ -43,6 +43,7 @@ public class UserData
 /// <summary>
 /// AIゲームリザルト用
 /// </summary>
+[Serializable]
 public class UserDataResultSave
 {
     public int UserId;

@@ -109,10 +109,11 @@ public class EventSystemViewerEditor : Editor
         {
             UniTask.RunOnThreadPool(async () =>
             {
+                System.Random rnd = new System.Random();
                 //各ユーザの結果をAPIに反映する
                 foreach (var data in _storedUserData)
                 {
-                    GameAPI.StoreUserResult(data.UserId, UnityEngine.Random.Range(0,2) == 0, UnityEngine.Random.Range(0, 2) == 0);
+                    GameAPI.StoreUserResult(data.UserId, rnd.Next(0, 2) == 0, rnd.Next(0, 2) == 0);
                 }
 
                 //データ設定後、APIを実行する

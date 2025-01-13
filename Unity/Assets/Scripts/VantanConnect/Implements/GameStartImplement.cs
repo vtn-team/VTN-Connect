@@ -5,6 +5,7 @@ using UnityEngine;
 /// <summary>
 /// リクエストパラメータ
 /// </summary>
+[Serializable]
 public class GameStartRequest
 {
     public int GameId;
@@ -14,6 +15,7 @@ public class GameStartRequest
 /// <summary>
 /// 戻り値
 /// </summary>
+[Serializable]
 public class GameStartResult
 {
     public int Status;

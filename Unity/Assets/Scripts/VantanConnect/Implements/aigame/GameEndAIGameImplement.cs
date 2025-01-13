@@ -7,6 +7,7 @@ using UnityEngine;
 /// <summary>
 /// リクエストパラメータ
 /// </summary>
+[Serializable]
 public class GameEndAIGameRequest
 {
     public string GameHash;
@@ -17,6 +18,7 @@ public class GameEndAIGameRequest
 /// <summary>
 /// 戻り値
 /// </summary>
+[Serializable]
 public class GameEndAIGameResult
 {
     public int Status;
@@ -40,7 +42,7 @@ public class GameEndAIGameImplement
             GameHash = instance.GetGameHash(),
             UserResults = instance.GetUserSave()
         };
-        string request = String.Format("{0}/ai/gamestart", ProjectSettings.APIServerURI);
+        string request = String.Format("{0}/ai/gameend", ProjectSettings.APIServerURI);
         string json = await Network.WebRequest.PostRequest(request, param);
         var ret = JsonUtility.FromJson<GameEndAIGameResult>(json);
         instance.ReleaseGameHash();

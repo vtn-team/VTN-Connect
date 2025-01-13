@@ -10,6 +10,7 @@ using UnityEngine;
 /// <summary>
 /// 戻り値
 /// </summary>
+[Serializable]
 public class GameStartAIGameResult
 {
     public int Status;

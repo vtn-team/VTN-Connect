@@ -9,6 +9,7 @@ using UnityEngine;
 /// <summary>
 /// 戻り値
 /// </summary>
+[Serializable]
 public class GetActiveGameUsersResult
 {
     public int Status;
@@ -19,6 +20,7 @@ public class GetActiveGameUsersResult
 /// <summary>
 /// 戻り値
 /// </summary>
+[Serializable]
 public class GetGameUsersResult
 {
     public int Status;

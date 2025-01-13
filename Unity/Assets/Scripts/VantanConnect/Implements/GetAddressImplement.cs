@@ -9,6 +9,7 @@ using UnityEngine;
 /// <summary>
 /// 戻り値
 /// </summary>
+[Serializable]
 public class GetAddrResult
 {
     public int Status;

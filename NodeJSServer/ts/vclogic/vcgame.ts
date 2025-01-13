@@ -41,6 +41,22 @@ export async function gameStartAIGame() {
 	return result;
 }
 
+//ゲーム終了
+export async function gameEndAIGame(gameResult: any) {
+	let result = {
+		Success: false,
+	};
+	
+	try {
+		result.Success = true;
+	} catch(ex) {
+		console.log(ex);
+	}
+	
+	return result;
+}
+
+
 //ゲーム開始
 export async function gameStartVC(gameId: number, userId: number) {
 	let result = {

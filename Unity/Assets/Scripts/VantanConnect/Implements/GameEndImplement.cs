@@ -6,6 +6,7 @@ using UnityEngine;
 /// <summary>
 /// リクエストパラメータ
 /// </summary>
+[Serializable]
 public class GameEndRequest
 {
     public string GameHash;
@@ -16,6 +17,7 @@ public class GameEndRequest
 /// <summary>
 /// 戻り値
 /// </summary>
+[Serializable]
 public class GameEndResult
 {
     public int Status;
