@@ -2,9 +2,10 @@ using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
+#if AIGAME_IMPLEMENT
 
 /// <summary>
-/// ƒŠƒNƒGƒXƒgƒpƒ‰ƒ[ƒ^
+/// ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 /// </summary>
 public class GameEndAIGameRequest
 {
@@ -14,7 +15,7 @@ public class GameEndAIGameRequest
 
 
 /// <summary>
-/// –ß‚è’l
+/// æˆ»ã‚Šå€¤
 /// </summary>
 public class GameEndAIGameResult
 {
@@ -24,15 +25,15 @@ public class GameEndAIGameResult
 
 
 /// <summary>
-/// ƒQ[ƒ€ŠJn(AIƒQ[ƒ€—p)
+/// ã‚²ãƒ¼ãƒ é–‹å§‹(AIã‚²ãƒ¼ãƒ ç”¨)
 /// NOTE: https://candle-stoplight-544.notion.site/API-def8a39d6b524c0fbf9e1a552d4b5428#16a39cbfbab9809c83d5efe15acd0e52
 /// </summary>
 public class GameEndAIGameImplement
 {
     /// <summary>
-    /// AIƒQ[ƒ€—p
+    /// AIã‚²ãƒ¼ãƒ ç”¨
     /// </summary>
-    /// <returns>AIƒQ[ƒ€ŠJn—pƒpƒ‰ƒ[ƒ^</returns>
+    /// <returns>AIã‚²ãƒ¼ãƒ é–‹å§‹ç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿</returns>
     async public UniTask<GameEndAIGameResult> Request(GameAPI instance)
     {
         var param = new GameEndAIGameRequest(){
@@ -47,3 +48,4 @@ public class GameEndAIGameImplement
         return ret;
     }
 }
+#endif

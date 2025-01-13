@@ -7,26 +7,55 @@ public class GameAPI
 {
     static GameAPI _instance = new GameAPI();
 
-    //APIリスト
-    GetAddressImplement _getAddress = new GetAddressImplement();
-    GameStartImplement _gameStart = new GameStartImplement();
-    GameEndImplement _gameEnd = new GameEndImplement();
-
-    GameStartAIGameImplement _gameStartAI = new GameStartAIGameImplement();
-    GameEndAIGameImplement _gameEndAI = new GameEndAIGameImplement();
-
-
     //公開インタフェース
-    static public UniTask<string> GetAddress() { return _instance._getAddress.Request(); }
-    static public UniTask<GameStartResult> GameStart(int userId = 0) { return _instance._gameStart.Request(_instance, userId); }
-    static public UniTask<GameEndResult> GameEnd(bool gameResult) { return _instance._gameEnd.Request(_instance, gameResult); }
 
-    //AIゲーム用
-    static public UniTask<GameStartAIGameResult> GameStartAIGame() { return _instance._gameStartAI.Request(_instance); }
-    static public UniTask<GameEndAIGameResult> GameEndAIGame() { return _instance._gameEndAI.Request(_instance); }
-    static public void StoreUserResult(int userId, bool gameResult, bool isMissionClear) { _instance.StackUser(userId, gameResult, isMissionClear); }
+    /// <summary>WebSocketのアドレスを取得する</summary>
+    static public UniTask<string> GetAddress(){ return _instance._getAddress.Request(); }
+
+    /// <summary>ユーザーデータ取得</summary>
+    static public UniTask<GetUserResult> GetUser(int userId){ return _instance._getUser.Request(userId); }
+
+    /// <summary>開催中のゲームの情報(所得</summary>
+    static public UniTask<GetActiveGameUsersResult> GetActiveGameUsers() { return _instance._getGameUsers.Request(); }
+
+    /// <summary>実行済/実行中の特定のゲームの情報を取得</summary>
+    static public UniTask<GetGameUsersResult> GetGameUsers(string gameHash) { return _instance._getGameUsers.Request(gameHash); }
+
+    /// <summary>ゲーム中かどうかを返す</summary>
     static public bool IsInGame => _instance._gameHash != null;
 
+#if !AIGAME_IMPLEMENT
+    /// <summary>ゲーム開始(バンコネ一般ゲーム用)</summary>
+    static public UniTask<GameStartResult> GameStart(int userId = 0) { return _instance._gameStart.Request(_instance, userId); }
+
+    /// <summary>ゲーム終了(バンコネ一般ゲーム用)</summary>
+    static public UniTask<GameEndResult> GameEnd(bool gameResult) { return _instance._gameEnd.Request(_instance, gameResult); }
+
+#else
+    //AIゲーム用
+
+    /// <summary>ゲーム開始(AIゲーム用)</summary>
+    static public UniTask<GameStartAIGameResult> GameStartAIGame() { return _instance._gameStartAI.Request(_instance); }
+    /// <summary>ゲーム終了(AIゲーム用)</summary>
+    static public UniTask<GameEndAIGameResult> GameEndAIGame() { return _instance._gameEndAI.Request(_instance); }
+    /// <summary>ゲーム結果の記録(AIゲーム用)</summary>
+    static public void StoreUserResult(int userId, bool gameResult, bool isMissionClear) { _instance.StackUser(userId, gameResult, isMissionClear); }
+#endif
+
+    #region 内部処理用
+
+    //APIリスト
+    GetAddressImplement _getAddress = new GetAddressImplement();
+    GetUserImplement _getUser = new GetUserImplement();
+    GetGameUsersImplement _getGameUsers = new GetGameUsersImplement();
+
+#if !AIGAME_IMPLEMENT
+    GameStartImplement _gameStart = new GameStartImplement();
+    GameEndImplement _gameEnd = new GameEndImplement();
+#else
+    GameStartAIGameImplement _gameStartAI = new GameStartAIGameImplement();
+    GameEndAIGameImplement _gameEndAI = new GameEndAIGameImplement();
+#endif
 
     //保存用
     string _gameHash = null;
@@ -46,6 +75,9 @@ public class GameAPI
     {
         _gameHash = null;
     }
+
+
+#if AIGAME_IMPLEMENT
     public void ReleaseAIGame()
     {
         _gameHash = null;
@@ -98,5 +130,7 @@ public class GameAPI
             Debug.LogWarning("保存対象のユーザが見つかりませんでした");
         }
     }
+#endif
+#endregion
 }
 

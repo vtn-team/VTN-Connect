@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// ƒŠƒNƒGƒXƒgƒpƒ‰ƒ[ƒ^
+/// ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 /// </summary>
 public class GameStartRequest
 {
@@ -12,7 +12,7 @@ public class GameStartRequest
 }
 
 /// <summary>
-/// –ß‚è’l
+/// æˆ»ã‚Šå€¤
 /// </summary>
 public class GameStartResult
 {
@@ -22,15 +22,15 @@ public class GameStartResult
 }
 
 /// <summary>
-/// ƒQ[ƒ€ŠJn
+/// ã‚²ãƒ¼ãƒ é–‹å§‹
 /// NOTE: https://candle-stoplight-544.notion.site/API-def8a39d6b524c0fbf9e1a552d4b5428#17539cbfbab980afa7acc523767846a3
 /// </summary>
 public class GameStartImplement
 {
     /// <summary>
-    /// ’ÊíƒQ[ƒ€—p
+    /// é€šå¸¸ã‚²ãƒ¼ãƒ ç”¨
     /// </summary>
-    /// <returns>“Á‚É‚È‚µ</returns>
+    /// <returns>ç‰¹ã«ãªã—</returns>
     async public UniTask<GameStartResult> Request(GameAPI instance, int userId = 0)
     {
         var param = new GameStartRequest() { GameId = ProjectSettings.GameID, UserId = userId };

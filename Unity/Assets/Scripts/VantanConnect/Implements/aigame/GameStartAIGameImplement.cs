@@ -2,12 +2,13 @@ using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
+#if AIGAME_IMPLEMENT
 
-/// ƒŠƒNƒGƒXƒgƒpƒ‰ƒ[ƒ^‚È‚µ
+/// ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãªã—
 
 
 /// <summary>
-/// –ß‚è’l
+/// æˆ»ã‚Šå€¤
 /// </summary>
 public class GameStartAIGameResult
 {
@@ -18,16 +19,16 @@ public class GameStartAIGameResult
 }
 
 /// <summary>
-/// ƒQ[ƒ€I—¹(AIƒQ[ƒ€—p)
+/// ã‚²ãƒ¼ãƒ çµ‚äº†(AIã‚²ãƒ¼ãƒ ç”¨)
 /// NOTE: https://candle-stoplight-544.notion.site/API-def8a39d6b524c0fbf9e1a552d4b5428#16a39cbfbab9809c83d5efe15acd0e52
 /// </summary>
 public class GameStartAIGameImplement
 {
     /// <summary>
-    /// ƒQ[ƒ€I—¹(AIƒQ[ƒ€—p)
+    /// ã‚²ãƒ¼ãƒ çµ‚äº†(AIã‚²ãƒ¼ãƒ ç”¨)
     /// </summary>
-    /// <param name="instance">APIƒCƒ“ƒXƒ^ƒ“ƒX</param>
-    /// <returns>ƒŠƒUƒ‹ƒg</returns>
+    /// <param name="instance">APIã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹</param>
+    /// <returns>ãƒªã‚¶ãƒ«ãƒˆ</returns>
     async public UniTask<GameStartAIGameResult> Request(GameAPI instance)
     {
         string request = String.Format("{0}/ai/gamestart", ProjectSettings.APIServerURI);
@@ -38,3 +39,4 @@ public class GameStartAIGameImplement
         return ret;
     }
 }
+#endif

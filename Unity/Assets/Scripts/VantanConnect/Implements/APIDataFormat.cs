@@ -2,7 +2,7 @@
 using System;
 
 /// <summary>
-/// ƒQ[ƒ€“à‚Åg—p‚·‚éuî•ñv‚ª“n‚³‚ê‚é
+/// ã‚²ãƒ¼ãƒ å†…ã§ä½¿ç”¨ã™ã‚‹ã€Œæƒ…å ±ã€ãŒæ¸¡ã•ã‚Œã‚‹
 /// </summary>
 [Serializable]
 public class GameInfo
@@ -12,41 +12,41 @@ public class GameInfo
 }
 
 /// <summary>
-/// ƒ†[ƒUî•ñ
+/// ãƒ¦ãƒ¼ã‚¶æƒ…å ±
 /// </summary>
 [Serializable]
 public class UserData
 {
-    //Id‚Í–³‹‚·‚é
+    //Idã¯ç„¡è¦–ã™ã‚‹
 
-    public int UserId;          //ƒ†[ƒUIDB‚±‚ÌID‚ğƒŠƒNƒGƒXƒg‚É‘—M‚·‚é
-    public string UserHash;     //ƒ†[ƒUƒnƒbƒVƒ…B‰½‚ç‚©‚ÌƒAƒNƒZƒX‚ğ‚·‚éÛA“Á’è‚³‚ê‚È‚¢—p“r‚Ég—p‚·‚éUUIDv4.
-    public int Type;            //ƒ†ƒj[ƒNƒ†[ƒU‚©ˆê”Êƒ†[ƒU‚©
-    public string Name;         //–¼‘OBƒtƒ‹ƒl[ƒ€
-    public int Level;           //ƒŒƒxƒ‹B1`
-    public int Gold;            //ŠƒS[ƒ‹ƒhBƒAƒEƒgƒQ[ƒ€‚Ì‚İQÆ‚·‚é‘z’èB
-    public int PlayCount;       //ƒvƒŒƒC‰ñ”
-    public DateTime CreatedAt;      //¶¬“ú
-    public DateTime LastPlayedAt;   //ÅŒã‚É—V‚ñ‚¾“ú
-    public string DisplayName;  //•\¦–¼(’Zk‚µ‚½ƒtƒ‹ƒl[ƒ€)
-    public int AvatarType;      //Œ©‚½–Ú(ƒAƒoƒ^[ID)
-    public string Gender;       //«•Ê
-    public int Age;             //”N—î
-    public string Job;          //E‹Æ
-    public string Personality;  //ŒÂ«
-    public string Motivation;   //–`Œ¯‚Ìƒ‚ƒ`ƒx
-    public string Weaknesses;   //ã“_
-    public string Background;   //ƒoƒbƒNƒXƒg[ƒŠ[
+    public int UserId;          //ãƒ¦ãƒ¼ã‚¶IDã€‚ã“ã®IDã‚’ãƒªã‚¯ã‚¨ã‚¹ãƒˆæ™‚ã«é€ä¿¡ã™ã‚‹
+    public string UserHash;     //ãƒ¦ãƒ¼ã‚¶ãƒãƒƒã‚·ãƒ¥ã€‚ä½•ã‚‰ã‹ã®ã‚¢ã‚¯ã‚»ã‚¹ã‚’ã™ã‚‹éš›ã€ç‰¹å®šã•ã‚Œãªã„ç”¨é€”ã«ä½¿ç”¨ã™ã‚‹UUIDv4.
+    public int Type;            //ãƒ¦ãƒ‹ãƒ¼ã‚¯ãƒ¦ãƒ¼ã‚¶ã‹ä¸€èˆ¬ãƒ¦ãƒ¼ã‚¶ã‹
+    public string Name;         //åå‰ã€‚ãƒ•ãƒ«ãƒãƒ¼ãƒ 
+    public int Level;           //ãƒ¬ãƒ™ãƒ«ã€‚1ï½
+    public int Gold;            //æ‰€æŒã‚´ãƒ¼ãƒ«ãƒ‰ã€‚ã‚¢ã‚¦ãƒˆã‚²ãƒ¼ãƒ ã®ã¿å‚ç…§ã™ã‚‹æƒ³å®šã€‚
+    public int PlayCount;       //ãƒ—ãƒ¬ã‚¤å›æ•°
+    public DateTime CreatedAt;      //ç”Ÿæˆæ—¥æ™‚
+    public DateTime LastPlayedAt;   //æœ€å¾Œã«éŠã‚“ã æ—¥
+    public string DisplayName;  //è¡¨ç¤ºå(çŸ­ç¸®ã—ãŸãƒ•ãƒ«ãƒãƒ¼ãƒ )
+    public int AvatarType;      //è¦‹ãŸç›®(ã‚¢ãƒã‚¿ãƒ¼ID)
+    public string Gender;       //æ€§åˆ¥
+    public int Age;             //å¹´é½¢
+    public string Job;          //è·æ¥­
+    public string Personality;  //å€‹æ€§
+    public string Motivation;   //å†’é™ºã®ãƒ¢ãƒãƒ™
+    public string Weaknesses;   //å¼±ç‚¹
+    public string Background;   //ãƒãƒƒã‚¯ã‚¹ãƒˆãƒ¼ãƒªãƒ¼
 };
 
 
 /// <summary>
-/// AIƒQ[ƒ€ƒŠƒUƒ‹ƒg—p
+/// AIã‚²ãƒ¼ãƒ ãƒªã‚¶ãƒ«ãƒˆç”¨
 /// </summary>
 public class UserDataResultSave
 {
     public int UserId;
     public bool GameResult;
     public bool MissionClear;
-    //note: ƒAƒCƒeƒ€‚È‚Ç‚ÍƒCƒxƒ“ƒg‚Å‘—‚é
+    //note: ã‚¢ã‚¤ãƒ†ãƒ ãªã©ã¯ã‚¤ãƒ™ãƒ³ãƒˆã§é€ã‚‹
 }
