@@ -96,7 +96,7 @@ export async function getGameUsers(req: any,res: any,route: any)
 	results = results.concat(getUniqueUsers(4-ids.length));
 	
 	return {
-		status: 200,
+		Status: 200,
 		result: results
 	};
 }
@@ -147,7 +147,7 @@ export async function gameStart(req: any,res: any,route: any)
 //ゲーム終了
 export async function gameEnd(req: any,res: any,route: any)
 {
-	let result:any = await gameEndVC(route.query);
+	let result:any = await gameEndVC(route.query.GameHash, route.query.GameResult);
 	
 	result.Status = 200;
 	

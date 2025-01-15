@@ -90,12 +90,13 @@ export async function gameStartVC(gameId: number, userId: number) {
 
 
 //ゲーム終了
-export async function gameEndVC(gameResult: any) {
+export async function gameEndVC(gameHash: string, gameResult: boolean) {
 	let result = {
 		Success: false,
 	};
 	
 	try {
+		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [gameResult ? 2 : 3, gameHash]);
 		result.Success = true;
 	} catch(ex) {
 		console.log(ex);
