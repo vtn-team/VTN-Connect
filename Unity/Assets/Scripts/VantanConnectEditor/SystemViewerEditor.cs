@@ -16,6 +16,23 @@ public class SystemViewerEditor : Editor
 
         SystemViewer view = target as SystemViewer;
         if (view.TestData == null) return;
+
+        GUILayout.Space(10);
+        if (GUILayout.Button(@"良いおうえん実行"))
+        {
+            EventData data = new EventData(EventDefine.Cheer);
+            data.DataPack("Emotion", 50);
+            data.DataPack("Message", "がんばれ");
+            VantanConnect.SendEvent(data);
+        }
+        GUILayout.Space(10);
+        if (GUILayout.Button(@"悪いおうえん実行"))
+        {
+            EventData data = new EventData(EventDefine.Cheer);
+            data.DataPack("Emotion", -50);
+            data.DataPack("Message", "くたばれ");
+            VantanConnect.SendEvent(data);
+        }
         /*
         if (GUILayout.Button(@"オリジナルイベント送信"))
         {
