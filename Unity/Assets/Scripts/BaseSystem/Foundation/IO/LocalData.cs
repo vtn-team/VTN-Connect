@@ -6,8 +6,10 @@ using System.Security.Cryptography;
 using System.Text;
 using Cysharp.Threading.Tasks;
 
-class LocalData
+public class LocalData
 {
+    static string BasePath => Application.dataPath + "/StreamingAssets"; //Application.persistentDataPath; //デバッグしやすくした。秘匿したいデータはpersistentDataPathを使う事。
+
     /// <summary>
     /// ファイルを読み込みます
     /// </summary>
@@ -22,7 +24,7 @@ class LocalData
         {
             if (path == null)
             {
-                path = Application.dataPath; //Application.persistentDataPath; //デバッグしやすくした、製品ではpersistentDataPathを使う事。
+                path = BasePath;
             }
 
             //ファイルがなかったらnullで返す
@@ -57,7 +59,7 @@ class LocalData
         {
             if (path == null)
             {
-                path = Application.dataPath; //Application.persistentDataPath; //デバッグしやすくした、製品ではpersistentDataPathを使う事。
+                path = BasePath;
             }
 
             //ファイルがなかったらnullで返す
@@ -108,7 +110,7 @@ class LocalData
         {
             if (path == null)
             {
-                path = Application.dataPath; //Application.persistentDataPath; //デバッグしやすくした、製品ではpersistentDataPathを使う事。
+                path = BasePath;
             }
 
             var json = JsonUtility.ToJson(data);
@@ -143,7 +145,7 @@ class LocalData
         {
             if (path == null)
             {
-                path = Application.dataPath; //Application.persistentDataPath; //デバッグしやすくした、製品ではpersistentDataPathを使う事。
+                path = BasePath;
             }
 
             var json = JsonUtility.ToJson(data);
