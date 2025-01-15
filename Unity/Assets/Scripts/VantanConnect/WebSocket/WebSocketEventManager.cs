@@ -1,122 +1,132 @@
-﻿using Network;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MessagePack;
 using System;
 using System.Text;
-using VTNConnect;
 
-/// <summary>
-/// WebSocketのイベント処理や監視をするクラス
-/// </summary>
-public class WebSocketEventManager : MonoBehaviour
+namespace VTNConnect
 {
-    [SerializeField] bool _isConnected;
-    [SerializeField] int _gameId;
-    [SerializeField] int _eventIndex = -1;
-
-    public bool IsConnecting { get; private set; } = false;
-
-    WebSocketCli client = new WebSocketCli();
-
-    Queue<EventData> _sendQueue = new Queue<EventData>();
-    Queue<EventData> _eventQueue = new Queue<EventData>();
-
-    EventSystem.EventDataCallback _event = null;
-    string _sessionId = null;
-
-
-    private void Start()
+    /// <summary>
+    /// WebSocketのイベント処理や監視をするクラス
+    /// </summary>
+    public class WebSocketEventManager : MonoBehaviour
     {
-        Setup();
-    }
+        //インスペクタ見る用
+        [SerializeField] bool _isConnected;
+        [SerializeField] int _gameId;
+        [SerializeField] int _eventIndex = -1;
 
-    async public void Setup()
-    {
-        if (IsConnecting) return;
+        public bool IsConnecting { get; private set; } = false;
 
-        _gameId = ProjectSettings.GameID;
-        string address = await GameAPI.GetAddress();
-        Connect(address);
-    }
+        //アドレス取得API
+        APIGetWSAddressImplement _getAddress = new APIGetWSAddressImplement();
 
-    void Update()
-    {
-        if (_eventQueue.Count > 0)
+        //クライアント実装
+        WebSocketCli _client = new WebSocketCli();
+
+        //イベント管理
+        Queue<EventData> _sendQueue = new Queue<EventData>();
+        Queue<EventData> _eventQueue = new Queue<EventData>();
+
+        //コールバック
+        EventSystem.EventDataCallback _event = null;
+
+        //接続したさいの識別ID
+        string _sessionId = null;
+
+
+        private void Start()
         {
-            foreach (var msg in _eventQueue)
+            Setup();
+        }
+
+        async public void Setup()
+        {
+            if (IsConnecting) return;
+
+            _gameId = ProjectSettings.GameID;
+            string address = await _getAddress.Request();
+            Connect(address);
+        }
+
+        public void SetEventSystem(EventSystem system)
+        {
+            system.Setup(Send, out _event);
+        }
+
+        void Update()
+        {
+            if (_eventQueue.Count > 0)
             {
-                _event.Invoke(msg);
+                foreach (var msg in _eventQueue)
+                {
+                    _event.Invoke(msg);
+                }
+                _eventQueue.Clear();
             }
-            _eventQueue.Clear();
+
+            if (_sendQueue.Count == 0) return;
+
+            var d = _sendQueue.Dequeue();
+
+            WSPS_SendEvent data = new WSPS_SendEvent(_sessionId, d);
+            _client.Send(JsonUtility.ToJson(data));
         }
 
-        if (_sendQueue.Count == 0) return;
 
-        var d = _sendQueue.Dequeue();
-        WSPS_Event data = new WSPS_Event(d);
-        data.SessionId = _sessionId;
-        client.Send(JsonUtility.ToJson(data));
-    }
-
-
-    void Connect(string address)
-    {
-        client.Connect(address, Message);
-        EventSystem.Setup(Send, out _event);
-    }
-
-    //最終的な設計には悩んでいる
-    void Send(int eventId, EventData data)
-    {
-        data.EventId = eventId;
-        data.FromId = _gameId;
-        _sendQueue.Enqueue(data);
-    }
-
-    void Message(byte[] msg)
-    {
-        WebSocketPacket data = null;
-        try
+        void Connect(string address)
         {
-            //data = MessagePackSerializer.Deserialize<ServerResult>(msg);
-            string json = Encoding.UTF8.GetString(msg);
-            data = JsonUtility.FromJson<WebSocketPacket>(json);
-        }
-        catch (Exception ex)
-        {
-            Debug.Log(ex.Message);
+            _client.Connect(address, Message);
         }
 
-        if (data == null) return;
-
-        try
+        void Send(EventData data)
         {
-            switch ((WebSocketCommand)data.Command)
+            _sendQueue.Enqueue(data);
+        }
+
+        void Message(byte[] msg)
+        {
+            WebSocketPacket data = null;
+            try
             {
-                case WebSocketCommand.WELCOME:
-                    {
-                        var welcome = JsonUtility.FromJson<WSPR_Welcome>(data.Data);
-                        var join = new WSPS_Join();
-                        join.SessionId = welcome.SessionId;
-                        join.GameId = _gameId;
-                        client.Send(JsonUtility.ToJson(join));
-                        _sessionId = welcome.SessionId;
-                    }
-                    break;
-
-                case WebSocketCommand.EVENT:
-                    {
-                        var evt = JsonUtility.FromJson<WSPR_Event>(data.Data);
-                        _eventQueue.Enqueue(evt);
-                    }
-                    break;
+                //data = MessagePackSerializer.Deserialize<ServerResult>(msg);
+                string json = Encoding.UTF8.GetString(msg);
+                data = JsonUtility.FromJson<WebSocketPacket>(json);
             }
-        }
-        catch (Exception ex)
-        {
-            Debug.Log(ex.Message);
+            catch (Exception ex)
+            {
+                Debug.Log(ex.Message);
+            }
+
+            if (data == null) return;
+
+            try
+            {
+                switch ((WebSocketCommand)data.Command)
+                {
+                    case WebSocketCommand.WELCOME:
+                        {
+                            var welcome = JsonUtility.FromJson<WSPR_Welcome>(data.Data);
+                            var join = new WSPS_Join();
+                            join.SessionId = welcome.SessionId;
+                            join.GameId = _gameId;
+                            _client.Send(JsonUtility.ToJson(join));
+                            _sessionId = welcome.SessionId;
+                        }
+                        break;
+
+                    case WebSocketCommand.EVENT:
+                        {
+                            var evt = JsonUtility.FromJson<EventData>(data.Data);
+                            _eventQueue.Enqueue(evt);
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log(ex.Message);
+            }
         }
     }
 }
