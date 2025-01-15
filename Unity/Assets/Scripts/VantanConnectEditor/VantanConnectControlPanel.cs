@@ -67,6 +67,7 @@ public class VantanConnectControlPanel : EditorWindow
         EditorGUILayout.Space(10);
 
         EditorGUILayout.LabelField("サンプル", headerStyle);
+        EditorGUILayout.Space(10);
         if (GUILayout.Button("実装サンプルを開く", GUILayout.Width(200)))
         {
             System.Diagnostics.Process.Start(Application.dataPath + "/VCSampleScene/SampleGame");

@@ -37,6 +37,26 @@ namespace VTNConnect
             //状態をリセット
             _user = null;
             SetViewEnable(true);
+
+            //リセットをフックにデバッグ処理をコール
+            //コネクト処理を常時行う
+            if(VantanConnect.SystemSave.IsDebugConnect)
+            {
+                UniTask.RunOnThreadPool(async () =>
+                {
+                    var result = await _getUser.Request(VantanConnect.SystemSave.UseConnectUserId);
+                    var status = APIUtility.PacketCheck(result);
+                    if (status != VC_StatusCode.OK)
+                    {
+                        Debug.LogError("エラーです");
+                        return;
+                    }
+
+                    _user = result.UserData;
+                    await UniTask.SwitchToMainThread();
+                    _view.Link(_user.DisplayName);
+                }).Forget();
+            }
         }
 
         public void SetViewEnable(bool isEnableView)
@@ -66,6 +86,8 @@ namespace VTNConnect
                             }
 
                             _user = result.UserData;
+
+                            await UniTask.SwitchToMainThread();
                             _view.Link(_user.DisplayName);
                         }).Forget();
                     }
