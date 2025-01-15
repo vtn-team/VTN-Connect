@@ -14,7 +14,6 @@ namespace VTNConnect
         //インスペクタ見る用
         [SerializeField] bool _isConnected;
         [SerializeField] int _gameId;
-        [SerializeField] int _eventIndex = -1;
 
         public bool IsConnecting { get; private set; } = false;
 
@@ -33,6 +32,11 @@ namespace VTNConnect
 
         //接続したさいの識別ID
         string _sessionId = null;
+
+#if UNITY_EDITOR
+        [SerializeField] List<EventData> _sendEventLog = new List<EventData>();
+        [SerializeField] List<EventData> _recvEventLog = new List<EventData>();
+#endif
 
 
         private void Start()
@@ -61,6 +65,9 @@ namespace VTNConnect
                 foreach (var msg in _eventQueue)
                 {
                     _event.Invoke(msg);
+#if UNITY_EDITOR
+                    _recvEventLog.Add(msg);
+#endif
                 }
                 _eventQueue.Clear();
             }
@@ -71,6 +78,9 @@ namespace VTNConnect
 
             WSPS_SendEvent data = new WSPS_SendEvent(_sessionId, d);
             _client.Send(JsonUtility.ToJson(data));
+#if UNITY_EDITOR
+            _sendEventLog.Add(data);
+#endif
         }
 
 
