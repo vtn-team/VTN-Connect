@@ -127,11 +127,11 @@ namespace VTNConnect
         APIGameStartAIGameImplement _gameStartAI = new APIGameStartAIGameImplement();
         APIGameEndAIGameImplement _gameEndAI = new APIGameEndAIGameImplement();
 #else
-        GameStartImplement _gameStart = new GameStartImplement();
-        GameEndImplement _gameEnd = new GameEndImplement();
+        APIGameStartImplement _gameStart = new APIGameStartImplement();
+        APIGameEndImplement _gameEnd = new APIGameEndImplement();
 #endif
 
-#if !AIGAME_IMPLEMENT
+#if AIGAME_IMPLEMENT
     
 #else
 
