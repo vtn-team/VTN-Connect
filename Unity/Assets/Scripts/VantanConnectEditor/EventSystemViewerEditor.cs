@@ -1,26 +1,22 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 using VTNConnect;
 using Cysharp.Threading.Tasks;
 using System;
 
 /// <summary>
-/// シーン依存系設定のエディタ拡張
+/// バンタンコネクト システムウインドウの値
 /// </summary>
-[CustomEditor(typeof(EventSystemViewer), true, isFallback = true)]
-public class EventSystemViewerEditor : Editor
+[CustomEditor(typeof(SystemViewer), true, isFallback = true)]
+public class SystemViewerEditor : Editor
 {
-    UserData[] _storedUserData;
-
-    /// <summary>
-    /// インスペクタ上で設定
-    /// </summary>
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
-        EventSystemViewer view = target as EventSystemViewer;
+        SystemViewer view = target as SystemViewer;
         if (view.TestData == null) return;
+        /*
         if (GUILayout.Button(@"オリジナルイベント送信"))
         {
             EventSystem.SendEvent(view.TestData.EventId, view.TestData);
@@ -121,16 +117,6 @@ public class EventSystemViewerEditor : Editor
             }).Forget();
         }
 #endif
-
-        /*
-        //特に必要ないのでコメントアウトしているコード
-        if (GUILayout.Button(@"API: GetAddress実行"))
-        {
-            UniTask.RunOnThreadPool(async () =>
-            {
-                Debug.Log(await GameAPI.GetAddress());
-            }).Forget();
-        }
         */
     }
 }
