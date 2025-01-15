@@ -125,6 +125,17 @@ namespace VTNConnect
             _instance._systemSave = systemSave;
 
             //環境構成
+            switch(systemSave.Environment)
+            {
+                case EnvironmentSetting.Local:
+                    _instance._environment = new LocalEnvironment();
+                    break;
+
+                case EnvironmentSetting.Develop:
+                case EnvironmentSetting.Production:
+                    _instance._environment = new ProductionEnvironment();
+                    break;
+            }
 
             //常駐する管理オブジェクトの生成
             GameObject obj = new GameObject("VCMain");

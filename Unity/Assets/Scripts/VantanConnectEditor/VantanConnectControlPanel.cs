@@ -69,7 +69,7 @@ public class VantanConnectControlPanel : EditorWindow
         EditorGUILayout.LabelField("サンプル", headerStyle);
         if (GUILayout.Button("実装サンプルを開く", GUILayout.Width(200)))
         {
-            System.Diagnostics.Process.Start(Application.dataPath + "/SampleScene/GameLoop");
+            System.Diagnostics.Process.Start(Application.dataPath + "/VCSampleScene/SampleGame");
         }
 
         EditorGUILayout.Space(50);
@@ -80,6 +80,11 @@ public class VantanConnectControlPanel : EditorWindow
             bool isDirty = false;
             EditorGUILayout.LabelField("システム設定", headerStyle);
 
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("環境設定系");
+            isDirty |= CheckParam(ref _saveData.Environment, (EnvironmentSetting)EditorGUILayout.EnumPopup("API塔の環境ターゲット", _saveData.Environment, GUILayout.Width(400)));
+
+            EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("コネクト系");
 
             EditorGUIUtility.labelWidth = 250;
