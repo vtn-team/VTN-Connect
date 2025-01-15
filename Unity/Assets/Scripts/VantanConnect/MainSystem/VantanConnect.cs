@@ -150,6 +150,7 @@ namespace VTNConnect
             var overlay = GameObject.Instantiate(prefab);
             GameObject.DontDestroyOnLoad(overlay);
             _instance._vcOverlayObject = overlay;
+            _instance._linkageSystem.Setup(overlay.GetComponentInChildren<VC_LoginView>());
 
             //イベント登録系など
             _instance._wsManager.SetEventSystem(_instance._eventSystem);
@@ -223,6 +224,9 @@ namespace VTNConnect
             {
                 request.UserId = _linkageSystem.UserData.UserId;
             }
+
+            //リンクビュー非表示にする
+            _linkageSystem.SetViewEnable(false);
 
             return await _gameStateSave.GameStartVCGame(request);
         }
