@@ -14,6 +14,8 @@ namespace VTNConnect
         public bool IsActive => true;
         public bool IsLink => _user != null;
 
+        public UserData UserData => _user;
+
         UserData _user = null;
         VC_LoginView _view = null;
 
@@ -25,6 +27,13 @@ namespace VTNConnect
         public void Setup(VC_LoginView view)
         {
             _view = view;
+        }
+
+        public void Reset()
+        {
+            //状態をリセット
+            _user = null;
+            SetViewEnable(true);
         }
 
         public void SetViewEnable(bool isEnableView)
