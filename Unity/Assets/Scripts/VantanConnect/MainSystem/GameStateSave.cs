@@ -32,11 +32,11 @@ namespace VTNConnect
 #if AIGAME_IMPLEMENT
         public UserData[] Users => _users;
 
-        static public GameEndAIGameRequest CreateAIGameResult(GameStateSave save)
+        GameEndAIGameRequest CreateAIGameResult()
         {
             var req = new GameEndAIGameRequest();
-            req.GameHash = save._gameHash;
-            req.UserResults = save.GetUserSave();
+            req.GameHash = _gameHash;
+            req.UserResults = GetUserSave();
             return req;
         }
 
@@ -55,7 +55,7 @@ namespace VTNConnect
 
         public async UniTask<VC_StatusCode> GameEndAIGame()
         {
-            var result = await _gameEndAI.Request(GameStateSave.CreateAIGameResult(_gameStateSave));
+            var result = await _gameEndAI.Request(CreateAIGameResult());
             var status = APIUtility.PacketCheck(result);
             if (status != VC_StatusCode.OK) return status;
             

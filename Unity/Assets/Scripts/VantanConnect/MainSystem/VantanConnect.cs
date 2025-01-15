@@ -177,7 +177,7 @@ namespace VTNConnect
         async UniTask<VC_StatusCode> GameStartImplement()
         {
 #if AIGAME_IMPLEMENT
-            return await GameStartAIGame();
+            return await _gameStateSave.GameStartAIGame();
 #else
             return await GameStartVCGame();
 #endif
@@ -189,7 +189,7 @@ namespace VTNConnect
 #if AIGAME_IMPLEMENT
         async UniTask<VC_StatusCode> GameEndImplement()
         {
-            return await GameEndAIGame();
+            return await _gameStateSave.GameEndAIGame();
         }
 #else
         async UniTask<VC_StatusCode> GameEndImplement(bool gameResult)
@@ -208,7 +208,7 @@ namespace VTNConnect
         }
 
 #if AIGAME_IMPLEMENT
-        UniTask<UserData[]> GetMainGameUsersImplement()
+        UserData[] GetMainGameUsersImplement()
         {
             return _gameStateSave.Users;
         }
