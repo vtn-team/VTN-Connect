@@ -340,25 +340,24 @@ function execMessage(data) {
 		{
 		case 100:
 		{
-			addLog(data.Data);
 		}
 		break;
 		
 		case 1000:
 		{
-
+			addSysLog(data.Data.Data.Name, data.Data.Data.Message);
 		}
 		break;
 		
 		case 1001:
 		{
-			addSysLog(data.Data.Data.Name, data.Data.Data.Message);
+			addLog(data.Data);
 		}
 		break;
 		
 		case 1002:
 		{
-			
+			addSysLog(data.Data.Data.Name, data.Data.Data.Message);
 		}
 		break;
 		}
@@ -420,7 +419,7 @@ async function testEvent() {
 		SessionId: wsSessionId,
 		Command: CMD.SEND_EVENT,
 		GameId: 101,
-		EventId: 100,
+		EventId: 1001,
 		Data: data
 	};
 	ws.send(JSON.stringify(json));
