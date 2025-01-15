@@ -13,6 +13,8 @@ public class PackageExporter
     /// </summary>
     static string[] PackTargets = new string[] {
         "Assets/ConnectEventAssets",
+        "Assets/SampleScene",
+        "Assets/Resources",
         "Assets/Scripts",
         "Assets/ThirdParty",
     };

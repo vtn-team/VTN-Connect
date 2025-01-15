@@ -69,7 +69,7 @@ public class VantanConnectControlPanel : EditorWindow
         EditorGUILayout.LabelField("サンプル", headerStyle);
         if (GUILayout.Button("実装サンプルを開く", GUILayout.Width(200)))
         {
-            System.Diagnostics.Process.Start(Application.dataPath + "/Scripts/VantanConnect/Sample");
+            System.Diagnostics.Process.Start(Application.dataPath + "/SampleScene/GameLoop");
         }
 
         EditorGUILayout.Space(50);
@@ -81,15 +81,14 @@ public class VantanConnectControlPanel : EditorWindow
             EditorGUILayout.LabelField("システム設定", headerStyle);
 
             EditorGUILayout.LabelField("コネクト系");
-            EditorGUILayout.LabelField("コネクト処理用のQRコードを表示する");
-            isDirty |= CheckParam(ref _saveData.IsUseQRCode, EditorGUILayout.Toggle("IsUseQRCode", _saveData.IsUseQRCode, GUILayout.Width(400)));
-            EditorGUILayout.LabelField("コネクト処理をローカル実行する");
-            isDirty |= CheckParam(ref _saveData.IsDebugConnect, EditorGUILayout.Toggle("IsDebugConnect", _saveData.IsDebugConnect, GUILayout.Width(400)));
+
+            EditorGUIUtility.labelWidth = 250;
+            isDirty |= CheckParam(ref _saveData.IsUseQRCode, EditorGUILayout.Toggle("コネクト処理用のQRコードを表示する", _saveData.IsUseQRCode, GUILayout.Width(400)));
+            isDirty |= CheckParam(ref _saveData.IsDebugConnect, EditorGUILayout.Toggle("コネクト処理をローカル実行する", _saveData.IsDebugConnect, GUILayout.Width(400)));
 
             if (_saveData.IsDebugConnect)
             {
-                EditorGUILayout.LabelField("デバッグ用のコネクト処理に使用するテスト用ID");
-                isDirty |= CheckParam(ref _saveData.UseConnectUserId, EditorGUILayout.IntField("UseConnectUserId", _saveData.UseConnectUserId, GUILayout.Width(400)));
+                isDirty |= CheckParam(ref _saveData.UseConnectUserId, EditorGUILayout.IntField("デバッグ用のコネクト処理に使用するテスト用ID", _saveData.UseConnectUserId, GUILayout.Width(400)));
             }
 
             if(isDirty)
