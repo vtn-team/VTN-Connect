@@ -465,6 +465,7 @@ MonoBehaviour:
   _qrRoot: {fileID: 9080680651896544679}
   _outQRImage: {fileID: 1869087150101166880}
   _connect: {fileID: 1869087149647252576}
+  _connectText: {fileID: 1869087150054039957}
 --- !u!1 &9080680651896544679
 GameObject:
   m_ObjectHideFlags: 0

@@ -74,7 +74,7 @@ namespace VTNConnect
         {
             var data = GetData(Key);
             if (data == null) return 0;
-            if (data.TypeName != "Integer")
+            if (data.TypeName != "Integer" && !data.TypeName.StartsWith("Int"))
             {
                 Debug.LogWarning($"Intじゃない値かもしれません:{data.Data}({data.TypeName })");
             }
@@ -105,16 +105,20 @@ namespace VTNConnect
 
         #region 内部実装
         //シリアライズされるメンバ
-        public readonly int EventId = -1;
-        protected readonly int FromId = ProjectSettings.GameID;
+        [SerializeField] public int EventId = -1;
+        [SerializeField] protected int FromId = ProjectSettings.GameID;
         [SerializeField] protected List<ParamData> Payload = new List<ParamData>();
         //ここまで
 
+        //主にコピーやイベントの変換に使う
         protected EventData(EventData d)
         {
             EventId = d.EventId;
+            FromId = d.FromId;
             Payload = d.Payload;
         }
+
+        //新しいイベントの作成に使う
         public EventData(int eventId)
         {
             EventId = eventId;

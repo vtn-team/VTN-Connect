@@ -76,7 +76,11 @@ namespace VTNConnect
         public void Reset()
         {
             //最初に購読していたシステムのリスナーだけにする
-            _eventListener = _initialSavedListener;
+            _eventListener.Clear();
+            foreach (var ev in _initialSavedListener)
+            {
+                _eventListener.Add(ev);
+            }
         }
 
         /// <summary>

@@ -14,6 +14,7 @@ namespace VTNConnect
         [SerializeField] GameObject _qrRoot;
         [SerializeField] RawImage _outQRImage;
         [SerializeField] GameObject _connect;
+        [SerializeField] Text _connectText;
 
         private void Start()
         {
@@ -35,10 +36,11 @@ namespace VTNConnect
             this.gameObject.SetActive(isEnable);
         }
 
-        public void Link()
+        public void Link(string displayName)
         {
             //TODO: 演出
 
+            _connectText.text = "[CONNECT]" + displayName;
             _connect.SetActive(true);
         }
     }

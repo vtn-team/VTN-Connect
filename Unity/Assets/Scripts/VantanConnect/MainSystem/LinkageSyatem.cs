@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using UnityEngine;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 namespace VTNConnect
 {
@@ -16,6 +18,7 @@ namespace VTNConnect
 
         public UserData UserData => _user;
 
+        APIGetUserImplement _getUser = new APIGetUserImplement();
         UserData _user = null;
         VC_LoginView _view = null;
 
@@ -52,7 +55,19 @@ namespace VTNConnect
                         var gameId = data.GetIntData("GameId");
                         if (gameId != ProjectSettings.GameID) break;
 
-                        _view.Link();
+                        UniTask.RunOnThreadPool(async () =>
+                        {
+                            var result = await _getUser.Request(data.GetIntData("UserId"));
+                            var status = APIUtility.PacketCheck(result);
+                            if (status != VC_StatusCode.OK)
+                            {
+                                Debug.LogError("エラーです");
+                                return;
+                            }
+
+                            _user = result.UserData;
+                            _view.Link(_user.DisplayName);
+                        }).Forget();
                     }
                     break;
             }

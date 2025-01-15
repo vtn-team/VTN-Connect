@@ -9,6 +9,7 @@ namespace VTNConnect
     public class CheerEvent : EventData
     {
         public CheerEvent() : base(EventDefine.Cheer){ }
+        public CheerEvent(EventData d) : base(d) { }
 
 
         /// <summary>
