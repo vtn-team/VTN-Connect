@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using ZXing;
 
 /// <summary>
-/// 
+/// QRコードを生成する
 /// NOTE: https://gist.github.com/AngeloYazar/6101673
 /// </summary>
 public class QRCodeMaker
