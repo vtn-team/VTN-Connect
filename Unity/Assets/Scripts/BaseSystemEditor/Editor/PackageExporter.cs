@@ -9,7 +9,7 @@ using System.CodeDom.Compiler;
 public class PackageExporter
 {
     /// <summary>
-    /// ƒpƒbƒP[ƒW‘ÎÛ‚ÌƒtƒHƒ‹ƒ_Aƒtƒ@ƒCƒ‹
+    /// ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸å¯¾è±¡ã®ãƒ•ã‚©ãƒ«ãƒ€ã€ãƒ•ã‚¡ã‚¤ãƒ«
     /// </summary>
     static string[] PackTargets = new string[] {
         "Assets/ConnectEventAssets",
@@ -18,7 +18,7 @@ public class PackageExporter
     };
 
     /// <summary>
-    /// ƒo[ƒWƒ‡ƒjƒ“ƒO
+    /// ãƒãƒ¼ã‚¸ãƒ§ãƒ‹ãƒ³ã‚°
     /// </summary>
     [MenuItem("VTNTools/Export/Versioning %e")]
     static void Versioning()
@@ -26,12 +26,12 @@ public class PackageExporter
         string PackageName = Application.productName;
         string Version = Application.version;
 
-        //ƒrƒ‹ƒhî•ñ‚ğ‹LÚ‚µ‚½ƒtƒ@ƒCƒ‹‚ğ©“®¶¬
+        //ãƒ“ãƒ«ãƒ‰æƒ…å ±ã‚’è¨˜è¼‰ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’è‡ªå‹•ç”Ÿæˆ
         BuildStateBuild(PackageName, Version);
     }
 
     /// <summary>
-    /// ©“®‚ÅƒpƒbƒP[ƒW‰»‚·‚é
+    /// è‡ªå‹•ã§ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸åŒ–ã™ã‚‹
     /// </summary>
     [MenuItem("VTNTools/Export/Export Packages %e")]
     static void Packaging()
@@ -74,13 +74,13 @@ public class BuildState
     {
         Directory.CreateDirectory(targetPath);
 
-        //“®“I¶¬
+        //å‹•çš„ç”Ÿæˆ
         using (FileStream fs = new FileStream(targetPath + "/BuildState.cs", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
         {
             string sourceCode = source;
-            sourceCode = sourceCode.Replace("<Hash>", Guid.NewGuid().ToString()); //ƒrƒ‹ƒhƒnƒbƒVƒ…‚ğV‹K¶¬‚·‚é
-            sourceCode = sourceCode.Replace("<Project>", project); //ƒ‰ƒCƒuƒ‰ƒŠƒo[ƒWƒ‡ƒ“
-            sourceCode = sourceCode.Replace("<Version>", version); //ƒ‰ƒCƒuƒ‰ƒŠƒo[ƒWƒ‡ƒ“
+            sourceCode = sourceCode.Replace("<Hash>", Guid.NewGuid().ToString()); //ãƒ“ãƒ«ãƒ‰ãƒãƒƒã‚·ãƒ¥ã‚’æ–°è¦ç”Ÿæˆã™ã‚‹
+            sourceCode = sourceCode.Replace("<Project>", project); //ãƒ©ã‚¤ãƒ–ãƒ©ãƒªãƒãƒ¼ã‚¸ãƒ§ãƒ³
+            sourceCode = sourceCode.Replace("<Version>", version); //ãƒ©ã‚¤ãƒ–ãƒ©ãƒªãƒãƒ¼ã‚¸ãƒ§ãƒ³
             byte[] bytes = Encoding.UTF8.GetBytes(sourceCode);
             fs.Write(bytes, 0, bytes.Length);
         }

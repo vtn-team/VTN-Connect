@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using DataManagement;
 using System.Collections.Generic;
 using System.Linq;
