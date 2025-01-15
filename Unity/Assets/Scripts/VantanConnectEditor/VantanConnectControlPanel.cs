@@ -65,6 +65,12 @@ public class VantanConnectControlPanel : EditorWindow
         headerStyle.normal.textColor = Color.white;
 
         EditorGUILayout.Space(10);
+        EditorGUILayout.LabelField("環境情報", headerStyle);
+        EditorGUILayout.Space(10);
+        EditorGUILayout.LabelField("バンコネバージョン", BuildState.Version);
+        EditorGUILayout.LabelField("ビルドハッシュ", BuildState.BuildHash);
+
+        EditorGUILayout.Space(30);
 
         EditorGUILayout.LabelField("サンプル", headerStyle);
         EditorGUILayout.Space(10);
@@ -73,7 +79,7 @@ public class VantanConnectControlPanel : EditorWindow
             System.Diagnostics.Process.Start(Application.dataPath + "/VCSampleScene/SampleGame");
         }
 
-        EditorGUILayout.Space(50);
+        EditorGUILayout.Space(30);
 
         //システムセーブ監視
         if (_saveData != null)

@@ -13,10 +13,10 @@ public class PackageExporter
     /// </summary>
     static string[] PackTargets = new string[] {
         "Assets/ConnectEventAssets",
-        "Assets/SampleScene",
         "Assets/Resources",
         "Assets/Scripts",
         "Assets/ThirdParty",
+        "Assets/VCSampleScene",
     };
 
     /// <summary>
@@ -63,11 +63,7 @@ public class BuildState
     {
         get
         {
-#if UNITY_EDITOR
-            return ""UNITY_EDITOR"";
-#else
             return _hash;
-#endif
         }
     }
 };";
