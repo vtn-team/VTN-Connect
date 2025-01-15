@@ -131,8 +131,8 @@ export async function createUserWithAI() { //status: UserStatus
 		let status: Array<any> = [userId, json.DisplayName, json.AvatarType, json.Gender, json.Age, json.Job, json.Personality, json.Motivation,json.Weaknesses, json.Background];
 		query("INSERT INTO UserGameStatus (UserId, DisplayName, AvatarType, Gender, Age, Job, Personality, Motivation, Weaknesses, Background) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", status);
 		
-		result.userId = userId;
-		result.userHash = userHash;
+		result.UserId = userId;
+		result.UserHash = userHash;
 		result.Type = 1;	//NOTE: ハードコード
 		result.Level = 1;	//NOTE: ハードコード
 		result.Gold = 500;	//NOTE: ハードコード

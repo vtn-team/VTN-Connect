@@ -202,21 +202,39 @@ async function cencelQR() {
 async function onScanSuccess(decodedText, decodedResult) {
     // Handle on success condition with the decoded text or result.
 	enableUIById("qrresult");
-	getElm("qrresult").innerText = `Scan result: ${decodedText}`;
 	await qrReader.stop();
 	
+	if(!userData || !userData.UserId)
+	{
+		getElm("qrresult").innerText = "ユーザー登録されていません";
+		return;
+	}
+	
+	if(decodedText.indexOf("VantanConnectQR:") == -1) {
+		getElm("qrresult").innerText = "無効なQRです";
+		return;
+	}
+	
+	decodedText = decodedText.replace("VantanConnectQR:","");
+	
 	try{
-		//let data = JSON.parse(decodedText);
+		
+		let data = JSON.parse(decodedText);
 		
 		//SessionIdをキーにしてJoinを返す
 		let json = {
 			SessionId: wsSessionId,
 			Command: CMD.SEND_EVENT,
-			EventId: 1000,
+			EventId: data.EventId,
 			Payload: [{
 				Key: "GameId",
 				TypeName: "Integer",
-				Data: decodedText,
+				Data: data.GameID
+			},
+			{
+				Key: "UserId",
+				TypeName: "Integer",
+				Data: userData.UserId
 			}]
 		};
 		ws.send(JSON.stringify(json));
@@ -462,10 +480,10 @@ async function createUser() {
 	console.log(req);
 	let result = await req.json();
 	console.log(result);
-	if(result.success) {
-		saveUserSession(result.result.userHash);
+	if(result.Success) {
+		saveUserSession(result.UserData.UserHash);
 	}
-	userData = result.result;
+	userData = result.UserData;
 	createUserInfoUI();
 	enableUIById("userinfo");
 }
@@ -512,7 +530,7 @@ function disableUIById(elmId) {
 }
 
 function createUserInfoUI() {
-	getElm("fullname").innerText = userData.Name;
+	getElm("fullname").innerText = userData.FullName;
 	getElm("level").innerText = userData.Level;
 	getElm("gender").innerText = userData.Gender;
 	getElm("age").innerText = userData.Age;
@@ -541,25 +559,25 @@ async function reqCheck(reqKey) {
 	case "gameEnd":
 	{
 		let sample = {
-			GameHash: 
+			GameHash: "",
 			UserResults: [
 				{
-					UserId: 1
+					UserId: 1,
 					GameResult: true,   //脱出
 					MissionClear: true, //ミッション成功
 				},
 				{
-					UserId: 35
+					UserId: 35,
 					GameResult: false,  //志望
 					MissionClear: false,//ミッション失敗
 				},
 				{
-					UserId: 40
+					UserId: 40,
 					GameResult: true,   //脱出
 					MissionClear: false,//ミッション失敗
 				},
 				{
-					UserId: 42
+					UserId: 42,
 					GameResult: false,  //脱出
 					MissionClear: true, //ミッション成功
 				}
