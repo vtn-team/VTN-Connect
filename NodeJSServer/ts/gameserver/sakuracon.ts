@@ -3,34 +3,39 @@ import { query } from "./../lib/database";
 import crypto from "crypto";
 
 /**
- * @summary サクラが送信する応援メッセージ一覧
+ * @summary サクラのメッセージと感情値のタプル
  */
-const sakuraSupportMessage: string[] = [
-    "support message test"
-];
-
-const sakuraWelcomeMessage: string[] = [
-    "welcome message test"
-];
+type messageEmotionTuple = {
+    message: string;
+    emotionValue: string;
+};
+// サクラのメッセージ一覧
+const sakuraWelcomeMessage: messageEmotionTuple[] = [{ message: "welcome message test", emotionValue: "50" }];
+const sakuraSupportMessage: messageEmotionTuple[] = [{ message: "support message test", emotionValue: "50" }];
 
 /**
  * @summary メッセージテンプレート
  */
-interface MessageTemplate {
+type messageTemplate = {
     Target: number;
-    // NOTE: 送信されるコマンドの種類
-    // CMD WELCOME: 1, JOIN: 2, EVENT: 3, SEND_JOIN: 100, SEND_EVENT: 101,
-    Command: 1 | 2 | 3 | 100 | 101;
+    Command: CMD;
     Data: {
         EventId: number;
-        FromId: number | 100; // 100はサクラのユーザID
-        Payload: {
-            Key: string;
-            TypeName: string;
-            Data: string;
-        }[];
+        FromId: number; //サクラのユーザID
+        Payload: [
+            {
+                Key: "Emotion";
+                TypeName: "Int32";
+                Data: string;
+            },
+            {
+                Key: "Message";
+                TypeName: "String";
+                Data: string;
+            }
+        ];
+        SessionId: ""; // サクラには不要
     };
-    SessionId: string; // サクラには不要
 };
 
 /**
@@ -40,18 +45,14 @@ export class SakuraConnect {
     // games: any;
     // sessionDic: any;
     // broadcast: any;
-
-    private sakuraMessage: MessageTemplate = {} as MessageTemplate;
-
-    public constructor() {
-    }
+    public constructor() {}
 
     /**
      * @summary ユニークユーザを取得するメソッド
-     * @param {number} userId 取得したいユニークユーザのID (デフォルトはランダム)
+     * @param {number} userId 取得したいユニークユーザのID
      * @returns ユニークユーザの情報
      */
-    private async getUniqueUsers(userId: string = crypto.randomInt(1, 1000).toString()) {
+    private async getUniqueUsers(userId: number) {
         // TODO: ts/vclogic/vcuser.tsにユニークユーザーを格納している変数があるので、それを使ってもいいかもしれない
         try {
             let botUserData = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?", [999]);
@@ -65,36 +66,83 @@ export class SakuraConnect {
     }
 
     /**
+     * @summary サクラのメッセージを生成するメソッド
+     * @param {number} toUserId 送信先ユーザID
+     * @param {number} fromUserId 送信元ユーザID
+     * @param {CMD} messageType 送信メッセージの種類
+     */
+    private async createSakuraMessage(toUserId: number, fromUserId: number, messageType: CMD): Promise<messageTemplate> {
+        // ユニークユーザを取得
+        let botUserData;
+        let uniqueId: number;
+        if (!fromUserId || fromUserId != -1) {
+            // データベースはIDが1から始まるが、配列は0から始まるため、-1する
+            uniqueId = fromUserId - 1;
+        } else {
+            // TODO: ちゃんと有効なユニークユーザーのデータ範囲を決める
+            // NOTE: 1<=n<999の範囲がユニークユーザーデータの範囲
+            uniqueId = crypto.randomInt(1, 999);
+        }
+        botUserData = await this.getUniqueUsers(uniqueId);
+
+        // ランダムでメッセージを選択するための数値を生成
+        let randomMessageNumber = crypto.randomInt(0, sakuraWelcomeMessage.length);
+
+        // ユニークユーザが取得できない場合は、再度取得する
+        while (!botUserData) {
+            uniqueId = crypto.randomInt(1, 999);
+            botUserData = await this.getUniqueUsers(uniqueId);
+        }
+
+        // 送信タイミングを判定し、送信するデータを選択する
+        let sendMessageData: messageEmotionTuple;
+        if (messageType == CMD.WELCOME) {
+            sendMessageData = sakuraWelcomeMessage[randomMessageNumber];
+        } else {
+            sendMessageData = sakuraSupportMessage[randomMessageNumber];
+        }
+
+        // メッセージを生成
+        let message: messageTemplate = {
+            Target: toUserId,
+            Command: CMD.SEND_EVENT,
+            Data: {
+                EventId: 1001,
+                FromId: uniqueId,
+                Payload: [
+                    {
+                        Key: "Emotion",
+                        TypeName: "Int32",
+                        Data: sendMessageData.emotionValue,
+                    },
+                    {
+                        Key: "Message",
+                        TypeName: "String",
+                        Data: sendMessageData.message,
+                    },
+                ],
+                SessionId: "",
+            },
+        };
+        return message;
+    }
+
+    /**
      * @summary サクラ機能を提供するメソッド
      * @param {number} waitTime 待ち時間 (ミリ秒)
-     * @param {string} toUserId 送信先ユーザID
+     * @param {number} toUserId 送信先ユーザID
+     * @param {number} fromUserId 送信元ユーザID
+     * @returns {Promise<any>} 送信データ
      */
-    public async sakuraConnect(waitTime: number = 0, toUserId: string) {
+    public async sendWelcomeMessage(waitTime: number = 0, toUserId: number, fromUserId: number): Promise<any> {
+        let sendData;
         try {
-            console.time("sakuraConnectTimer");
-
-            // 応援メソッド発火
-            // 引数のwaitTimeでデフォルト即時実行と、待ち時間実行を選択できる
-            await this.delay(waitTime);
-
-            console.timeEnd("sakuraConnectTimer");
-
-            // ユニークユーザを取得
-            let botUserData;
-            if (toUserId || toUserId == "-1") {
-                // データベースはIDが1から始まるが、配列は0から始まるため、-1する
-                let parseId = (parseInt(toUserId) - 1).toString();
-                botUserData = this.getUniqueUsers(parseId);
-            } else {
-                botUserData = this.getUniqueUsers();
-            }
-            console.log(botUserData);
-
-            // NOTE: ここで応援処理を呼び出す
-            createMessage(toUserId, CMD.WELCOME, TARGET.OTHER, botUserData);
+            sendData = this.createSakuraMessage(toUserId, fromUserId, CMD.WELCOME);
         } catch (ex) {
-            console.log(ex);
+            console.warn(`SendMessageError: ${ex}`);
         }
+        await this.delay(waitTime);
+        return sendData;
     }
 
     /**
