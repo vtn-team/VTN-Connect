@@ -128,13 +128,13 @@ export class SakuraConnect {
     }
 
     /**
-     * @summary サクラ機能を提供するメソッド
+     * @summary 挨拶メッセージを送信するメソッド
      * @param {number} waitTime 待ち時間 (ミリ秒)
      * @param {number} toUserId 送信先ユーザID
-     * @param {number} fromUserId 送信元ユーザID
+     * @param {number} fromUserId 送信元ユーザID (未指定の場合ランダムで選択)
      * @returns {Promise<any>} 送信データ
      */
-    public async sendWelcomeMessage(waitTime: number = 0, toUserId: number, fromUserId: number): Promise<any> {
+    public async sendWelcomeMessage(waitTime: number = 0, toUserId: number, fromUserId: number = -1): Promise<any> {
         let sendData;
         try {
             sendData = this.createSakuraMessage(toUserId, fromUserId, CMD.WELCOME);
@@ -142,6 +142,23 @@ export class SakuraConnect {
             console.warn(`SendMessageError: ${ex}`);
         }
         await this.delay(waitTime);
+        return sendData;
+    }
+
+    /**
+     * @summary 応援メッセージを送信するメソッド
+     * @param {number} toUserId 送信先ユーザID
+     * @param {number} fromUserId 送信元ユーザID (未指定の場合ランダムで選択)
+     * @returns {Promise<any>} 送信データ
+     */
+    public async sendSupportMessage(toUserId: number, fromUserId: number = -1): Promise<any> {
+        // TODO: 難易度とゲームの内容を見てから、どのタイミングで応援が必要そうかを決める
+        let sendData;
+        try {
+            sendData = this.createSakuraMessage(toUserId, fromUserId, CMD.SEND_JOIN);
+        } catch (ex) {
+            console.warn(`SendMessageError: ${ex}`);
+        }
         return sendData;
     }
 
