@@ -95,31 +95,41 @@ let ws = null;
 let wsSessionId = "";
 let qrReader = null;
 
+
 if ('serviceWorker' in navigator) {
    navigator.serviceWorker.register("/serviceworker.js");
 }
-function notifyMe() {
-  if (!("Notification" in window)) {
-    // ブラウザーが通知に対応しているか調べる
-    alert("このブラウザーはデスクトップ通知に対応していません。");
-  } else if (Notification.permission === "granted") {
-    // 通知権限が既に付与されているかどうかを調べる。
-    // そうであれば、通知を作成
-    const notification = new Notification("こんにちは！");
-    // …
-  } else if (Notification.permission !== "denied") {
-    // ユーザーにその権限を要求する必要がある
-    Notification.requestPermission().then((permission) => {
-      // ユーザーが許可したら、通知を作成
-      if (permission === "granted") {
-        const notification = new Notification("こんにちは！");
-        // …
-      }
-    });
-  }
 
-  // 最後に、ユーザーが通知を拒否していて、あなたが敬意を
-  // 払いたい場合は、これ以上相手を煩わせることはありません。
+function notifyMe() {
+	if (!("Notification" in window)) {
+		// ブラウザーが通知に対応しているか調べる
+		alert("このブラウザーはデスクトップ通知に対応していません。");
+	} else if (Notification.permission === "granted") {
+		// 通知権限が既に付与されているかどうかを調べる。
+		// そうであれば、通知を作成
+		const notification = new Notification("こんにちは！");
+	} else if (Notification.permission !== "denied") {
+		// ユーザーにその権限を要求する必要がある
+		Notification.requestPermission().then((permission) => {
+			// ユーザーが許可したら、通知を作成
+			if (permission === "granted") {
+				const notification = new Notification("こんにちは！");
+			}
+		});
+	}
+	
+	//SessionIdをキーにしてJoinを返す
+	let json = {
+		SessionId: wsSessionId,
+		Command: CMD.SEND_EVENT,
+		EventId: 1000,
+		Payload: [{
+			Key: "GameId",
+			TypeName: "Integer",
+			Data: "2",
+		}]
+	};
+	ws.send(JSON.stringify(json));
 }
 
 window.addEventListener("load", (event) => {
@@ -164,7 +174,7 @@ async function readQR() {
 	qrReader.start(
 		cameraId, 
 	{
-		fps: 10,// Optional, frame per seconds for qr code scanning
+		fps: 10,	// Optional, frame per seconds for qr code scanning
 		qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
 	},
 	onScanSuccess,
@@ -192,18 +202,46 @@ async function cencelQR() {
 async function onScanSuccess(decodedText, decodedResult) {
     // Handle on success condition with the decoded text or result.
 	enableUIById("qrresult");
-	getElm("qrresult").innerText = `Scan result: ${decodedText} - ${decodedResult}`;
 	await qrReader.stop();
 	
-	//SessionIdをキーにしてJoinを返す
-	let json = {
-		SessionId: wsSessionId,
-		Command: CMD.SEND_EVENT,
-		GameId: 101,
-		EventId: 102,
-		Data: decodedText
-	};
-	ws.send(JSON.stringify(json));
+	if(!userData || !userData.UserId)
+	{
+		getElm("qrresult").innerText = "ユーザー登録されていません";
+		return;
+	}
+	
+	if(decodedText.indexOf("VantanConnectQR:") == -1) {
+		getElm("qrresult").innerText = "無効なQRです";
+		return;
+	}
+	
+	decodedText = decodedText.replace("VantanConnectQR:","");
+	
+	try{
+		
+		let data = JSON.parse(decodedText);
+		
+		//SessionIdをキーにしてJoinを返す
+		let json = {
+			SessionId: wsSessionId,
+			Command: CMD.SEND_EVENT,
+			EventId: data.EventId,
+			Payload: [{
+				Key: "GameId",
+				TypeName: "Integer",
+				Data: data.GameID
+			},
+			{
+				Key: "UserId",
+				TypeName: "Integer",
+				Data: userData.UserId
+			}]
+		};
+		ws.send(JSON.stringify(json));
+		
+	}catch(ex){
+		console.log(ex);
+	}
 }
 
 function addSysLog(evtName, evtMessage) {
@@ -297,17 +335,29 @@ function execMessage(data) {
 	
 	case CMD.EVENT:
 	{
+		//addSysLog("冒険者が魔法を使った", data.Data.Data);
 		switch(data.Data.EventId)
 		{
 		case 100:
+		{
+		}
+		break;
+		
+		case 1000:
+		{
+			addSysLog(data.Data.Data.Name, data.Data.Data.Message);
+		}
+		break;
+		
+		case 1001:
 		{
 			addLog(data.Data);
 		}
 		break;
 		
-		case 102:
+		case 1002:
 		{
-			addSysLog("冒険者が魔法を使った", data.Data.Data);
+			addSysLog(data.Data.Data.Name, data.Data.Data.Message);
 		}
 		break;
 		}
@@ -369,7 +419,7 @@ async function testEvent() {
 		SessionId: wsSessionId,
 		Command: CMD.SEND_EVENT,
 		GameId: 101,
-		EventId: 100,
+		EventId: 1001,
 		Data: data
 	};
 	ws.send(JSON.stringify(json));
@@ -429,10 +479,10 @@ async function createUser() {
 	console.log(req);
 	let result = await req.json();
 	console.log(result);
-	if(result.success) {
-		saveUserSession(result.result.userHash);
+	if(result.Success) {
+		saveUserSession(result.UserData.UserHash);
 	}
-	userData = result.result;
+	userData = result.UserData;
 	createUserInfoUI();
 	enableUIById("userinfo");
 }
@@ -479,7 +529,7 @@ function disableUIById(elmId) {
 }
 
 function createUserInfoUI() {
-	getElm("fullname").innerText = userData.Name;
+	getElm("fullname").innerText = userData.FullName;
 	getElm("level").innerText = userData.Level;
 	getElm("gender").innerText = userData.Gender;
 	getElm("age").innerText = userData.Age;
@@ -488,6 +538,65 @@ function createUserInfoUI() {
 	getElm("motivation").innerText = userData.Motivation;
 	getElm("weakness").innerText = userData.Weaknesses;
 	getElm("backstory").innerText = userData.Background;
+}
+
+let debugData = {};
+async function reqCheck(reqKey) {
+	let host = "http://localhost:4649"; //"https://vc.vtn-game.com";
+	switch(reqKey) {
+	case "gameStart":
+	{
+		let req = await fetch(host + "/vc/gamestart", {
+			mode: 'cors'
+		});
+		let result = await req.json();
+		console.log(result);
+		debugData.gameStart = result;
+	}
+	break;
+	
+	case "gameEnd":
+	{
+		let sample = {
+			GameHash: "",
+			UserResults: [
+				{
+					UserId: 1,
+					GameResult: true,   //脱出
+					MissionClear: true, //ミッション成功
+				},
+				{
+					UserId: 35,
+					GameResult: false,  //志望
+					MissionClear: false,//ミッション失敗
+				},
+				{
+					UserId: 40,
+					GameResult: true,   //脱出
+					MissionClear: false,//ミッション失敗
+				},
+				{
+					UserId: 42,
+					GameResult: false,  //脱出
+					MissionClear: true, //ミッション成功
+				}
+			]
+		};
+		
+		let req = await fetch(host + "/vc/gamestart", {
+			mode: 'cors',
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(sample)
+		});
+		let result = await req.json();
+		console.log(result);
+		debugData.gameStart = result;
+	}
+	break;
+	}
 }
 
 </script>
@@ -535,6 +644,16 @@ function createUserInfoUI() {
 		</div>
 		
 		<div style="height:50px;"></div>
+		
+		<div class="nes-container with-title status">
+			<p class="title">リクエストチェック</p>
+			<div class="center">
+				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameStart");>gamestart</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameEnd");>gameend</button>
+				<div style="height:10px;"></div>
+			</div>
+		</div>
 	</div>
 	
 	<div class="main">

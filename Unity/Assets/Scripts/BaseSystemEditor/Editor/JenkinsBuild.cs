@@ -1,18 +1,21 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System;
+using System.Text;
 
 public class BuildCommand
 {
-    [MenuItem("Assets/Build Application")]
+    [MenuItem("VTNTools/Build Application")]
     public static void Build()
     {
         //プラットフォーム、オプション
         bool isDevelopment = true;
         BuildTarget platform = BuildTarget.StandaloneWindows;
+
+        // チーム名
+        var teamID = "Foundation";
 
         // 出力名とか
         var exeName = PlayerSettings.productName;
@@ -31,6 +34,9 @@ public class BuildCommand
         {
             switch (args[i])
             {
+                case "-team":
+                    teamID = args[i + 1].Trim();
+                    break;
                 case "-projectPath":
                     outpath = args[i + 1] + "\\Build";
                     break;
@@ -53,6 +59,12 @@ public class BuildCommand
                         case "Switch":
                             platform = BuildTarget.Switch;
                             ext = "";
+                            break;
+                        case "Mac":
+                            platform = BuildTarget.StandaloneOSX;
+                            ext = ".app";
+                            // Macの場合は対象CPUアーキテクチャを設定する
+                            PlayerSettings.SetArchitecture(BuildTargetGroup.Standalone, 2);
                             break;
                     }
                     break;

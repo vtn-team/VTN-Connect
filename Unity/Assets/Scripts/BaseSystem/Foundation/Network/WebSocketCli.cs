@@ -78,10 +78,10 @@ public class ClientExample : MonoBehaviour
 
     async void Connect()
     {
-        //Ú‘±æƒGƒ“ƒhƒ|ƒCƒ“ƒg‚ğw’è
+        //æ¥ç¶šå…ˆã‚¨ãƒ³ãƒ‰ãƒã‚¤ãƒ³ãƒˆã‚’æŒ‡å®š
         var uri = new Uri(host);
 
-        //ƒT[ƒo‚É‘Î‚µAÚ‘±‚ğŠJn
+        //ã‚µãƒ¼ãƒã«å¯¾ã—ã€æ¥ç¶šã‚’é–‹å§‹
         await _webSocket.ConnectAsync(uri, CancellationToken.None);
     }
 
@@ -92,13 +92,13 @@ public class ClientExample : MonoBehaviour
 
     async void Receive()
     {
-        //Š“¾î•ñŠm•Û—p‚Ì”z—ñ‚ğ€”õ
+        //æ‰€å¾—æƒ…å ±ç¢ºä¿ç”¨ã®é…åˆ—ã‚’æº–å‚™
         var segment = new ArraySegment<byte>(buffer);
 
-        //ƒT[ƒo‚©‚ç‚ÌƒŒƒXƒ|ƒ“ƒXî•ñ‚ğæ“¾
+        //ã‚µãƒ¼ãƒã‹ã‚‰ã®ãƒ¬ã‚¹ãƒãƒ³ã‚¹æƒ…å ±ã‚’å–å¾—
         var result = await _webSocket.ReceiveAsync(segment, CancellationToken.None);
 
-        //ƒGƒ“ƒhƒ|ƒCƒ“ƒgClose‚Ìê‡Aˆ—‚ğ’†’f
+        //ã‚¨ãƒ³ãƒ‰ãƒã‚¤ãƒ³ãƒˆCloseã®å ´åˆã€å‡¦ç†ã‚’ä¸­æ–­
         if (result.MessageType == WebSocketMessageType.Close)
         {
             await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK",
@@ -106,7 +106,7 @@ public class ClientExample : MonoBehaviour
             return;
         }
 
-        //ƒoƒCƒiƒŠ‚Ìê‡‚ÍA“–ˆ—‚Å‚Íˆµ‚¦‚È‚¢‚½‚ßAˆ—‚ğ’†’f
+        //ãƒã‚¤ãƒŠãƒªã®å ´åˆã¯ã€å½“å‡¦ç†ã§ã¯æ‰±ãˆãªã„ãŸã‚ã€å‡¦ç†ã‚’ä¸­æ–­
         if (result.MessageType == WebSocketMessageType.Binary)
         {
             await _webSocket.CloseAsync(WebSocketCloseStatus.InvalidMessageType,
@@ -114,7 +114,7 @@ public class ClientExample : MonoBehaviour
             return;
         }
 
-        //ƒƒbƒZ[ƒW‚ÌÅŒã‚Ü‚Åæ“¾
+        //ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®æœ€å¾Œã¾ã§å–å¾—
         int count = result.Count;
         while (!result.EndOfMessage)
         {
@@ -130,7 +130,7 @@ public class ClientExample : MonoBehaviour
             count += result.Count;
         }
 
-        //ƒƒbƒZ[ƒW‚ğæ“¾
+        //ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å–å¾—
         var message = Encoding.UTF8.GetString(buffer, 0, count);
         Debug.Log("> " + message);
     }

@@ -21,6 +21,6 @@
 
 ## クライアントからローカルサーバを見る
 1. Unityフォルダ内をUnityHubから登録し起動する
-2. EventTestシーンを開き、EventオブジェクトについているGameAPIをLocalImplementsに変更
+2. VTNTools→VantanConnectControlPanelから、API等の環境ターゲットをLocalにする
 3. 再生するとローカルサーバに接続に行く
 

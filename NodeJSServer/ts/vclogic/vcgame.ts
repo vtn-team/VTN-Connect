@@ -41,8 +41,8 @@ export async function gameStartAIGame() {
 	return result;
 }
 
-//ゲーム開始
-export async function gameStartVC(userHash: string) {
+//ゲーム終了
+export async function gameEndAIGame(gameResult: any) {
 	let result = {
 		Success: false,
 	};
@@ -57,13 +57,46 @@ export async function gameStartVC(userHash: string) {
 }
 
 
+//ゲーム開始
+export async function gameStartVC(gameId: number, userId: number) {
+	let result = {
+		Success: false,
+		GameHash: "",
+		GameInfo: []
+	};
+	
+	try {
+		let gameHash = uuidv4();
+		
+		//Gameにプレイ開始したゲームの情報を記録
+		if(userId > 0)
+		{
+			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
+			await query("INSERT INTO Adventure (GameHash, UserId) VALUES (?, ?)", [gameHash, userId]);
+		}
+		else
+		{
+			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 3)", [gameHash, gameId]);
+		}
+		
+		result.GameHash = gameHash;
+		result.Success = true;
+	} catch(ex) {
+		console.log(ex);
+	}
+	
+	return result;
+}
+
+
 //ゲーム終了
-export async function gameEndVC(gameResult: any) {
+export async function gameEndVC(gameHash: string, gameResult: boolean) {
 	let result = {
 		Success: false,
 	};
 	
 	try {
+		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [gameResult ? 2 : 3, gameHash]);
 		result.Success = true;
 	} catch(ex) {
 		console.log(ex);

@@ -32,7 +32,7 @@ public class LocalizeTextAttributeDrawer : PropertyDrawer
         //参照するマスタ名を拾ってくる(※今は使ってない)
         var attr = attribute as LocalizeTextAttribute;
         var master = attr.Master;
-
+        
         //設定可能なテキストのリストを作る
         List<string> list = new List<string>();
         list.Add("None");
@@ -47,19 +47,7 @@ public class LocalizeTextAttributeDrawer : PropertyDrawer
 
         //テキストの選択フィールドと、選択後にプレビューを更新する処理
         bool isInit = true;
-        var popup = GetPopup(property, list, text, isInit);
-
-        //GUI構築
-        _element.Add(popup);
-        _element.Add(text);
-        _element.MarkDirtyRepaint();
-
-        isInit = false;
-    }
-
-    private PopupField<string> GetPopup(SerializedProperty property, List<string> list, TextField text, bool isInit)
-    {
-        return new PopupField<string>(property.name.Replace("_", ""), list, _selected, (string s) =>
+        var popup = new PopupField<string>(property.name.Replace("_",""), list, _selected, (string s) =>
         {
             //tags[idx].Index = tags[idx].TagArray.ToList().IndexOf(s);
             //BuildContainer(property);
@@ -89,6 +77,13 @@ public class LocalizeTextAttributeDrawer : PropertyDrawer
 
             return s;
         });
+
+        //GUI構築
+        _element.Add(popup);
+        _element.Add(text);
+        _element.MarkDirtyRepaint();
+
+        isInit = false;
     }
 
     /// <summary>

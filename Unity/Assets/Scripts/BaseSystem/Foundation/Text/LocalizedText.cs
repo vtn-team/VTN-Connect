@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using DataManagement;
 using Cysharp.Threading.Tasks;
 using TMPro;

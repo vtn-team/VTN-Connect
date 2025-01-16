@@ -1,27 +1,32 @@
-﻿using System;
-using System.Runtime.Serialization;
-using UnityEngine;
-using VTNConnect;
+using System;
 
-
-/// <summary>
-/// データクラス
-/// </summary>
-[Serializable]
-public class NecoEvent : EventData
+namespace VTNConnect
 {
-    //実装
-    public class Neco
+    /// <summary>
+    /// 応援イベントクラス
+    /// </summary>
+    [Serializable]
+    public class CheerEvent : EventData
     {
-        public int CatType = 0;
-        public int Color = 0;
-        public int Move = 0;
-    }
+        public CheerEvent() : base(EventDefine.Cheer){ }
+        public CheerEvent(EventData d) : base(d) { }
 
-    public Neco NecoData = default;
 
-    public NecoEvent()
-    {
-        base.EventId = 1;
+        /// <summary>
+        /// メッセージを得る
+        /// </summary>
+        public string GetMessage()
+        {
+            return GetStringData("Message");
+        }
+
+        /// <summary>
+        /// 感情値を得る
+        /// NOTE: -100～100まで
+        /// </summary>
+        public int GetEmotion()
+        {
+            return GetIntData("Emotion");
+        }
     }
 }
