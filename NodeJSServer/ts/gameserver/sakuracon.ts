@@ -96,6 +96,7 @@ export class SakuraConnect {
 
         // 送信タイミングを判定し、送信するデータを選択する
         let sendMessageData: messageEmotionTuple;
+        // TODO: Enumが適切かを確認する
         if (messageType == CMD.WELCOME) {
             sendMessageData = sakuraWelcomeMessage[randomMessageNumber];
         } else {
@@ -151,8 +152,9 @@ export class SakuraConnect {
      * @param {number} fromUserId 送信元ユーザID (未指定の場合ランダムで選択)
      * @returns {Promise<any>} 送信データ
      */
-    public async sendSupportMessage(toUserId: number, fromUserId: number = -1): Promise<any> {
+    public async sendSupportMessage(toUserId: number, fromUserId: number = -1, event?: any): Promise<any> {
         // TODO: 難易度とゲームの内容を見てから、どのタイミングで応援が必要そうかを決める
+        // TODO: 今後{event}を送ってもらう場合があるので、一応引数を設定しておく
         let sendData;
         try {
             sendData = this.createSakuraMessage(toUserId, fromUserId, CMD.SEND_JOIN);
@@ -160,6 +162,40 @@ export class SakuraConnect {
             console.warn(`SendMessageError: ${ex}`);
         }
         return sendData;
+    }
+
+    /**
+     * @summary 運営メッセージを送信するメソッド
+     * @param {string} adminMessage 運営メッセージ
+     * @returns {any} 送信データ
+     */
+    public sendAdminMessage(adminMessage: string): any {
+        try {
+            // TODO: おそらく運営メッセージもこの形式で送信する
+            return {
+                Target: 0,
+                Command: CMD.EVENT,
+                Data: {
+                    EventId: 1001,
+                    FromId: -1,
+                    Payload: [
+                        {
+                            Key: "Emotion",
+                            TypeName: "Int32",
+                            Data: "99",
+                        },
+                        {
+                            Key: "Message",
+                            TypeName: "String",
+                            Data: adminMessage,
+                        },
+                    ],
+                    SessionId: "",
+                },
+            };
+        } catch (ex) {
+            console.warn(`SendMessageError: ${ex}`);
+        }
     }
 
     /**
