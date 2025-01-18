@@ -1,4 +1,5 @@
 import { GameConnect, createMessage, TARGET, CMD } from "./gamecon";
+import { uniqueUsers, preloadUniqueUsers } from "./../vclogic/vcuser";
 import { query } from "./../lib/database";
 import crypto from "crypto";
 
@@ -42,11 +43,15 @@ type messageTemplate = {
  * @summary BOT的なユーザのふるまいをするサービス
  */
 export class SakuraConnect {
-    // games: any;
-    // sessionDic: any;
-    // broadcast: any;
-    public constructor() {}
+	games: any;
+	sessionDic: any;
+	broadcast: any;
 
+	constructor(bc: any) {
+		this.games = {};
+		this.sessionDic = {};
+		this.broadcast = bc;
+	}
     /**
      * @summary ユニークユーザを取得するメソッド
      * @param {number} userId 取得したいユニークユーザのID
@@ -83,7 +88,8 @@ export class SakuraConnect {
             // NOTE: 1<=n<999の範囲がユニークユーザーデータの範囲
             uniqueId = crypto.randomInt(1, 999);
         }
-        botUserData = await this.getUniqueUsers(uniqueId);
+
+        botUserData = uniqueUsers[uniqueId];
 
         // ランダムでメッセージを選択するための数値を生成
         let randomMessageNumber = crypto.randomInt(0, sakuraWelcomeMessage.length);
@@ -91,7 +97,7 @@ export class SakuraConnect {
         // ユニークユーザが取得できない場合は、再度取得する
         while (!botUserData) {
             uniqueId = crypto.randomInt(1, 999);
-            botUserData = await this.getUniqueUsers(uniqueId);
+            botUserData = uniqueUsers[uniqueId];
         }
 
         // 送信タイミングを判定し、送信するデータを選択する
@@ -130,12 +136,12 @@ export class SakuraConnect {
 
     /**
      * @summary 挨拶メッセージを送信するメソッド
-     * @param {number} waitTime 待ち時間 (ミリ秒)
      * @param {number} toUserId 送信先ユーザID
      * @param {number} fromUserId 送信元ユーザID (未指定の場合ランダムで選択)
+     * @param {number} waitTime 待ち時間 (ミリ秒)
      * @returns {Promise<any>} 送信データ
      */
-    public async sendWelcomeMessage(waitTime: number = 0, toUserId: number, fromUserId: number = -1): Promise<any> {
+    public async sendWelcomeMessage(toUserId: number, fromUserId: number = -1, waitTime: number = 0): Promise<any> {
         let sendData;
         try {
             sendData = this.createSakuraMessage(toUserId, fromUserId, CMD.WELCOME);
@@ -150,9 +156,9 @@ export class SakuraConnect {
      * @summary 応援メッセージを送信するメソッド
      * @param {number} toUserId 送信先ユーザID
      * @param {number} fromUserId 送信元ユーザID (未指定の場合ランダムで選択)
-     * @returns {Promise<any>} 送信データ
+     * @returns {any} 送信データ
      */
-    public async sendSupportMessage(toUserId: number, fromUserId: number = -1, event?: any): Promise<any> {
+    public sendSupportMessage(toUserId: number, fromUserId: number = -1, event?: any): any {
         // TODO: 難易度とゲームの内容を見てから、どのタイミングで応援が必要そうかを決める
         // TODO: 今後{event}を送ってもらう場合があるので、一応引数を設定しておく
         let sendData;
