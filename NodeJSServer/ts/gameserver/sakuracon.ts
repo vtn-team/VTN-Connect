@@ -58,7 +58,6 @@ export class SakuraConnect {
      * @returns ユニークユーザの情報
      */
     private async getUniqueUsers(userId: number) {
-        // TODO: ts/vclogic/vcuser.tsにユニークユーザーを格納している変数があるので、それを使ってもいいかもしれない
         try {
             let botUserData = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?", [999]);
             let users: any = [];
