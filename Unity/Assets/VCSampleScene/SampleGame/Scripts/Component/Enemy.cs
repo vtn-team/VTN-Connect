@@ -14,7 +14,7 @@ namespace GameLoopTest
             if(this.transform.position.y < -20)
             {
                 //イベントを送信する
-                EventData data = new EventData(EventDefine.SummonEnemy);
+                EventData data = new EventData(EventDefine.Cheer);
                 data.DataPack("Position", this.transform.position);
                 VantanConnect.SendEvent(data);
 
