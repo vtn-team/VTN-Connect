@@ -157,6 +157,7 @@ export class SakuraConnect {
      * @param {number} fromUserId 送信元ユーザID (未指定の場合ランダムで選択)
      * @returns {any} 送信データ
      */
+    // TODO: 応援を訳すとSupportになったが、イケてないのでいずれ変更する
     public sendSupportMessage(toUserId: number, fromUserId: number = -1, event?: any): any {
         // TODO: 難易度とゲームの内容を見てから、どのタイミングで応援が必要そうかを決める
         // TODO: 今後{event}を送ってもらう場合があるので、一応引数を設定しておく
