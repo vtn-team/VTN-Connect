@@ -1,5 +1,4 @@
 import { GameConnect, createMessage, TARGET, CMD } from "./gamecon";
-import { uniqueUsers, preloadUniqueUsers } from "./../vclogic/vcuser";
 import { query } from "./../lib/database";
 import crypto from "crypto";
 
@@ -43,15 +42,18 @@ type messageTemplate = {
  * @summary BOT的なユーザのふるまいをするサービス
  */
 export class SakuraConnect {
-	games: any;
-	sessionDic: any;
-	broadcast: any;
+    games: any;
+    sessionDic: any;
+    broadcast: any;
 
-	constructor(bc: any) {
-		this.games = {};
-		this.sessionDic = {};
-		this.broadcast = bc;
-	}
+    uniqueUsers: any;
+
+    constructor(bc: any) {
+        this.games = {};
+        this.sessionDic = {};
+        this.broadcast = bc;
+        this.uniqueUsers = async () => await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?", [999]);
+    }
     /**
      * @summary ユニークユーザを取得するメソッド
      * @param {number} userId 取得したいユニークユーザのID
@@ -88,7 +90,7 @@ export class SakuraConnect {
             uniqueId = crypto.randomInt(1, 999);
         }
 
-        botUserData = uniqueUsers[uniqueId];
+        botUserData = this.uniqueUsers[uniqueId];
 
         // ランダムでメッセージを選択するための数値を生成
         let randomMessageNumber = crypto.randomInt(0, sakuraWelcomeMessage.length);
@@ -96,7 +98,7 @@ export class SakuraConnect {
         // ユニークユーザが取得できない場合は、再度取得する
         while (!botUserData) {
             uniqueId = crypto.randomInt(1, 999);
-            botUserData = uniqueUsers[uniqueId];
+            botUserData = this.uniqueUsers[uniqueId];
         }
 
         // 送信タイミングを判定し、送信するデータを選択する
