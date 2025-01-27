@@ -42,16 +42,9 @@ type messageTemplate = {
  * @summary BOT的なユーザのふるまいをするサービス
  */
 export class SakuraConnect {
-    games: any;
-    sessionDic: any;
-    broadcast: any;
-
     uniqueUsers: any;
 
-    constructor(bc: any) {
-        this.games = {};
-        this.sessionDic = {};
-        this.broadcast = bc;
+    constructor() {
         this.uniqueUsers = async () => await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?", [999]);
     }
     /**
@@ -163,12 +156,17 @@ export class SakuraConnect {
     public sendSupportMessage(toUserId: number, fromUserId: number = -1, event?: any): any {
         // TODO: 難易度とゲームの内容を見てから、どのタイミングで応援が必要そうかを決める
         // TODO: 今後{event}を送ってもらう場合があるので、一応引数を設定しておく
+
+        console.log("start SendSupportMessage");
+
         let sendData;
         try {
             sendData = this.createSakuraMessage(toUserId, fromUserId, CMD.SEND_JOIN);
         } catch (ex) {
             console.warn(`SendMessageError: ${ex}`);
         }
+
+        console.log("end SendSupportMessage");
         return sendData;
     }
 
