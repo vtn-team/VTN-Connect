@@ -213,7 +213,11 @@ async function run(req: any, res: any, route: any) {
 			res.write("run..." + route.action);
 			res.end();
 		}else{
-			if(typeof result == "object")
+			if(result.html && result.statusCode && result.type){
+				res.writeHead(result.statusCode, {'Content-Type': result.type});
+				res.write(result.html);
+			}
+			else if(typeof result == "object")
 			{
 				if(result.statusCode)
 				{

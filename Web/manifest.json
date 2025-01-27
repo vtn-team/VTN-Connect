@@ -1,0 +1,32 @@
+{
+  "theme_color": "#f69435",
+  "background_color": "#f69435",
+  "display": "standalone",
+  "scope": "https://www.vtn-game.com/vc/",
+  "start_url": "https://www.vtn-game.com/vc/index.html",
+  "name": "Vantan Connect",
+  "short_name": "V.C.",
+  "description": "バンタンコネクトの冒険者用ページ",
+  "icons": [
+    {
+      "src": "/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

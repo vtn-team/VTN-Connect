@@ -3,10 +3,13 @@ exports.Routes = {
 		"/"				: "index#index#トップページ",
 		"/route"		: "index#route#APIリスト羅列",
 		"/favicon.ico"	: "resource#favicon#favicon",
+		"/manifest.json" : "debug#manifest#Webテスト",
+		"/serviceworker.js" : "debug#serviceworker#Webテスト",
 		"/stat" : {
 			"/" : "stat#check#状態確認"
 		},
 		"/vc" : {
+			"/" : "debug#web#                      Webテスト",
 			"/stat" : "vc#stat#                    ゲームの状況確認",
 			"/getaddr" : "vc#getaddr#              ゲームサーバ接続情報取得",
 			"/user" : {
