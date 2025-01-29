@@ -15,8 +15,8 @@ function check(method: string, url: string)
 		url = url.substr( 0, url.indexOf("?") );
 	}
 	
-	console.log(url);
-	console.log(get_vars);
+	//console.log(url);
+	//console.log(get_vars);
 	var uris: any = url.split('/');
 	var uri_key: any = 2;
 	var route: any = Routes[method]["/" + uris[1]];
@@ -164,7 +164,7 @@ function check(method: string, url: string)
 }
 
 async function run(req: any, res: any, route: any) {
-	console.log(route);
+	//console.log(route);
 	let apiScript = require('./server/' + route.action);
 	let target = route.target;
 	if(!target) target = "run";
@@ -183,7 +183,7 @@ async function run(req: any, res: any, route: any) {
 		if(route.auth)
 		{
 			route.session = await getCache(route.query.session);
-			console.log(route.session);
+			//console.log(route.session);
 			if(target != "login" && !route.session) {
 				res.writeHead(503, {'Content-Type': 'text/html'});
 				res.write("invalid session.");
@@ -191,7 +191,7 @@ async function run(req: any, res: any, route: any) {
 				return ;
 			}
 			if(target != "login" && req.method == "POST") {
-				console.log(target);
+				//console.log(target);
 				//POSTの場合重複送信を避けるためtokenを確認
 				if(target != "login" && route.query.token != route.session.token) {
 					res.writeHead(503, {'Content-Type': 'text/html'});
@@ -207,7 +207,7 @@ async function run(req: any, res: any, route: any) {
 		if(target != "login" && req.method == "POST" && route.auth) {
 			result.token = await updateToken(route.query.session);
 		}
-		console.log(result);
+		//console.log(result);
 		if(!result) {
 			res.writeHead(200, {'Content-Type': 'text/html'});
 			res.write("run..." + route.action);
@@ -264,13 +264,13 @@ export function launch(port: number) {
 			let data = "";
 			req.on('data', (chunk: any) => {
 				data += chunk;
-				console.log('BODY: ' + chunk);
+				//console.log('BODY: ' + chunk);
 			});
 			req.on('end', async () => {
 				//end of data
 				var isParsed = false;
 				try {
-					console.log(data);
+					//console.log(data);
 					let d = JSON.parse(data);
 					for(var k in d) {
 						route.query[k] = d[k];
@@ -292,7 +292,7 @@ export function launch(port: number) {
 					}
 				}
 				
-				console.log('END:');
+				//console.log('END:');
 				await run(req,res,route);
 			})
 			return ;
