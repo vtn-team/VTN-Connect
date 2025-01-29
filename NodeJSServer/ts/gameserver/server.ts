@@ -1,58 +1,12 @@
-import { GameConnect, CMD, TARGET, createMessage } from "./gamecon"
+import { GameConnect } from "./gamecon"
 import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
+import { UserSession, CMD, TARGET, createMessage } from "./session"
 
 
 //サーバキャッシュ
 let gServer:Server|null = null;
-
-
-//接続するユーザを管理する構造体
-class UserSession {
-	protected userId: string;		//ユーザ特定用のハッシュ
-	protected client: WebSocket;	//WebSocket接続クライアント
-	protected isPingAlive: boolean;	//生きているか
-	
-	//コンストラクタ
-	constructor(userId: string, ws: WebSocket) {
-		this.userId = userId;
-		this.client = ws;
-		this.isPingAlive = true;
-	}
-	
-	public term() {
-		this.client.terminate();
-	}
-	
-	public sendMessage(msg: string) {
-		if (this.client == null) return 
-		if (this.client.readyState != WebSocket.OPEN) return;
-		
-		this.client.send(msg);
-	}
-	
-	public isAlive() : boolean {
-		return this.client.readyState == WebSocket.OPEN;
-	}
-	
-	public ping() {
-		if(this.isPingAlive == false) this.term();
-		this.client.ping();
-		this.isPingAlive = false;
-	}
-	public pong() {
-		this.isPingAlive = true;
-	}
-	
-	public chkTarget(tgt: TARGET, tgtId: string) {
-		switch(tgt) {
-		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.userId == tgtId);
-		case TARGET.OTHER: return (this.userId != tgtId);
-		}
-	}
-};
 
 
 //サーバ本体
@@ -70,10 +24,11 @@ class Server {
 	//データ送信
 	broadcast(data: any) {
 		let msg = JSON.stringify(data);
+		
 		//let msg = msgpack.pack(data);
 		for(var k in this.sessions) {
 			let us = this.sessions[k];
-			if(!us.chkTarget(data.Target, data.UserId)) return;
+			if(!us.chkTarget(data)) return;
 			
 			us.sendMessage(msg);
 			console.log("send:" + msg);
@@ -89,11 +44,10 @@ class Server {
 		this.lastActiveNum = 0;
 		this.server.on ('connection', (ws: any) => {
 			let uuid = randomUUID();
-			let session = new UserSession(uuid, ws);
-			this.sessions[uuid] = session;
+			this.sessions[uuid] = new UserSession(uuid, ws);
 			
 			ws.on('pong', () => {
-				session.pong();
+				this.pong(uuid);
 			});
 
 			ws.on('message', (message: string) => {
@@ -104,7 +58,17 @@ class Server {
 					let sessionId = data["SessionId"];
 					
 					if(this.sessions[sessionId]) {
-						this.contents.execMessage(data);
+						//重要なメッセージはここでさばく
+						switch(data["Command"])
+						{
+						case CMD.SEND_JOIN:
+							this.joinRoom(data);
+							break;
+							
+						default:
+							this.contents.execMessage(data);
+							break;
+						}
 					}else{
 						console.error("session not found.")
 					}
@@ -136,7 +100,7 @@ class Server {
 			for(var k in this.sessions) {
 				let us = this.sessions[k];
 				if (!us.isAlive()) return us.term();
-				
+
 				us.ping();
 				count++;
 			}
@@ -147,10 +111,39 @@ class Server {
 		console.log("server launch port on :" + port);
 	}
 	
+	joinRoom(data: any) {
+		let gameId = parseInt(data.GameId);
+		let sessionId = data["SessionId"];
+		
+		this.sessions[sessionId] = this.contents.joinRoom(gameId, this.sessions[sessionId], data);
+	}
+	
 	removeSession(uuid: string) {
 		delete this.sessions[uuid];
 		this.contents.removeSession(uuid);
 		console.log("delete session :" + uuid);
+	}
+
+	pong(sessionId: string) {
+		if (this.sessions[sessionId]) {
+			this.sessions[sessionId].pong();
+		}
+	}
+
+	public setupGameConnect() {
+		this.contents.setupGameConnect();
+	}
+	
+	public startRecord(gameId:number, gameHash: string) {
+		this.contents.startRecord(gameId, gameHash);
+	}
+	
+	public stopRecord(gameHash: string) {
+		this.contents.stopRecord(gameHash);
+	}
+	
+	public sendAPIEvent(data: any) {
+		this.contents.sendAPIEvent(data);
 	}
 	
 	public getPort() {
@@ -176,6 +169,7 @@ export function launchDGS(port: number) {
 	if(gServer != null) return;
 	
 	gServer = new Server(port);
+	gServer.setupGameConnect();
 }
 
 //(公開関数)WebSocketに接続するホストアドレスとポートを返す
@@ -197,4 +191,25 @@ export function getActiveGames() {
 	if(gServer == null) return 0;
 	
 	return gServer.getActiveGames();
+}
+
+//(公開関数)APIをイベントとして配信する
+export function sendAPIEvent(data: any) {
+	if(gServer == null) return;
+	
+	gServer.sendAPIEvent(data);
+}
+
+//(公開関数)ゲームを記録する
+export function startRecord(gameId:number, gameHash:string) {
+	if(gServer == null) return;
+	
+	gServer.startRecord(gameId, gameHash);
+}
+
+//(公開関数)ゲームの記録を終了する
+export function stopRecord(gameHash:string) {
+	if(gServer == null) return;
+	
+	gServer.stopRecord(gameHash);
 }

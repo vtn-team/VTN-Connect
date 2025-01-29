@@ -60,6 +60,11 @@ export function getUniqueUsers(num: number) {
 	return reserve;
 }
 
+//ユニークユーザを特定数分取得
+export function getAllUniqueUsers() {
+	return uniqueUsers;
+}
+
 async function createUserFromChatGPT(sessionId:string|null) {
 	let prompt = getAIRule("CreateUser").RuleText;
 	prompt += `
