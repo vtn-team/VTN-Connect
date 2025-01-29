@@ -5,7 +5,6 @@ import { launchDGS } from "./gameserver/server"
 import { connect } from "./lib/database"
 import { HTTP_SERVER_PORT, GAME_SERVER_PORT } from "./config/config"
 import { loadMaster, loadMasterFromCache } from "./lib/masterDataCache"
-import { loadInformation, loadInformationFromCache } from "./lib/InformationCache"
 import { preloadUniqueUsers } from "./vclogic/vcuser"
 
 (async function() {
