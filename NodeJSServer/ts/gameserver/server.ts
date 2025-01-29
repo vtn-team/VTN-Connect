@@ -1,4 +1,5 @@
 import { GameConnect } from "./gamecon"
+import { UserPortal } from "./portal"
 import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
@@ -17,13 +18,16 @@ class Server {
 	protected sessions: any;			//各接続のセッション
 	protected server: any;				//WebSocketサーバ本体
 	protected roomCheck: any;			//ルーム監視用のタイマー
+	protected sendStatsTimer:any;		//スタッツ送信用タイマー
 	protected contents: GameConnect;	//ゲームコネクター(ゲーム同士をつなげるGameServerの本体)
+	protected portal: UserPortal;		//ユーザールーム(ユーザを管理するGameServerの本体)
 	protected lastActiveNum: number;	//現在のアクティブ人数キャッシュ
 	protected port: number;				//接続するポート
 
 	//データ送信
 	broadcast(data: any) {
 		let msg = JSON.stringify(data);
+		console.log("send:" + msg);
 		
 		//let msg = msgpack.pack(data);
 		for(var k in this.sessions) {
@@ -31,7 +35,6 @@ class Server {
 			if(!us.chkTarget(data)) return;
 			
 			us.sendMessage(msg);
-			console.log("send:" + msg);
 		}
 	};
 	
@@ -41,6 +44,7 @@ class Server {
 		this.port = port;
 		this.server = new WebSocketServer({ port });
 		this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
+		this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
 		this.lastActiveNum = 0;
 		this.server.on ('connection', (ws: any) => {
 			let uuid = randomUUID();
@@ -62,9 +66,14 @@ class Server {
 						switch(data["Command"])
 						{
 						case CMD.SEND_JOIN:
-							this.joinRoom(data);
+							this.joinGame(data);
 							break;
 							
+						case CMD.SEND_USER_JOIN:
+							this.joinPortal(data);
+							break;
+							
+						case CMD.SEND_EVENT:
 						default:
 							this.contents.execMessage(data);
 							break;
@@ -96,26 +105,28 @@ class Server {
 		});
 		
 		this.roomCheck = setInterval(() => {
-			let count = 0;
-			for(var k in this.sessions) {
-				let us = this.sessions[k];
-				if (!us.isAlive()) return us.term();
-
-				us.ping();
-				count++;
-			}
-			this.lastActiveNum = count;
-			//console.log("active session count:" + count);
+			this.activeCheck();
 		}, 10000);
+		
+		this.sendStatsTimer = setInterval(() => {
+			this.sendGameStatus();
+		}, 5000);
 		
 		console.log("server launch port on :" + port);
 	}
 	
-	joinRoom(data: any) {
-		let gameId = parseInt(data.GameId);
+	joinGame(data: any) {
 		let sessionId = data["SessionId"];
+		let gameId = parseInt(data.GameId);
 		
-		this.sessions[sessionId] = this.contents.joinRoom(gameId, this.sessions[sessionId], data);
+		this.sessions[sessionId] = this.contents.joinGame(gameId, this.sessions[sessionId], data);
+	}
+	
+	async joinPortal(data: any) {
+		let sessionId = data["SessionId"];
+		let userId = parseInt(data.UserId);
+		
+		this.sessions[sessionId] = await this.portal.joinRoom(userId, this.sessions[sessionId], data);
 	}
 	
 	removeSession(uuid: string) {
@@ -128,6 +139,27 @@ class Server {
 		if (this.sessions[sessionId]) {
 			this.sessions[sessionId].pong();
 		}
+	}
+	
+	activeCheck() {
+		let count = 0;
+		for(var k in this.sessions) {
+			let us = this.sessions[k];
+			if (!us.isAlive()) return us.term();
+
+			us.ping();
+			count++;
+		}
+		this.lastActiveNum = count;
+		//console.log("active session count:" + count);
+	}
+	
+	sendGameStatus() {
+		let stats = {
+			ActiveGames: this.contents.getActiveGames(),
+			ActiveUsers: this.portal.getActiveUsers()
+		}
+		this.broadcast(createMessage("", CMD.GAMESTAT, TARGET.ALL, stats));
 	}
 
 	public setupGameConnect() {

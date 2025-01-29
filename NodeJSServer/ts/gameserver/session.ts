@@ -10,31 +10,56 @@ export enum CMD {
 	WELCOME = 1,
 	JOIN = 2,
 	EVENT = 3,
+	GAMESTAT = 4,
 	SEND_JOIN = 100,
 	SEND_EVENT = 101,
+	SEND_USER_JOIN = 110,
 };
+
+export enum SESSION_TYPE {
+	INVALID = 0,
+	USER = 1,
+	GAME = 2,
+}
+
+export interface VCActiveGame
+{
+	GameId: number;
+	Name: string;
+	ActiveTime: number;
+}
 
 
 //接続するユーザを管理する構造体
 export class UserSession {
-	protected userId: string;			//ユーザ特定用のハッシュ
+	protected sessionId: string;		//ユーザ特定用のハッシュ
 	protected client: WebSocket|null;	//WebSocket接続クライアント
 	protected isPingAlive: boolean;		//生きているか
+	protected bornAt: Date;
 	
 	//コンストラクタ
-	constructor(userId: string, ws: WebSocket|null) {
-		this.userId = userId;
+	constructor(sessionId: string, ws: WebSocket|null) {
+		this.sessionId = sessionId;
 		this.client = ws;
+		this.bornAt = new Date();
 		this.isPingAlive = true;
 	}
 	
 	protected setupExtends(us: UserSession) {
-		this.userId = us.userId;
+		this.sessionId = us.sessionId;
 		this.client = us.client;
 	}
 	
 	public term() {
 		this.client?.terminate();
+	}
+	
+	public getActiveTime() {
+		return new Date().valueOf() - this.bornAt.valueOf();
+	}
+	
+	public getSessionType() {
+		return SESSION_TYPE.INVALID;
 	}
 	
 	public sendMessage(msg: string) {
@@ -49,7 +74,6 @@ export class UserSession {
 	}
 	
 	public ping() {
-		console.log("ping:" + this.isPingAlive + "userId:" + this.userId);
 		if (this.isPingAlive == false) this.term();
 
 		this.client?.ping();
@@ -57,7 +81,6 @@ export class UserSession {
 	}
 	public pong() {
 		this.isPingAlive = true;
-		console.log("pong:" + this.isPingAlive + "userId:" + this.userId);
 	}
 	
 	public chkTarget(data: any) {
@@ -65,8 +88,34 @@ export class UserSession {
 		let senderId: string = data.UserId;
 		switch(tgt) {
 		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.userId == senderId);
-		case TARGET.OTHER: return (this.userId != senderId);
+		case TARGET.SELF: return (this.sessionId == senderId);
+		case TARGET.OTHER: return (this.sessionId != senderId);
+		}
+	}
+};
+
+//ユーザーセッション
+export class VCUserSession extends UserSession {
+	protected userId: number;		//ゲーム特定用Id
+	
+	//コンストラクタ
+	constructor(userId: number, us: UserSession) {
+		super("", null);
+		this.setupExtends(us);
+		this.userId = userId;
+	}
+	
+	public getSessionType() {
+		return SESSION_TYPE.USER;
+	}
+	
+	public chkTarget(data: any) {
+		let tgt: TARGET = data.Target;
+		let senderId: string = data.UserId;
+		switch(tgt) {
+		case TARGET.ALL:return true;
+		case TARGET.SELF: return (this.sessionId == senderId);
+		case TARGET.OTHER: return (this.sessionId != senderId);
 		}
 	}
 };
@@ -82,13 +131,17 @@ export class VCGameSession extends UserSession {
 		this.gameId = gameId;
 	}
 	
+	public getSessionType() {
+		return SESSION_TYPE.GAME;
+	}
+	
 	public chkTarget(data: any) {
 		let tgt: TARGET = data.Target;
 		let senderId: string = data.UserId;
 		switch(tgt) {
 		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.userId == senderId);
-		case TARGET.OTHER: return (this.userId != senderId);
+		case TARGET.SELF: return (this.sessionId == senderId);
+		case TARGET.OTHER: return (this.sessionId != senderId);
 		}
 	}
 };
@@ -106,7 +159,7 @@ export function createMessage(senderId: string, command: CMD, target:TARGET, dat
 	return ret;
 }
 
-export function createGameMessage(senderId: string, senderGameId: string, command: CMD, target:TARGET, data: any) {
+export function createGameMessage(senderId: string, senderGameId: number, command: CMD, target:TARGET, data: any) {
 	//let msg = msgpack.pack(data);
 	delete data["Command"]
 	let msg = JSON.stringify(data);

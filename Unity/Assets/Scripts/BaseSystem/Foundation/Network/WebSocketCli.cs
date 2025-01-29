@@ -1,7 +1,5 @@
 using UnityEngine;
-using System.Collections;
 using WebSocketSharp;
-using WebSocketSharp.Net;
 
 public class WebSocketCli
 {
@@ -22,7 +20,7 @@ public class WebSocketCli
 
         _webSocket.OnMessage += (sender, e) =>
         {
-            Debug.Log("WebSocket Message Data: " + System.Text.Encoding.UTF8.GetString(e.RawData));
+            //Debug.Log("WebSocket Message Data: " + System.Text.Encoding.UTF8.GetString(e.RawData));
             _callback?.Invoke(e.RawData);
         };
 

@@ -1,0 +1,1 @@
+call npx tsc --watch

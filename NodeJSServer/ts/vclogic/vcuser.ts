@@ -155,3 +155,15 @@ export async function createUserWithAI() { //status: UserStatus
 		result: result
 	}
 }
+
+export async function getUserFromId(id: number) {
+	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id = ?", [id]);
+	if(result.length == 0) return null;
+	return result[0];
+}
+
+export async function getUserFromHash(hash: string) {
+	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE UserHash = ?", [hash]);
+	if(result.length == 0) return null;
+	return result[0];
+}

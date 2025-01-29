@@ -64,6 +64,8 @@ public class VantanConnectControlPanel : EditorWindow
         headerStyle.fontSize = 20;
         headerStyle.normal.textColor = Color.white;
 
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.BeginVertical();
         EditorGUILayout.Space(10);
         EditorGUILayout.LabelField("環境情報", headerStyle);
         EditorGUILayout.Space(10);
@@ -110,120 +112,149 @@ public class VantanConnectControlPanel : EditorWindow
                 LocalData.Save<SystemSaveData>("SystemSave.json", _saveData);
             }
         }
+        EditorGUILayout.EndVertical();
 
-    /*
-    SystemViewer view = target as SystemViewer;
-    if (view.TestData == null) return;
-    if (GUILayout.Button(@"オリジナルイベント送信"))
-    {
-        EventSystem.SendEvent(view.TestData.EventId, view.TestData);
-    }
-    if (GUILayout.Button(@"オリジナルイベント実行"))
-    {
-        EventSystem.RunEvent(view.TestData);
-    }
-
-    GUILayout.Space(50);
-
-    if (GUILayout.Button(@"API: サンプルソースを開く"))
-    {
-        System.Diagnostics.Process.Start(Application.dataPath + "/Scripts/VantanConnectEditor/EventSystemViewerEditor.cs");
-    }
-
-    ////////////////////////////////////////////////////////////
-    // ここからAPIのサンプル
-    // NOTE: RunOnThreadPoolは本実装では使用しないこと。
-
-    //ユーザ取得のAPI
-    if (GUILayout.Button(@"API: GetUser実行"))
-    {
-        UniTask.RunOnThreadPool(async () =>
+        var data = EditorDataRelay.GameStat;
+        if (data != null)
         {
-            int userId = 1;
-            var result = await GameAPI.GetUser(userId);
-            Debug.Log($"Status: {result.Status}");
-            Debug.Log($"UserData: {JsonUtility.ToJson(result.UserData)}");
-        }).Forget();
-    }
-
-    //ゲーム情報取得のAPI
-    if (GUILayout.Button(@"API: GetGameUser実行"))
-    {
-        UniTask.RunOnThreadPool(async () =>
-        {
-            var result = await GameAPI.GetActiveGameUsers();
-            Debug.Log($"Status: {result.Status}");
-        }).Forget();
-    }
-
-#if !AIGAME_IMPLEMENT
-    //ゲームスタートのAPI
-    //NOTE: 情報を保存する
-    if (GUILayout.Button(@"API: GameStart実行"))
-    {
-        UniTask.RunOnThreadPool(async () =>
-        {
-            int userId = 0; //コネクトしたユーザを渡す
-            var result = await GameAPI.GameStart(userId);
-            Debug.Log($"Status: {result.Status}");
-            Debug.Log($"GameHash: {result.GameHash}");
-            Debug.Log($"GameInfo: {result.GameInfo}");
-        }).Forget();
-    }
-
-    //ゲーム終了のAPI
-    //NOTE: GameStartを呼び出していないとエラー
-    if (GUILayout.Button(@"API: GameEnd実行"))
-    {
-        UniTask.RunOnThreadPool(async () =>
-        {
-            var result = await GameAPI.GameEnd(true);
-            Debug.Log($"Status: {result.Status}");
-        }).Forget();
-    }
-
-#else
-
-    //ゲームスタートのAPI
-    //NOTE: 通常ゲームとは引数が異なる
-    if (GUILayout.Button(@"API: (AIGAME)GameStart実行"))
-    {
-        UniTask.RunOnThreadPool(async () =>
-        {
-            var result = await GameAPI.GameStartAIGame();
-            Debug.Log($"Status: {result.Status}");
-            _storedUserData = result.GameUsers;
-        }).Forget();
-    }
-
-    //ゲーム終了のAPI
-    //NOTE: 情報格納用の関数を実行してからEndを実行する
-    if (GUILayout.Button(@"API: (AIGAME)GameEnd実行"))
-    {
-        UniTask.RunOnThreadPool(async () =>
-        {
-            System.Random rnd = new System.Random();
-            //各ユーザの結果をAPIに反映する
-            foreach (var data in _storedUserData)
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("アクティブゲーム");
+            foreach (var d in data.ActiveGames)
             {
-                GameAPI.StoreUserResult(data.UserId, rnd.Next(0, 2) == 0, rnd.Next(0, 2) == 0);
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"{d.GameId}", GUILayout.Width(25));
+                EditorGUILayout.LabelField($"{d.Name}", GUILayout.Width(75));
+                EditorGUILayout.LabelField($"ACTIVE TIME: {d.ActiveTime}", GUILayout.Width(200));
+                EditorGUILayout.EndHorizontal();
             }
+            EditorGUILayout.Space(50);
+            EditorGUILayout.LabelField("アクティブユーザー");
+            foreach (var d in data.ActiveUsers)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"{d.UserId}", GUILayout.Width(25));
+                EditorGUILayout.LabelField($"{d.DisplayName}", GUILayout.Width(75));
+                EditorGUILayout.LabelField($"ACTIVE TIME: {d.ActiveTime}", GUILayout.Width(200));
+                EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.EndVertical();
+        }
+        EditorGUILayout.EndHorizontal();
 
-            //データ設定後、APIを実行する
-            var result = await GameAPI.GameEndAIGame();
-        }).Forget();
-    }
-#endif
-    */
-    /*
-    //特に必要ないのでコメントアウトしているコード
-    if (GUILayout.Button(@"API: GetAddress実行"))
-    {
-        UniTask.RunOnThreadPool(async () =>
+        /*
+        SystemViewer view = target as SystemViewer;
+        if (view.TestData == null) return;
+        if (GUILayout.Button(@"オリジナルイベント送信"))
         {
-            Debug.Log(await GameAPI.GetAddress());
-        }).Forget();
+            EventSystem.SendEvent(view.TestData.EventId, view.TestData);
+        }
+        if (GUILayout.Button(@"オリジナルイベント実行"))
+        {
+            EventSystem.RunEvent(view.TestData);
+        }
+
+        GUILayout.Space(50);
+
+        if (GUILayout.Button(@"API: サンプルソースを開く"))
+        {
+            System.Diagnostics.Process.Start(Application.dataPath + "/Scripts/VantanConnectEditor/EventSystemViewerEditor.cs");
+        }
+
+        ////////////////////////////////////////////////////////////
+        // ここからAPIのサンプル
+        // NOTE: RunOnThreadPoolは本実装では使用しないこと。
+
+        //ユーザ取得のAPI
+        if (GUILayout.Button(@"API: GetUser実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                int userId = 1;
+                var result = await GameAPI.GetUser(userId);
+                Debug.Log($"Status: {result.Status}");
+                Debug.Log($"UserData: {JsonUtility.ToJson(result.UserData)}");
+            }).Forget();
+        }
+
+        //ゲーム情報取得のAPI
+        if (GUILayout.Button(@"API: GetGameUser実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                var result = await GameAPI.GetActiveGameUsers();
+                Debug.Log($"Status: {result.Status}");
+            }).Forget();
+        }
+
+    #if !AIGAME_IMPLEMENT
+        //ゲームスタートのAPI
+        //NOTE: 情報を保存する
+        if (GUILayout.Button(@"API: GameStart実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                int userId = 0; //コネクトしたユーザを渡す
+                var result = await GameAPI.GameStart(userId);
+                Debug.Log($"Status: {result.Status}");
+                Debug.Log($"GameHash: {result.GameHash}");
+                Debug.Log($"GameInfo: {result.GameInfo}");
+            }).Forget();
+        }
+
+        //ゲーム終了のAPI
+        //NOTE: GameStartを呼び出していないとエラー
+        if (GUILayout.Button(@"API: GameEnd実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                var result = await GameAPI.GameEnd(true);
+                Debug.Log($"Status: {result.Status}");
+            }).Forget();
+        }
+
+    #else
+
+        //ゲームスタートのAPI
+        //NOTE: 通常ゲームとは引数が異なる
+        if (GUILayout.Button(@"API: (AIGAME)GameStart実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                var result = await GameAPI.GameStartAIGame();
+                Debug.Log($"Status: {result.Status}");
+                _storedUserData = result.GameUsers;
+            }).Forget();
+        }
+
+        //ゲーム終了のAPI
+        //NOTE: 情報格納用の関数を実行してからEndを実行する
+        if (GUILayout.Button(@"API: (AIGAME)GameEnd実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                System.Random rnd = new System.Random();
+                //各ユーザの結果をAPIに反映する
+                foreach (var data in _storedUserData)
+                {
+                    GameAPI.StoreUserResult(data.UserId, rnd.Next(0, 2) == 0, rnd.Next(0, 2) == 0);
+                }
+
+                //データ設定後、APIを実行する
+                var result = await GameAPI.GameEndAIGame();
+            }).Forget();
+        }
+    #endif
+        */
+        /*
+        //特に必要ないのでコメントアウトしているコード
+        if (GUILayout.Button(@"API: GetAddress実行"))
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                Debug.Log(await GameAPI.GetAddress());
+            }).Forget();
+        }
+        */
     }
-    */
-}
 }

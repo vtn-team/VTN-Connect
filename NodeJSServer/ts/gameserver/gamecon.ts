@@ -13,13 +13,13 @@ class GameContainer {
 	protected gameId: number;
 	protected recorder: EventRecorder|null;  //イベントレコーダー
 	protected player: EventPlayer|null;  //イベントプレーヤー
-	protected master: any;
+	protected gameInfo: any;
 	protected queue: Array<any>;
 	protected session: VCGameSession|null;
 	
-	constructor(master: any, session: VCGameSession|null) {
-		this.master = master;
-		this.gameId = master.Id;
+	constructor(gameInfo: any, session: VCGameSession|null) {
+		this.gameInfo = gameInfo;
+		this.gameId = gameInfo.Id;
 		this.session = session;
 		this.recorder = null;
 		this.player = null;
@@ -27,6 +27,20 @@ class GameContainer {
 			this.player = new EventPlayer(this.gameId);
 		}
 		this.queue = [];
+	}
+
+	public isActiveSession() {
+		return this.session != null;
+	}
+	
+	public getStat() {
+		if(!this.session) return null;
+		
+		return {
+			GameId: this.gameId,
+			Name: this.gameInfo.ProjectCode,
+			ActiveTime: this.session.getActiveTime()
+		};
 	}
 
 	public startReplay(msgExec: any) {
@@ -59,6 +73,11 @@ class GameContainer {
 	public term() {
 		if (this.player) this.player.stop();
 	}
+
+	public sendEventMessage(msg: any) {
+		let evtJson = JSON.stringify(msg)
+		this.session?.sendMessage(evtJson);
+	}
 }
 
 
@@ -75,6 +94,8 @@ export class GameConnect {
 		this.sessionDic = {};
 		this.recordingHash = {};
 		this.broadcast = bc;
+
+		console.log(getMaster("GameEvent"));
 	}
 	
 	parsePayload(payload: any) {
@@ -120,22 +141,45 @@ export class GameConnect {
 		return payload;
 	}
 
+	castEvent(gameId: number, data: any) {
+		let evtId = parseInt(data.EventId);
+		let event = getGameEvent(evtId);
+		if (!event) {
+			console.log("NO DATA:" + data.EventId);
+			return;
+		}
+
+		let msg = createGameMessage(data.SessionId, gameId, CMD.EVENT, TARGET.SELF, data);
+		for (var gId in this.games) {
+			if (!this.games[gId].isActiveSession()) continue;
+
+			if (event.Target == -1) {
+				this.games[gId].sendEventMessage(msg);
+			} else if (gId == event.Target) {
+				this.games[gId].sendEventMessage(msg);
+			}
+		}
+	}
+
 	public setupGameConnect() {
 		let master = getMaster("GameInfo");
 		for (let m of master) {
 			if (m.IsReplayTarget && !this.games[m.Id]) {
 				this.games[m.Id] = new GameContainer(m, null);
-				this.games[m.Id].startReplay(this.execReplay);
+				this.games[m.Id].startReplay((gameId: number, data: any) => { this.execReplay(gameId, data); } );
 			}
 		}
 	}
 
 	public execReplay(gameId: number, data: any) {
-		console.log("replay:" + gameId);
-		console.log(data);
+		let usePortal = false;
+		usePortal = this.execCommand(data);
+		data.SessionId = "BOT";
+		this.castEvent(gameId, data);
 	}
 
 	public execMessage(data: any) {
+		let usePortal = false;
 		let payload = this.parsePayload(data["Payload"]);
 		let gameId = this.sessionDic[data.SessionId];
 		
@@ -162,14 +206,16 @@ export class GameConnect {
 
 			this.games[gameId].recordMessage(gameId, data);
 
-			this.execCommand(data);
+			usePortal = this.execCommand(data);
 			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
 		}
 		break;
 		}
+		
+		return usePortal;
 	}
 
-	joinRoom(gameId: number, us: UserSession, data: any) {
+	joinGame(gameId: number, us: UserSession, data: any) {
 		if(this.games[gameId]) {
 			
 		}
@@ -215,7 +261,10 @@ export class GameConnect {
 		let games:any = [];
 		
 		for(var gId in this.games) {
-			let us = this.games[gId];
+			let stat = this.games[gId].getStat();
+			if(stat){
+				games.push(stat);
+			}
 		}
 		
 		return games;
@@ -223,7 +272,7 @@ export class GameConnect {
 	
 	//処理
 	execCommand(data: any) {
-		
+		return false;
 	}
 	
 	async messageRelay(data: any) {

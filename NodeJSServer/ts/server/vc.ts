@@ -1,7 +1,7 @@
 import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
 import { chatWithSession } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
-import { getUniqueUsers, createUserWithAI } from "./../vclogic/vcuser"
+import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
 
 //デフォルト関数
@@ -60,12 +60,10 @@ export async function getUser(req: any,res: any,route: any)
 	let result = null;
 	
 	if(id) {
-		result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id = ?", [id]);
+		result = await getUserFromId(id);
 	}else{
-		result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE UserHash = ?", [hash]);
+		result = await getUserFromHash(hash);
 	}
-	
-	result = result[0];
 	
 	return {
 		Status: 200,

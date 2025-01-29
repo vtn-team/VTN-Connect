@@ -44,6 +44,11 @@ namespace VTNConnect
             Setup();
         }
 
+        void OnDestroy()
+        {
+            _client?.Close();
+        }
+
         async public void Setup()
         {
             if (IsConnecting) return;
@@ -129,6 +134,15 @@ namespace VTNConnect
                         {
                             var evt = JsonUtility.FromJson<EventData>(data.Data);
                             _eventQueue.Enqueue(evt);
+                        }
+                        break;
+
+                    case WebSocketCommand.GAMESTAT:
+                        {
+#if UNITY_EDITOR
+                            var stat = JsonUtility.FromJson<WSPR_GameStat>(data.Data);
+                            EditorDataRelay.UpdateGameStat(stat);
+#endif
                         }
                         break;
                 }
