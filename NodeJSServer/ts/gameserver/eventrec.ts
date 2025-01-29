@@ -131,7 +131,7 @@ export class EventPlayer {
 	async loadReplay() {
 		let result = await query("SELECT GameId, GameHash, PlayTime FROM GameReplay WHERE GameId = ?", [this.gameId]);
 		if(result.length == 0) {
-			console.log("リプレイデータがない:" + this.gameId);
+			//console.log("リプレイデータがない:" + this.gameId);
 
 			this.playbackTimer = setTimeout(async () => {
 				await this.loadReplay();
@@ -145,7 +145,7 @@ export class EventPlayer {
 			this.reels.push(new EventReel(gameHash, this.msgExec));
 		}
 
-		console.log("リプレイ開始:" + this.gameId);
+		//console.log("リプレイ開始:" + this.gameId);
 		this.reelIndex = 0;
 		this.playbackTimer = setTimeout(() => { this.playbackAction() }, 1000);
 	}
@@ -164,17 +164,17 @@ export class EventPlayer {
 				break;
 
 			case PlaybackState.END_REEL:
-				console.log("再生終了:" + this.gameId);
+				//console.log("再生終了:" + this.gameId);
 				this.reelIndex++;
 				if (this.reelIndex >= this.reels.length) {
-					console.log("終了:" + this.gameId);
+					//console.log("終了:" + this.gameId);
 					this.playbackTimer = setTimeout(async () => {
 						await this.loadReplay();
 					}, 5000);
 					break;
 				}
 
-				console.log("続き:" + this.gameId);
+				//console.log("続き:" + this.gameId);
 				this.playbackTimer = setTimeout(() => { this.playbackAction() }, 5000);
 				break;
 		}
