@@ -1,5 +1,8 @@
+.vs/
+bin/
 node_modules/
 js/
+obj/
 ts/config/config.ts
 package-lock.json
 .env
