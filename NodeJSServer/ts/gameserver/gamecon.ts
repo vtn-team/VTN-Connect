@@ -207,7 +207,7 @@ export class GameConnect {
 			this.games[gameId].recordMessage(gameId, data);
 
 			usePortal = this.execCommand(data);
-			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
+			this.castEvent(gameId, data);
 		}
 		break;
 		}
