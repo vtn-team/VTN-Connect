@@ -1,6 +1,7 @@
 .vs/
 bin/
 node_modules/
+replay/
 js/
 obj/
 ts/config/config.ts
