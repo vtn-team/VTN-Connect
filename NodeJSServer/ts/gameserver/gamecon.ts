@@ -1,50 +1,63 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
-import { getGameInfo, getGameEvent } from "./../lib/masterDataCache"
+import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
+import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
+import { EventRecorder, EventPlayer } from "./eventrec"
 
-
-
-export enum TARGET {
-	ALL = 0,
-	SELF = 1,
-	OTHER = 2,	//TargetSessionIdsが渡される
-};
-
-export enum CMD {
-	WELCOME = 1,
-	JOIN = 2,
-	EVENT = 3,
-	SEND_JOIN = 100,
-	SEND_EVENT = 101,
-};
 
 export enum SP_EVENT {
 	AI_CHAT = 10000,
 };
 
-export function createMessage(senderId: string, command: CMD, target:TARGET, data: any) {
-	//let msg = msgpack.pack(data);
-	delete data["Command"]
-	let msg = JSON.stringify(data);
-	let ret = { 
-		"UserId" : senderId,
-		"Target" : target,
-		"Command" : command,
-		"Data" :msg
-	};
-	return ret;
-}
-
-
 class GameContainer {
 	protected gameId: number;
+	protected recorder: EventRecorder|null;  //イベントレコーダー
+	protected player: EventPlayer|null;  //イベントプレーヤー
 	protected master: any;
 	protected queue: Array<any>;
+	protected session: VCGameSession|null;
 	
-	constructor(master: any) {
+	constructor(master: any, session: VCGameSession|null) {
 		this.master = master;
 		this.gameId = master.Id;
+		this.session = session;
+		this.recorder = null;
+		this.player = null;
+		if(session == null) {
+			this.player = new EventPlayer(this.gameId);
+		}
 		this.queue = [];
+	}
+
+	public startReplay(msgExec: any) {
+		if (!this.player) return;
+
+		this.player.start(msgExec);
+	}
+	
+	public stopReplay() {
+		if(!this.player) return;
+		
+		this.player.stop();
+	}
+	
+	public startRecord(gameHash: string) {
+		this.recorder = new EventRecorder(this.gameId, gameHash);
+	}
+	
+	public recordMessage(gameId: number, data: any) {
+		if(!this.recorder) return;
+
+		delete data["SessionId"];
+		this.recorder.recordMessage(gameId, data);
+	}
+
+	public stopRecord(gameHash: string) {
+		this.recorder?.save(gameHash);
+	}
+
+	public term() {
+		if (this.player) this.player.stop();
 	}
 }
 
@@ -55,10 +68,12 @@ export class GameConnect {
 	games: any;
 	sessionDic: any;
 	broadcast: any;
+	recordingHash: any;
 
 	constructor(bc: any) {
 		this.games = {};
 		this.sessionDic = {};
+		this.recordingHash = {};
 		this.broadcast = bc;
 	}
 	
@@ -90,16 +105,42 @@ export class GameConnect {
 			types: types
 		};
 	}
+	
+	createdPayload(data: any) {
+		let payload:any = [];
+		if(data) {
+			for(var k in data) {
+				payload.push({
+					Key: k,
+					TypeName: typeof data[k],
+					Data: data[k]
+				});
+			}
+		}
+		return payload;
+	}
+
+	public setupGameConnect() {
+		let master = getMaster("GameInfo");
+		for (let m of master) {
+			if (m.IsReplayTarget && !this.games[m.Id]) {
+				this.games[m.Id] = new GameContainer(m, null);
+				this.games[m.Id].startReplay(this.execReplay);
+			}
+		}
+	}
+
+	public execReplay(gameId: number, data: any) {
+		console.log("replay:" + gameId);
+		console.log(data);
+	}
 
 	public execMessage(data: any) {
 		let payload = this.parsePayload(data["Payload"]);
+		let gameId = this.sessionDic[data.SessionId];
 		
 		switch(data["Command"])
 		{
-		case CMD.SEND_JOIN:
-			this.joinRoom(data);
-			break;
-		
 		case CMD.SEND_EVENT:
 		{
 			switch(data.EventId)
@@ -118,7 +159,9 @@ export class GameConnect {
 			}
 			break;
 			}
-			
+
+			this.games[gameId].recordMessage(gameId, data);
+
 			this.execCommand(data);
 			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
 		}
@@ -126,8 +169,7 @@ export class GameConnect {
 		}
 	}
 
-	joinRoom(data: any) {
-		let gameId = parseInt(data.GameId);
+	joinRoom(gameId: number, us: UserSession, data: any) {
 		if(this.games[gameId]) {
 			
 		}
@@ -140,9 +182,15 @@ export class GameConnect {
 		let find = false;
 		let master = getGameInfo(gameId);
 		if(master) {
-			this.games[gameId] = new GameContainer(master);
+			let session = new VCGameSession(gameId, us);
+			if (this.games[gameId]) {
+				this.games[gameId].term();
+			}
+			this.games[gameId] = new GameContainer(master, session);
 			this.sessionDic[data.SessionId] = gameId;
-			console.log(`GAME ID:${gameId} - ${master.Name} join.`);
+			console.log(`GAME ID:${gameId} - ${master.ProjectCode} join.`);
+			
+			return session;
 		}else{
 			console.log(`GAME ID:${gameId} not found.`);
 		}
@@ -156,6 +204,9 @@ export class GameConnect {
 		let gameId = this.sessionDic[sessionId];
 		delete this.games[gameId];
 		delete this.sessionDic[sessionId];
+
+		//イベントプレイヤーにする
+		this.setupGameConnect();
 		
 		console.log(`GAME ID:${gameId} leave.`);
 	}
@@ -200,5 +251,23 @@ export class GameConnect {
 		}catch(ex){
 			console.log(ex);
 		}
+	}
+	
+	public startRecord(gameId:number, gameHash: string) {
+		if(!this.games[gameId]) return;
+		
+		this.games[gameId].startRecord(gameHash);
+		this.recordingHash[gameHash] = gameId;
+	}
+	
+	public stopRecord(gameHash: string) {
+		if(!this.recordingHash[gameHash]) return;
+		
+		let gameId = this.recordingHash[gameHash];
+		this.games[gameId].stopRecord(gameHash);
+	}
+	
+	public sendAPIEvent(data: any) {
+		//TBD
 	}
 };

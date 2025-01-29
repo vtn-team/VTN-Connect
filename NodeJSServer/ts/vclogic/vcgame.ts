@@ -1,13 +1,19 @@
 import { updateMainGameInfo } from "./vcinfo"
 import { getUniqueUsers } from "./vcuser"
+import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { query } from "./../lib/database"
 const { v4: uuidv4 } = require('uuid')
+
+enum GameOption {
+	None = 0,
+	Recording = (1<<0),
+}
 
 //ゲーム情報構造体
 
 //AIゲーム開始
 //NOTE: 誰を使うかはサーバが決定する
-export async function gameStartAIGame() {
+export async function gameStartAIGame(option: number) {
 	let result = {
 		Success: false,
 		GameHash: "",
@@ -17,7 +23,7 @@ export async function gameStartAIGame() {
 	
 	try {
 		let gameHash = uuidv4();
-		let users = await choiseAIGameUsers();
+		let users = await choiceAIGameUsers();
 		let gameId = 1; //NOTE: ハードコードで良くないが良い手段がない
 		
 		//DBに保存
@@ -58,7 +64,7 @@ export async function gameEndAIGame(gameResult: any) {
 
 
 //ゲーム開始
-export async function gameStartVC(gameId: number, userId: number) {
+export async function gameStartVC(gameId: number, userId: number, option: number) {
 	let result = {
 		Success: false,
 		GameHash: "",
@@ -69,14 +75,15 @@ export async function gameStartVC(gameId: number, userId: number) {
 		let gameHash = uuidv4();
 		
 		//Gameにプレイ開始したゲームの情報を記録
-		if(userId > 0)
-		{
+		if(userId > 0) {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
 			await query("INSERT INTO Adventure (GameHash, UserId) VALUES (?, ?)", [gameHash, userId]);
-		}
-		else
-		{
+		} else {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 3)", [gameHash, gameId]);
+		}
+		
+		if(option & GameOption.Recording) {
+			startRecord(gameId, gameHash);
 		}
 		
 		result.GameHash = gameHash;
@@ -98,6 +105,9 @@ export async function gameEndVC(gameHash: string, gameResult: boolean) {
 	try {
 		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [gameResult ? 2 : 3, gameHash]);
 		result.Success = true;
+		
+		stopRecord(gameHash);
+		
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -105,7 +115,7 @@ export async function gameEndVC(gameHash: string, gameResult: boolean) {
 	return result;
 }
 
-async function choiseAIGameUsers() {
+async function choiceAIGameUsers() {
 	//DBから更新日時が最も古い3人を抜き出す
 	let player = await query("SELECT Id FROM User ORDER BY LastPlayedAt ASC LIMIT 0,?",[3]);
 	let ids:Array<number> = [];

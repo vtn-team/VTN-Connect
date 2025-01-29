@@ -117,7 +117,7 @@ export async function createUser(req: any,res: any,route: any)
 //AIゲーム開始
 export async function gameStartAI(req: any,res: any,route: any)
 {
-	let result:any = await gameStartAIGame();
+	let result:any = await gameStartAIGame(route.query.Option);
 	
 	result.Status = 200;
 	
@@ -137,7 +137,7 @@ export async function gameEndAI(req: any,res: any,route: any)
 //ゲーム開始
 export async function gameStart(req: any,res: any,route: any)
 {
-	let result:any = await gameStartVC(route.query.GameId, route.query.UserId);
+	let result:any = await gameStartVC(route.query.GameId, route.query.UserId, route.query.Option);
 	
 	result.Status = 200;
 	
