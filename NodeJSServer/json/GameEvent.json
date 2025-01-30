@@ -1,215 +1,555 @@
 {
-  "Version": 51,
+  "Version": 309,
   "Data": [
     {
-      "ID": "Id",
-      "何が起きるか": "Description",
-      "発生したゲーム": "From",
-      "対象のゲーム": "Target",
-      "管理": "Release"
+      "Id": "101",
+      "Description": "岩垂UIの憑依",
+      "From": "3",
+      "Target": "-1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "DemonUI",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "1",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "102",
+      "Description": "死んだらおもちゃの熊が落ちてくる",
+      "From": "4",
+      "Target": "1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "DeathTrap",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "2",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "103",
+      "Description": "死ぬと死体が増える",
+      "From": "3",
+      "Target": "4",
+      "SendFlag": "対象のみ",
+      "EnumCode": "DeathStack",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "3",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "104",
+      "Description": "ジェンガ1本抜くと材質に応じた何かが起きる",
+      "From": "5",
+      "Target": "1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "JengaInfo",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "4",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "105",
+      "Description": "アクターにランダム効果",
+      "From": "-1",
+      "Target": "2",
+      "SendFlag": "対象のみ",
+      "EnumCode": "ActorEffect",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "5",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "106",
+      "Description": "ステージギミック復活(罠系)",
+      "From": "-1",
+      "Target": "2",
+      "SendFlag": "対象のみ",
+      "EnumCode": "ReviveGimmick",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "6",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "107",
+      "Description": "照明の光度が一定時間低下する。",
+      "From": "-1",
+      "Target": "2",
+      "SendFlag": "対象のみ",
+      "EnumCode": "DarkRoom",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "7",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "108",
+      "Description": "冒険者がアイテムを取ると…",
+      "From": "1",
+      "Target": "2",
+      "SendFlag": "対象のみ",
+      "EnumCode": "PickupItem",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "8",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "109",
+      "Description": "プレイヤーの頭上から雑魚敵が降ってくる",
+      "From": "-1",
+      "Target": "2",
+      "SendFlag": "対象のみ",
+      "EnumCode": "SummonEnemy",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "9",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "110",
+      "Description": "冒険者が死ぬと悲鳴をだす",
+      "From": "1",
+      "Target": "4",
+      "SendFlag": "対象のみ",
+      "EnumCode": "DeathScream",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "10",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "111",
+      "Description": "敵を倒すと弾幕を消すボム的なものが出る",
+      "From": "1",
+      "Target": "3",
+      "SendFlag": "対象のみ",
+      "EnumCode": "DefeatBomb",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "11",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "112",
+      "Description": "ジェンガを倒すと何か起こる(ダメージ)",
+      "From": "5",
+      "Target": "1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "BadJengaInfo",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "12",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "113",
+      "Description": "ヘリが落ちる",
+      "From": "3",
+      "Target": "1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "SummonHeliCopter",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "13",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "114",
+      "Description": "台詞が冒険者に共有される。",
+      "From": "4",
+      "Target": "1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "UserTalk",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "14",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "115",
+      "Description": "アイテムを取ると冒険者が回復する。",
+      "From": "2",
+      "Target": "1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "ConfrontHeal",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "15",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "116",
+      "Description": "窓をたたく音を出す",
+      "From": "-1",
+      "Target": "4",
+      "SendFlag": "対象のみ",
+      "EnumCode": "KnockWindow",
+      "Release": "〇",
+      "System": ""
     },
     {
-      "ID": "16",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "117",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "17",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "118",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "18",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "119",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "19",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "120",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "20",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "121",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "21",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "122",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "22",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "123",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "23",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "124",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "24",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "125",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "25",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "126",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "26",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "127",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "27",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "128",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "28",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "129",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     },
     {
-      "ID": "29",
-      "何が起きるか": "",
-      "発生したゲーム": "",
-      "対象のゲーム": "",
-      "管理": ""
+      "Id": "130",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "131",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "132",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "133",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "134",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "135",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "136",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "137",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "138",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "139",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "140",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "141",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "142",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "143",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "144",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "145",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "146",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "147",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "148",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "149",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "150",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "1000",
+      "Description": "コインいっこ入れる",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "自分のみ",
+      "EnumCode": "Link",
+      "Release": "〇",
+      "System": "〇"
+    },
+    {
+      "Id": "1001",
+      "Description": "おうえんメッセージ",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "対象のみ",
+      "EnumCode": "Cheer",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1002",
+      "Description": "コイン増える",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "自分のみ",
+      "EnumCode": "BonusCoin",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1003",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "1004",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
     }
   ]
 }

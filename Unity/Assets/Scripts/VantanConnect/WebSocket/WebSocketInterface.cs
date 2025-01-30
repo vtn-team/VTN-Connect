@@ -10,8 +10,10 @@ namespace VTNConnect
         WELCOME = 1,
         JOIN = 2,
         EVENT = 3,
+        GAMESTAT = 4,
         SEND_JOIN = 100,
-        SEND_EVENT = 101
+        SEND_EVENT = 101,
+        SEND_USER_JOIN = 110,
     };
 
     [Serializable]
@@ -26,6 +28,29 @@ namespace VTNConnect
     public class WSPR_Welcome
     {
         public string SessionId;
+    };
+
+    [Serializable]
+    public class VCActiveGame
+    {
+        public int GameId;
+        public string Name;
+        public int ActiveTime;
+    }
+
+    [Serializable]
+    public class VCActiveUser
+    {
+        public int UserId;
+        public string DisplayName;
+        public int ActiveTime;
+    }
+
+    [Serializable]
+    public class WSPR_GameStat
+    {
+        public VCActiveGame[] ActiveGames;
+        public VCActiveUser[] ActiveUsers;
     };
 
     [Serializable]

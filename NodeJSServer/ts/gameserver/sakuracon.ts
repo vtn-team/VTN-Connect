@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { GameConnect, createMessage, TARGET, CMD } from "./gamecon";
+=======
+import { GameConnect } from "./gamecon";
+import { CMD, TARGET, createMessage } from "./session"
+import { getAllUniqueUsers, preloadUniqueUsers } from "./../vclogic/vcuser";
+>>>>>>> main
 import { query } from "./../lib/database";
-import crypto from "crypto";
+const crypto = require("crypto");
 
 /**
  * @summary サクラのメッセージと感情値のタプル
@@ -83,7 +89,12 @@ export class SakuraConnect {
             uniqueId = crypto.randomInt(1, 999);
         }
 
+<<<<<<< HEAD
         botUserData = this.uniqueUsers[uniqueId];
+=======
+        let uniqueUsers = getAllUniqueUsers();
+        botUserData = uniqueUsers[uniqueId];
+>>>>>>> main
 
         // ランダムでメッセージを選択するための数値を生成
         let randomMessageNumber = crypto.randomInt(0, sakuraWelcomeMessage.length);

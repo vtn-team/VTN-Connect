@@ -1,58 +1,13 @@
-import { GameConnect, CMD, TARGET, createMessage } from "./gamecon"
+import { GameConnect } from "./gamecon"
+import { UserPortal } from "./portal"
 import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
+import { UserSession, CMD, TARGET, createMessage } from "./session"
 
 
 //サーバキャッシュ
 let gServer:Server|null = null;
-
-
-//接続するユーザを管理する構造体
-class UserSession {
-	protected userId: string;		//ユーザ特定用のハッシュ
-	protected client: WebSocket;	//WebSocket接続クライアント
-	protected isPingAlive: boolean;	//生きているか
-	
-	//コンストラクタ
-	constructor(userId: string, ws: WebSocket) {
-		this.userId = userId;
-		this.client = ws;
-		this.isPingAlive = true;
-	}
-	
-	public term() {
-		this.client.terminate();
-	}
-	
-	public sendMessage(msg: string) {
-		if (this.client == null) return 
-		if (this.client.readyState != WebSocket.OPEN) return;
-		
-		this.client.send(msg);
-	}
-	
-	public isAlive() : boolean {
-		return this.client.readyState == WebSocket.OPEN;
-	}
-	
-	public ping() {
-		if(this.isPingAlive == false) this.term();
-		this.client.ping();
-		this.isPingAlive = false;
-	}
-	public pong() {
-		this.isPingAlive = true;
-	}
-	
-	public chkTarget(tgt: TARGET, tgtId: string) {
-		switch(tgt) {
-		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.userId == tgtId);
-		case TARGET.OTHER: return (this.userId != tgtId);
-		}
-	}
-};
 
 
 //サーバ本体
@@ -63,20 +18,23 @@ class Server {
 	protected sessions: any;			//各接続のセッション
 	protected server: any;				//WebSocketサーバ本体
 	protected roomCheck: any;			//ルーム監視用のタイマー
+	protected sendStatsTimer:any;		//スタッツ送信用タイマー
 	protected contents: GameConnect;	//ゲームコネクター(ゲーム同士をつなげるGameServerの本体)
+	protected portal: UserPortal;		//ユーザールーム(ユーザを管理するGameServerの本体)
 	protected lastActiveNum: number;	//現在のアクティブ人数キャッシュ
 	protected port: number;				//接続するポート
 
 	//データ送信
 	broadcast(data: any) {
 		let msg = JSON.stringify(data);
+		console.log("send:" + msg);
+		
 		//let msg = msgpack.pack(data);
 		for(var k in this.sessions) {
 			let us = this.sessions[k];
-			if(!us.chkTarget(data.Target, data.UserId)) return;
+			if(!us.chkTarget(data)) return;
 			
 			us.sendMessage(msg);
-			console.log("send:" + msg);
 		}
 	};
 	
@@ -86,14 +44,14 @@ class Server {
 		this.port = port;
 		this.server = new WebSocketServer({ port });
 		this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
+		this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
 		this.lastActiveNum = 0;
 		this.server.on ('connection', (ws: any) => {
 			let uuid = randomUUID();
-			let session = new UserSession(uuid, ws);
-			this.sessions[uuid] = session;
+			this.sessions[uuid] = new UserSession(uuid, ws);
 			
 			ws.on('pong', () => {
-				session.pong();
+				this.pong(uuid);
 			});
 
 			ws.on('message', (message: string) => {
@@ -104,7 +62,22 @@ class Server {
 					let sessionId = data["SessionId"];
 					
 					if(this.sessions[sessionId]) {
-						this.contents.execMessage(data);
+						//重要なメッセージはここでさばく
+						switch(data["Command"])
+						{
+						case CMD.SEND_JOIN:
+							this.joinGame(data);
+							break;
+							
+						case CMD.SEND_USER_JOIN:
+							this.joinPortal(data);
+							break;
+							
+						case CMD.SEND_EVENT:
+						default:
+							this.contents.execMessage(data);
+							break;
+						}
 					}else{
 						console.error("session not found.")
 					}
@@ -132,25 +105,77 @@ class Server {
 		});
 		
 		this.roomCheck = setInterval(() => {
-			let count = 0;
-			for(var k in this.sessions) {
-				let us = this.sessions[k];
-				if (!us.isAlive()) return us.term();
-				
-				us.ping();
-				count++;
-			}
-			this.lastActiveNum = count;
-			//console.log("active session count:" + count);
+			this.activeCheck();
 		}, 10000);
 		
+		this.sendStatsTimer = setInterval(() => {
+			this.sendGameStatus();
+		}, 5000);
+		
 		console.log("server launch port on :" + port);
+	}
+	
+	joinGame(data: any) {
+		let sessionId = data["SessionId"];
+		let gameId = parseInt(data.GameId);
+		
+		this.sessions[sessionId] = this.contents.joinGame(gameId, this.sessions[sessionId], data);
+	}
+	
+	async joinPortal(data: any) {
+		let sessionId = data["SessionId"];
+		let userId = parseInt(data.UserId);
+		
+		this.sessions[sessionId] = await this.portal.joinRoom(userId, this.sessions[sessionId], data);
 	}
 	
 	removeSession(uuid: string) {
 		delete this.sessions[uuid];
 		this.contents.removeSession(uuid);
 		console.log("delete session :" + uuid);
+	}
+
+	pong(sessionId: string) {
+		if (this.sessions[sessionId]) {
+			this.sessions[sessionId].pong();
+		}
+	}
+	
+	activeCheck() {
+		let count = 0;
+		for(var k in this.sessions) {
+			let us = this.sessions[k];
+			if (!us.isAlive()) return us.term();
+
+			us.ping();
+			count++;
+		}
+		this.lastActiveNum = count;
+		//console.log("active session count:" + count);
+	}
+	
+	sendGameStatus() {
+		let stats = {
+			ActiveGames: this.contents.getActiveGames(),
+			ActiveUsers: this.portal.getActiveUsers()
+		}
+		this.broadcast(createMessage("", CMD.GAMESTAT, TARGET.ALL, stats));
+	}
+
+	public setupGameConnect() {
+		this.contents.setupGameConnect();
+	}
+	
+	public startRecord(gameId:number, gameHash: string) {
+		this.contents.startRecord(gameId, gameHash);
+	}
+	
+	public stopRecord(gameHash: string) {
+		this.contents.stopRecord(gameHash);
+	}
+	
+	public sendAPIEvent(data: any) {
+		this.contents.sendAPIEvent(data);
 	}
 	
 	public getPort() {
@@ -176,6 +201,7 @@ export function launchDGS(port: number) {
 	if(gServer != null) return;
 	
 	gServer = new Server(port);
+	gServer.setupGameConnect();
 }
 
 //(公開関数)WebSocketに接続するホストアドレスとポートを返す
@@ -197,4 +223,25 @@ export function getActiveGames() {
 	if(gServer == null) return 0;
 	
 	return gServer.getActiveGames();
+}
+
+//(公開関数)APIをイベントとして配信する
+export function sendAPIEvent(data: any) {
+	if(gServer == null) return;
+	
+	gServer.sendAPIEvent(data);
+}
+
+//(公開関数)ゲームを記録する
+export function startRecord(gameId:number, gameHash:string) {
+	if(gServer == null) return;
+	
+	gServer.startRecord(gameId, gameHash);
+}
+
+//(公開関数)ゲームの記録を終了する
+export function stopRecord(gameHash:string) {
+	if(gServer == null) return;
+	
+	gServer.stopRecord(gameHash);
 }

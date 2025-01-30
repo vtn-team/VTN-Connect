@@ -6,7 +6,7 @@ let mDicCache:any = {};
 let versionInfo:any = {};
 
 let masterFiles = ["GameInfo", "GameEvent", "AIRule"];
-const sheetUri = "https://script.google.com/macros/s/AKfycbyxclLktfu7L4q12Ak8bpS9EJtNFIYlL8c3sseezVJFGv1bJC8Tx00z5R_YJNhl9Qr0eQ/exec";
+const sheetUri = "https://script.google.com/macros/s/AKfycbwxrmXMYPwuDnCTugeCQ3XYUeNv54FeFQG7h_nPmnQBj7zDj_qRibqklzxZPu__NydlSQ/exec";
 
 async function getSheetJson(sheet: string)
 {

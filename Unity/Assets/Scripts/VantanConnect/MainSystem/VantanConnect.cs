@@ -218,6 +218,12 @@ namespace VTNConnect
             request.GameId = ProjectSettings.GameID;
             request.UserId = 0;
 
+            //特殊なステータス
+            if (_systemSave.IsRecording)
+            {
+                request.Option |= (int)GameOption.Recording;
+            }
+
             //ユーザがリンクしていればそのユーザのUserIdを送信する
             if(_linkageSystem.IsLink)
             {

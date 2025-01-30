@@ -86,15 +86,18 @@ const CMD = {
 	WELCOME: 1,
 	JOIN: 2,
 	EVENT: 3,
+	GAMESTAT: 4,
 	SEND_JOIN: 100,
 	SEND_EVENT: 101,
+	SEND_USER_JOIN: 110,
 };
 
 let userData = {};
 let ws = null;
 let wsSessionId = "";
 let qrReader = null;
-
+let baseURI = "https://vc.vtn-game.com";
+//"wss://wss.vtn-game.com/ws/";
 
 if ('serviceWorker' in navigator) {
    navigator.serviceWorker.register("/serviceworker.js");
@@ -132,30 +135,30 @@ function notifyMe() {
 	ws.send(JSON.stringify(json));
 }
 
-window.addEventListener("load", (event) => {
-	console.log("ページが完全に読み込まれました");
 
-	var cookie = getCookieArray();
-	console.log(cookie)
-	
-	getElm("usercreate").addEventListener('click', () => {
+window.addEventListener("load", async (event) => {
+	console.log("onload event");
+
+	getElm("usercreate").addEventListener('click', async () => {
 		disableUIById("usercreate");
-		createUser();
+		await createUser();
+		await userSetup();
 	});
 	
-	//addSysLog("冒険者が魔法を使った", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+	//localhostの場合挙動を変える
+	if(document.location.hostname == "localhost") {
+		baseURI = "http://localhost:4649";
+	}
 	
-	connectDGS("wss://wss.vtn-game.com/ws/");
-	
+	//クッキー取得
+	var cookie = getCookieArray();
+	console.log(cookie)
 	if(!cookie.user_hash || cookie.user_hash === "undefined") {
 		
 	}else{
-		loadUser(cookie.user_hash);
+		await loadUser(cookie.user_hash);
+		await userSetup();
 	}
-	
-	////
-//	debugLoad();
-//	createUserInfoUI();
 });
 
 async function readQR() {
@@ -304,19 +307,97 @@ function addLog(evtData) {
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// API 
+//////////
+
 //接続先取得
 async function getaddr() {
-	let req = await fetch("https://vc.vtn-game.com/vc/getaddr", {
+	let req = await fetch(`${baseURI}/vc/getaddr`, {
 		mode: 'cors'
 	});
 	let result = await req.json();
-	console.log(result);
-	return result.address;
+	return result.Address;
+}
+
+//ユーザ読み込み
+async function loadUser(userHash) {
+	let user = localStorage.getItem("UserData");
+	if(user) {
+		try{
+			user = JSON.parse(user);
+		}catch(ex){
+		}
+	}
+	
+	if(user && user.UserHash) {
+		userData = user;
+	}else{
+		let req = await fetch(`${baseURI}/vc/user/${userHash}`, {
+			mode: 'cors'
+		});
+		let result = await req.json();
+		
+		userData = result.UserData;
+		localStorage.setItem("UserData", JSON.stringify(userData));
+	}
+}
+
+//ユーザ作成
+async function createUser() {
+	let req = await fetch(`${baseURI}/vc/usercreate`, {
+		mode: 'cors'
+	});
+	let result = await req.json();
+	if(result.Success) {
+		saveUserSession(result.UserData.UserHash);
+	}
+	
+	userData = result.UserData;
+}
+
+async function userSetup() {
+	createUserInfoUI();
+	enableUIById("userinfo");
+	
+	connectDGS();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// EVENT 
+//////////
+
+//WebSocket接続
+async function connectDGS() {
+	let addr = await getaddr();
+	ws = new WebSocket(addr);
+	
+	ws.onopen = (event) => {
+	};
+	
+	ws.onerror = (error) => {
+		console.log("Connection Error");
+		console.log(error)
+		getElm("ws-state").innerText = "エラー";
+	};
+		
+	ws.onclose = (event) => {
+		console.log("close");
+		getElm("ws-state").innerText = "切断";
+	};
+
+	ws.onmessage = (event) => {
+		const json = JSON.parse(event.data);
+		const time = new Date(json.date);
+		//場合に応じて
+		let data = JSON.parse(json.Data);
+		json.Data = data;
+		execMessage(json);
+	};
 }
 
 function execMessage(data) {
-	console.log(data);
-	
 	let ret = "";
 	switch(data.Command){
 	case CMD.WELCOME:
@@ -324,14 +405,18 @@ function execMessage(data) {
 		//SessionIdをキーにしてJoinを返す
 		let json = {
 			SessionId: data.Data.SessionId,
-			Command: CMD.SEND_JOIN,
-			GameId: 101,
+			Command: CMD.SEND_USER_JOIN,
+			UserId: userData.UserId,
 		};
 		ws.send(JSON.stringify(json));
 		wsSessionId = data.Data.SessionId;
 		getElm("ws-state").innerText = "接続";
 	}
 	break;
+	
+	case CMD.GAMESTAT:
+		console.log(data.Data);
+		break;
 	
 	case CMD.EVENT:
 	{
@@ -368,33 +453,10 @@ function execMessage(data) {
 	return ret;
 }
 
-//WebSocket接続
-async function connectDGS(addr) {
-	ws = new WebSocket(addr);
-	
-	ws.onopen = (event) => {
-	};
-	
-	ws.onerror = (error) => {
-		console.log("Connection Error");
-		console.log(error)
-		getElm("ws-state").innerText = "エラー";
-	};
-		
-	ws.onclose = (event) => {
-		console.log("close");
-		getElm("ws-state").innerText = "切断";
-	};
 
-	ws.onmessage = (event) => {
-		const json = JSON.parse(event.data);
-		const time = new Date(json.date);
-		//場合に応じて
-		let data = JSON.parse(json.Data);
-		json.Data = data;
-		execMessage(json);
-	};
-}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TEST 
+//////////
 
 async function testEvent() {
 	let toUserId = -1;
@@ -444,49 +506,6 @@ function debugLoad() {
 	};
 }
 
-//ユーザ読み込み
-async function loadUser(userHash) {
-	let user = localStorage.getItem("UserData");
-	if(user) {
-		try{
-			user = JSON.parse(user);
-		}catch(ex){
-		}
-	}
-	
-	if(user && user.UserHash) {
-		userData = user;
-	}else{
-		let req = await fetch("https://vc.vtn-game.com/vc/user/" + userHash, {
-			mode: 'cors'
-		});
-		console.log(req);
-		let result = await req.json();
-		console.log(result);
-		
-		userData = result.result;
-		localStorage.setItem("UserData", JSON.stringify(userData));
-	}
-	createUserInfoUI();
-	enableUIById("userinfo");
-}
-
-//ユーザ作成
-async function createUser() {
-	let req = await fetch("https://vc.vtn-game.com/vc/usercreate", {
-		mode: 'cors'
-	});
-	console.log(req);
-	let result = await req.json();
-	console.log(result);
-	if(result.Success) {
-		saveUserSession(result.UserData.UserHash);
-	}
-	userData = result.UserData;
-	createUserInfoUI();
-	enableUIById("userinfo");
-}
-
 // 連想配列に格納
 function getCookieArray() {
     var arr = {};
@@ -529,7 +548,7 @@ function disableUIById(elmId) {
 }
 
 function createUserInfoUI() {
-	getElm("fullname").innerText = userData.FullName;
+	getElm("fullname").innerText = userData.Name;
 	getElm("level").innerText = userData.Level;
 	getElm("gender").innerText = userData.Gender;
 	getElm("age").innerText = userData.Age;
