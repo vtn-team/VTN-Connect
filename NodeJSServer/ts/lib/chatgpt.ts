@@ -8,6 +8,16 @@ const dataModel = "gpt-4o-mini";
 
 let chatSession:any = {};
 
+//モデルのリスト
+export async function modelList() {
+	var compare = function(a, b) {
+	  return b.created - a.created;
+	}
+	var list = await openai.models.list();
+	
+	list.body.data.sort(compare);
+	return list.body.data;
+}
 
 //コンテキスト無し
 export async function chat(prompt:any) {

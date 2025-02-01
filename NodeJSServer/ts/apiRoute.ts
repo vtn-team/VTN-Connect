@@ -28,7 +28,8 @@ exports.Routes = {
 			"/epictest" : "vc#epictest#             冒険の書を作る",
 		},
 		"/tools" : {
-			"/masterupdate" : "tools#masterupdate#   マスタデータ更新"
+			"/masterupdate" : "tools#masterupdate#   マスタデータ更新",
+			"/modelist" : "tools#modelist#   モデルリスト"
 		}
 	},
 	POST: {
