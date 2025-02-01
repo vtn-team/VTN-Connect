@@ -118,10 +118,6 @@ class EpisodeBook {
 		return this.gameId;
 	}
 	
-	public getUserId() {
-		return this.userInfo.UserId;
-	}
-	
 	public stockEpisode(data: GameEpisode) {
 		this.episodes.push(data);
 	}
@@ -143,63 +139,63 @@ class Epic {
 		this.books = {};
 	}
 	
+	getBookHash(gameHash: string, userId: number) {
+		return gameHash + "__" + userId;
+	}
+	
 	public createEpisode(gameId: number, gameHash: string, userInfo: any) {
-		this.books[gameHash] = new EpisodeBook(gameId, gameHash, userInfo);
+		let hash = this.getBookHash(gameHash, userInfo.UserId);
+		this.books[hash] = new EpisodeBook(gameId, gameHash, userInfo);
 	}
 	
-	public getGameId(gameHash: string) {
-		if(!this.books[gameHash]) return 0;
-		return this.books[gameHash].getGameId();
+	public getEpisodeBook(gameHash: string, userId: number) {
+		let hash = this.getBookHash(gameHash, userId);
+		
+		if(!this.books[hash]) return null;
+		return this.books[hash];
 	}
 	
-	public getUserId(gameHash: string) {
-		if(!this.books[gameHash]) return 0;
-		return this.books[gameHash].getUserId();
-	}
-	
-	public stockEpisode(gameHash: string, data: GameEpisode) {
-		if(!this.books[gameHash]) {
+	public stockEpisode(gameHash: string, userId: number, data: GameEpisode) {
+		let hash = this.getBookHash(gameHash, userId);
+		if(!this.books[hash]) {
 			return ;
 		}
 		
-		this.books[gameHash].stockEpisode(data);
+		this.books[hash].stockEpisode(data);
 	}
 	
-	public deleteEpisode(gameHash: string) {
-		delete this.books[gameHash];
-	}
-	
-	public getEpisodePrompt(gameHash: string) {
-		if(!this.books[gameHash]) return null;
-		return this.books[gameHash].getEpisodePrompt();
+	public deleteEpisode(gameHash: string, userId: number) {
+		let hash = this.getBookHash(gameHash, userId);
+		if(!this.books[hash]) {
+			return ;
+		}
+		
+		delete this.books[hash];
 	}
 };
 
 let epic = new Epic();
+let userCache: any = { };
 
 //
-export function createEpisode(gameId: number, gameHash: string, userInfo: any) {
+export function createEpisodeNormalGame(gameId: number, gameHash: string, userInfo: any) {
 	//
 	epic.createEpisode(gameId, gameHash, userInfo);
+	cacheUser(gameHash, userInfo);
 	console.log("create episode");
 }
 
 //
-export function stockEpisode(gameHash: string, data: any) {
-	//
-	let d: GameEpisode = new GameEpisode(data);
-	epic.stockEpisode(gameHash, d);
-}
-
-//
-export async function saveEpisode(gameHash: string, gameResult: boolean) {
-	//
-	let messages = epic.getEpisodePrompt(gameHash);
-	if(!messages) return;
+export async function saveEpisodeNormalGame(gameHash: string, gameResult: boolean) {
+	let userInfo = getCachedUser(gameHash);
+	if(!userInfo) return;
+	let episode = epic.getEpisodeBook(gameHash, userInfo.UserId);
+	if(!episode) return;
+	
+	let master = getGameInfo(episode.getGameId());
+	let messages = episode.getEpisodePrompt();
 	
 	console.log("save episode");
-	
-	let master = getGameInfo(epic.getGameId(gameHash));
 	
 	let rule = getAIRule("CreateEpic_" + master.ProjectCode);
 	if(!rule) rule = getAIRule("CreateEpic");
@@ -213,12 +209,100 @@ export async function saveEpisode(gameHash: string, gameResult: boolean) {
 	
 	let msg:any = await chatWithContextsText(messages);
 	
-	let userId = epic.getUserId(gameHash);
 	let logId = uuidv4();
-	await query("INSERT INTO Adventure (GameHash, UserId, Result, LogId) VALUES (?, ?, ?, ?)", [gameHash, userId, gameResult ? 1 : 0, logId]);
+	await query("INSERT INTO Adventure (GameHash, UserId, Result, LogId) VALUES (?, ?, ?, ?)", [gameHash, userInfo.UserId, gameResult ? 1 : 0, logId]);
 	await uploadToS3(logId, msg.content);
 	
-	epic.deleteEpisode(gameHash);
+	epic.deleteEpisode(gameHash, userInfo.UserId);
+	deleteCachedUser(gameHash);
 	
 	console.log("complete message");
+}
+
+//物語の記録を開始(AIゲーム)
+export function createEpisodeAIGame(gameId: number, gameHash: string, users: any) {
+	
+	//プレイするユーザの情報を4人分記録
+	for(let u of users) {
+		epic.createEpisode(gameId, gameHash, u);
+		console.log("create episode");
+	}
+	cacheUser(gameHash, users);
+	console.log("cached aigame users");
+}
+
+//物語生成(AIゲーム)
+export async function saveEpisodeAIGame(gameHash: string, gameResult: any) {
+	//ユーザのリストが入っている
+	let users = getCachedUser(gameHash);
+	
+	console.log(gameResult);
+	
+	let rule = getAIRule("CreateEpic_VCMain");
+	
+	for(let result of gameResult) {
+		let target = null;
+		for(let u of users) {
+			if(u.UserId != result.UserId) continue;
+			target = u;
+			break;
+		}
+		
+		let episode = epic.getEpisodeBook(gameHash, result.UserId);
+		if(!episode) continue;
+		
+		let resNumber = 0;
+		let prompt = rule.RuleText;
+		if(result.GameResult) {
+			prompt += "\n\n# 冒険の結末\n- 成功";
+			resNumber += 10;
+		}else{
+			prompt += "\n\n# 冒険の結末\n- 失敗";
+			resNumber += 20;
+		}
+		if(result.MissionClear) {
+			prompt += "\n\n# 冒険の目的\n- 達成";
+			resNumber += 100;
+		}else{
+			prompt += "\n\n# 冒険の目的\n- 未達成";
+		}
+		
+		let messages = episode.getEpisodePrompt();
+		messages.push({ role: "user", content: prompt });
+		console.log(messages);
+		
+		let msg:any = await chatWithContextsText(messages);
+		console.log(msg);
+		
+		let logId = uuidv4();
+		await query("INSERT INTO Adventure (GameHash, UserId, Result, LogId) VALUES (?, ?, ?, ?)", [gameHash, result.UserId, resNumber, logId]);
+		await uploadToS3(logId, msg.content);
+		
+		epic.deleteEpisode(gameHash, result.UserId);
+		
+		console.log("save episode:" + result.UserId);
+	}
+	
+	deleteCachedUser(gameHash);
+	
+	console.log("complete message");
+}
+
+//物語を記録
+export function stockEpisode(gameHash: string, userId: number, data: any) {
+	//
+	let d: GameEpisode = new GameEpisode(data);
+	epic.stockEpisode(gameHash, userId, d);
+}
+
+function cacheUser(gameHash: string, userInfo: any) {
+	userCache[gameHash] = userInfo;
+}
+
+function getCachedUser(gameHash: string) {
+	return userCache[gameHash];
+}
+
+function deleteCachedUser(gameHash: string) {
+	delete userCache[gameHash];
 }

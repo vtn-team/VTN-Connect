@@ -1,5 +1,5 @@
 import { updateMainGameInfo } from "./vcinfo"
-import { createEpisode, saveEpisode } from "./vcgameInfo"
+import { createEpisodeNormalGame, createEpisodeAIGame, saveEpisodeNormalGame, saveEpisodeAIGame } from "./vcgameInfo"
 import { getUniqueUsers, getUserFromId } from "./vcuser"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { query } from "./../lib/database"
@@ -32,16 +32,19 @@ export async function gameStartAIGame(option: number) {
 		//Gameにプレイ開始したゲームの情報を記録
 		await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
 		
-		//Adventureにプレイしたユーザの情報を記録
-		for(let u of users) {
-			await query("INSERT INTO Adventure (GameHash, UserId) VALUES (?, ?)", [gameHash, u.Id]);
-		}
-		
 		result.Success = true;
 		result.GameHash = gameHash;
 		result.GameUsers = users;
 		
-		//result.info //TBD
+		//AI記録
+		createEpisodeAIGame(gameId, gameHash, users);
+		
+		//DGSにイベントリレー
+		sendAPIEvent({
+			API: gameStartAIGame,
+			GameHash: gameHash,
+			GameUsers: users,
+		});
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -57,6 +60,18 @@ export async function gameEndAIGame(gameResult: any) {
 	
 	try {
 		result.Success = true;
+		
+		let hash = gameResult.GameHash;
+		
+		//awaitはしない
+		saveEpisodeAIGame(hash, gameResult.UserResults);
+		
+		//DGSにイベントリレー
+		sendAPIEvent({
+			API: gameStartAIGame,
+			GameHash: hash,
+			GameResult: gameResult,
+		});
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -74,12 +89,13 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 	
 	try {
 		let gameHash = uuidv4();
+		let userInfo = null;
 		
 		//Gameにプレイ開始したゲームの情報を記録
 		if(userId > 0) {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
 			let userInfo = await getUserFromId(userId);
-			createEpisode(gameId, gameHash, userInfo);
+			createEpisodeNormalGame(gameId, gameHash, userInfo);
 		} else {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 3)", [gameHash, gameId]);
 		}
@@ -90,6 +106,14 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		
 		result.GameHash = gameHash;
 		result.Success = true;
+		
+		//DGSにイベントリレー
+		sendAPIEvent({
+			API: gameStartVC,
+			GameHash: gameHash,
+			UserId: userId,
+			UserInfo: userInfo,
+		});
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -110,8 +134,16 @@ export async function gameEndVC(gameHash: string, gameResult: boolean) {
 		
 		stopRecord(gameHash);
 		
-		saveEpisode(gameHash, gameResult);
+		//awaitはしない
+		saveEpisodeNormalGame(gameHash, gameResult);
 		
+		//DGSにイベントリレー
+		//NOTE: UserInfoは取ろうと思えばとれる
+		sendAPIEvent({
+			API: gameStartVC,
+			GameHash: gameHash,
+			GameResult: gameResult
+		});
 	} catch(ex) {
 		console.log(ex);
 	}

@@ -214,7 +214,7 @@ export class GameConnect {
 		{
 			if(!data["GameHash"]) break;
 			
-			stockEpisode(data["GameHash"], data);
+			stockEpisode(data["GameHash"], data["UserId"], data);
 		}
 		break;
 		}
