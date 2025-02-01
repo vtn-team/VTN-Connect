@@ -10,11 +10,10 @@ let chatSession:any = {};
 
 //モデルのリスト
 export async function modelList() {
-	var compare = function(a, b) {
+	var compare = function(a:any, b:any) {
 	  return b.created - a.created;
 	}
-	var list = await openai.models.list();
-	
+	var list:any = await openai.models.list();
 	list.body.data.sort(compare);
 	return list.body.data;
 }
