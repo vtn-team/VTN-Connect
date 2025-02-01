@@ -24,6 +24,38 @@ export async function chat(prompt:any) {
 	return "";
 }
 
+//コンテキストあり(自由指定)
+export async function chatWithContexts(message:Array<any>) {
+	const completion = await openai.chat.completions.create({
+		messages: message,
+		model : dataModel,
+		response_format : {"type": "json_object"}
+	});
+
+	//console.log(completion);
+	if(completion && completion.choices[0]){
+		return completion.choices[0].message;
+	}
+	return "";
+}
+
+
+//コンテキストあり(自由指定)
+export async function chatWithContextsText(message:Array<any>) {
+	const completion = await openai.chat.completions.create({
+		messages: message,
+		model : dataModel,
+		response_format : {"type": "text" }
+	});
+
+	//console.log(completion);
+	if(completion && completion.choices[0]){
+		return completion.choices[0].message;
+	}
+	return "";
+}
+
+
 //コンテキストあり(覚えているメッセージを使って聞く)
 export async function chatWithSession(sessionId:string|null, prompt:any) {
 	let session:string = "";

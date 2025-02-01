@@ -1,5 +1,6 @@
 import { updateMainGameInfo } from "./vcinfo"
-import { getUniqueUsers } from "./vcuser"
+import { createEpisode, saveEpisode } from "./vcgameinfo"
+import { getUniqueUsers, getUserFromId } from "./vcuser"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { query } from "./../lib/database"
 const { v4: uuidv4 } = require('uuid')
@@ -39,6 +40,7 @@ export async function gameStartAIGame(option: number) {
 		result.Success = true;
 		result.GameHash = gameHash;
 		result.GameUsers = users;
+		
 		//result.info //TBD
 	} catch(ex) {
 		console.log(ex);
@@ -67,8 +69,7 @@ export async function gameEndAIGame(gameResult: any) {
 export async function gameStartVC(gameId: number, userId: number, option: number) {
 	let result = {
 		Success: false,
-		GameHash: "",
-		GameInfo: []
+		GameHash: ""
 	};
 	
 	try {
@@ -78,6 +79,8 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		if(userId > 0) {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
 			await query("INSERT INTO Adventure (GameHash, UserId) VALUES (?, ?)", [gameHash, userId]);
+			let userInfo = await getUserFromId(userId);
+			createEpisode(gameId, gameHash, userInfo);
 		} else {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 3)", [gameHash, gameId]);
 		}
@@ -107,6 +110,8 @@ export async function gameEndVC(gameHash: string, gameResult: boolean) {
 		result.Success = true;
 		
 		stopRecord(gameHash);
+		
+		saveEpisode(gameHash, gameResult);
 		
 	} catch(ex) {
 		console.log(ex);
