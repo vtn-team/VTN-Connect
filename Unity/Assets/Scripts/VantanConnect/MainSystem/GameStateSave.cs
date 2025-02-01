@@ -12,6 +12,7 @@ namespace VTNConnect
     public class GameStateSave
     {
         public bool IsInGame => _gameHash != null;
+        public string GameHash => _gameHash;
 
         string _gameHash = null;
 

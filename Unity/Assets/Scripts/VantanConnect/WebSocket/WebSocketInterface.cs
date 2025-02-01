@@ -13,6 +13,7 @@ namespace VTNConnect
         GAMESTAT = 4,
         SEND_JOIN = 100,
         SEND_EVENT = 101,
+        SEND_EPISODE = 102,
         SEND_USER_JOIN = 110,
     };
 
@@ -60,6 +61,18 @@ namespace VTNConnect
         public int Command = (int)WebSocketCommand.SEND_EVENT;
 
         public WSPS_SendEvent(string sessionId, EventData d) : base(d)
+        {
+            SessionId = sessionId;
+        }
+    };
+
+    [Serializable]
+    public class WSPS_SendEpisode : GameEpisode
+    {
+        public string SessionId;
+        public int Command = (int)WebSocketCommand.SEND_EPISODE;
+
+        public WSPS_SendEpisode(string sessionId, GameEpisode d) : base(d)
         {
             SessionId = sessionId;
         }

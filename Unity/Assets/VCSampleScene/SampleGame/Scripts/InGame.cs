@@ -48,11 +48,20 @@ namespace VTNConnect
                 });
 #else
                 //ゲーム終了
-                VantanConnect.GameEnd(true, (VC_StatusCode status) =>
+                VantanConnect.GameEnd(false, (VC_StatusCode status) =>
                 {
                     SceneManager.LoadScene("Title");
                 });
 #endif
+            }
+
+            if(_timer > 10.0f)
+            {
+                //ゲーム終了
+                VantanConnect.GameEnd(true, (VC_StatusCode status) =>
+                {
+                    SceneManager.LoadScene("Title");
+                });
             }
         }
 

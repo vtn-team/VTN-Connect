@@ -37,6 +37,8 @@ public class WebSocketCli
         _webSocket.Connect();
     }
 
+    public bool IsClosed => _webSocket != null ? _webSocket.ReadyState == WebSocketState.Closed : true;
+
     public void Send(string msg)
     {
         _webSocket.Send(msg);
@@ -50,6 +52,8 @@ public class WebSocketCli
 
     public void Close()
     {
+        if (_webSocket == null) return;
+
         _webSocket.Close();
         _webSocket = null;
     }

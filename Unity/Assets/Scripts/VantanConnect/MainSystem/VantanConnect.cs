@@ -32,7 +32,10 @@ namespace VTNConnect
         static public SystemSaveData SystemSave => _instance._systemSave;
 
         /// <summary>ゲーム中かどうかを返す</summary>
-        public bool IsInGame => _instance._gameStateSave.IsInGame;
+        static public bool IsInGame => _instance._gameStateSave.IsInGame;
+
+        static public string GameHash => _instance._gameStateSave.GameHash;
+
 
         #region ゲームAPI
 
@@ -80,6 +83,12 @@ namespace VTNConnect
 
         /// <summary>イベントを送信(IDのみで送信)</summary>
         static public void SendEvent(EventDefine eventId) { _instance.SendVCEvent(eventId); }
+
+        /// <summary>ゲーム内物語を送信(物語データを作って送信)</summary>
+        static public void SendEpisode(GameEpisode episode) { _instance.SendVCEpisode(episode); }
+
+        /// <summary>イベントを送信(IDのみで送信)</summary>
+        static public void SendEpisode(EpisodeCode episodeId) { _instance.SendVCEpisode(episodeId); }
 
         #endregion
 
@@ -152,7 +161,7 @@ namespace VTNConnect
             _instance._linkageSystem.Setup(overlay.GetComponentInChildren<VC_LoginView>());
 
             //イベント登録系など
-            _instance._wsManager.SetEventSystem(_instance._eventSystem);
+            _instance._eventSystem.SetEventSystem(_instance._wsManager);
             _instance._eventSystem.RegisterReceiver(_instance._linkageSystem);
             _instance._eventSystem.SystemInitialSave();
         }
@@ -253,11 +262,22 @@ namespace VTNConnect
             EventData data = new EventData(evCode);
             SendVCEvent(data);
         }
-        void SendVCEvent(EventData d)
+
+        void SendVCEpisode(EpisodeCode epiCode)
         {
-            _eventSystem.SendEvent(d);
+            GameEpisode data = new GameEpisode(epiCode);
+            SendVCEpisode(data);
         }
 
-#endregion
+        void SendVCEvent(EventData d)
+        {
+            _wsManager.Send(d);
+        }
+
+        void SendVCEpisode(GameEpisode d)
+        {
+            _wsManager.Send(d);
+        }
+        #endregion
     }
 }
