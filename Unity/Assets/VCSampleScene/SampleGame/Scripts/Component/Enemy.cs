@@ -20,11 +20,13 @@ namespace GameLoopTest
                 VantanConnect.SendEvent(data);
                 */
 
-                GameEpisode epic = new GameEpisode(EpisodeCode.SGEnemyLeave);
+#if AIGAME_IMPLEMENT
+#else
+                GameEpisode epic = VantanConnect.CreateEpisode(EpisodeCode.SGEnemyLeave);
                 epic.SetEpisode("敵を逃がしてしまった");
                 epic.DataPack("敵を逃がした位置", this.transform.position);
                 VantanConnect.SendEpisode(epic);
-
+#endif
                 ScoreManager.AddScore(-100);
 
                 //消える

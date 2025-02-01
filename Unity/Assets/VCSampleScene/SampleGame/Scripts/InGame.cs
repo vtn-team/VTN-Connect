@@ -57,11 +57,19 @@ namespace VTNConnect
 
             if(_timer > 10.0f)
             {
+#if AIGAME_IMPLEMENT
+                //ゲーム終了
+                VantanConnect.GameEnd((VC_StatusCode status) =>
+                {
+                    SceneManager.LoadScene("Title");
+                });
+#else
                 //ゲーム終了
                 VantanConnect.GameEnd(true, (VC_StatusCode status) =>
                 {
                     SceneManager.LoadScene("Title");
                 });
+#endif
             }
         }
 

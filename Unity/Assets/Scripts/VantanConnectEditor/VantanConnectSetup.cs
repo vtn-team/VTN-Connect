@@ -79,7 +79,7 @@ public class VantanConnectSetup : EditorWindow
             var result2 = await Network.WebRequest.GetRequest(string.Format("{0}?sheet=GameEvent", BaseURL));
             _gameEvent = JsonUtility.FromJson<GameEventMaster>(result2);
 
-            _filteredEventList = _gameEvent.Data.Where(d => (d.System.Trim() == "")).ToList();
+            _filteredEventList = _gameEvent.Data.Where(d => (d.System.Trim() == "" && d.Release != "")).ToList();
         }).ContinueWith(() =>
         {
             _isSetup = true;
@@ -298,7 +298,7 @@ namespace VTNConnect
 
         using (FileStream fs = new FileStream(targetPath + "/EventDefine.cs", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
         {
-            var events = _filteredEventList.Where(d => ((d.From == _gameID || d.From == -1 || d.From == 100) || (d.Target == _gameID || d.Target == -1 || d.Target == 100)) && (d.Id < 200 || d.Id >= 1000)).ToList();
+            var events = _filteredEventList.Where(d => (_gameID == 100 || (d.From == _gameID || d.From == -1 || d.From == 100) || (d.Target == _gameID || d.Target == -1 || d.Target == 100)) && (d.Id < 200 || d.Id >= 1000)).ToList();
 
             string sourceCode = eventDefSource;
             sourceCode = sourceCode.Replace("<EventList>", EventDefineCreate(events));      //イベント置き換え
@@ -309,7 +309,7 @@ namespace VTNConnect
 
         using (FileStream fs = new FileStream(targetPath + "/EpisodeCode.cs", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
         {
-            var episodes = _filteredEventList.Where(d => ((d.From == _gameID || d.From == -1 || d.From == 100) || (d.Target == _gameID || d.Target == -1 || d.Target == 100)) && (d.Id >= 200 && d.Id < 1000)).ToList();
+            var episodes = _filteredEventList.Where(d => (_gameID == 100 || (d.From == _gameID || d.From == -1 || d.From == 100) || (d.Target == _gameID || d.Target == -1 || d.Target == 100)) && (d.Id >= 200 && d.Id < 1000)).ToList();
             
             string sourceCode = episodeDefSource;
             sourceCode = sourceCode.Replace("<EpisodeList>", EpisodeDefineCreate(episodes));      //イベント置き換え

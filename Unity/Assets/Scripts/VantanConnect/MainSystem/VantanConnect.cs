@@ -68,11 +68,14 @@ namespace VTNConnect
 
         /// <summary>現在のAIゲームに参加しているユーザーリストを返す(GameStart後に取得可能)</summary>
         static public UserData[] GetMainGameUsers() { return _instance.GetMainGameUsersImplement(); }
+
+        /// <summary>生死を保存</summary>
+        static public void UserRecord(int userId, bool gameResult, bool isMissionClear) { _instance.UserRecordImplement(userId, gameResult, isMissionClear); }
 #else
         /// <summary>ゲーム終了</summary>
         static public void GameEnd(bool gameResult, ExecuteCallback callback) { _instance.CallbackAction(callback, _instance.GameEndImplement, gameResult); }
 #endif
-#endregion
+        #endregion
 
         #region イベント
         /// <summary>イベントを受信するクラスを登録(何個登録しても良い)</summary>
@@ -84,13 +87,16 @@ namespace VTNConnect
         /// <summary>イベントを送信(IDのみで送信)</summary>
         static public void SendEvent(EventDefine eventId) { _instance.SendVCEvent(eventId); }
 
+
+#if AIGAME_IMPLEMENT
+#else
+        /// <summary>ゲーム内物語の作成ヘルパ(物語データにUserIdを絡ませる)</summary>
+        static public GameEpisode CreateEpisode(EpisodeCode epiCode) { return _instance.CreateVCEpisode(epiCode); }
+#endif
         /// <summary>ゲーム内物語を送信(物語データを作って送信)</summary>
         static public void SendEpisode(GameEpisode episode) { _instance.SendVCEpisode(episode); }
 
-        /// <summary>イベントを送信(IDのみで送信)</summary>
-        static public void SendEpisode(EpisodeCode episodeId) { _instance.SendVCEpisode(episodeId); }
-
-        #endregion
+#endregion
 
 
         #region 内部処理用
@@ -220,6 +226,11 @@ namespace VTNConnect
         {
             return _gameStateSave.Users;
         }
+
+        void UserRecordImplement(int userId, bool gameResult, bool isMissionClear)
+        {
+            _gameStateSave.StackUser(userId, gameResult, isMissionClear);
+        }
 #else
         async UniTask<VC_StatusCode> GameStartVCGame()
         {
@@ -263,12 +274,18 @@ namespace VTNConnect
             SendVCEvent(data);
         }
 
-        void SendVCEpisode(EpisodeCode epiCode)
+#if AIGAME_IMPLEMENT
+#else
+        GameEpisode CreateVCEpisode(EpisodeCode epiCode)
         {
-            GameEpisode data = new GameEpisode(epiCode);
-            SendVCEpisode(data);
+            if (!_linkageSystem.IsLink)
+            {
+                return new GameEpisode(epiCode, 0);
+            }
+            
+            return new GameEpisode(epiCode, _instance._linkageSystem.UserData.UserId);
         }
-
+#endif
         void SendVCEvent(EventData d)
         {
             _wsManager.Send(d);
@@ -276,8 +293,10 @@ namespace VTNConnect
 
         void SendVCEpisode(GameEpisode d)
         {
+            if (!d.IsValidEpisode) return;
+
             _wsManager.Send(d);
         }
-        #endregion
+#endregion
     }
 }
