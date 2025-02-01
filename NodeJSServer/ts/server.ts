@@ -164,7 +164,7 @@ function check(method: string, url: string)
 }
 
 async function run(req: any, res: any, route: any) {
-	//console.log(route);
+	console.log("ACCESS_LOG:" + JSON.stringify(route));
 	let apiScript = require('./server/' + route.action);
 	let target = route.target;
 	if(!target) target = "run";
