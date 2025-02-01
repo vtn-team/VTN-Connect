@@ -3,6 +3,8 @@ import { chatWithSession } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
 import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
+import { uploadToS3 } from "./../lib/s3"
+const { v4: uuidv4 } = require('uuid')
 
 //デフォルト関数
 export async function index(req: any,res: any,route: any)
@@ -55,14 +57,12 @@ export async function chat(req: any,res: any,route: any)
 //ユーザーを取得する
 export async function getUser(req: any,res: any,route: any)
 {
-	let id = route.query.id;
-	let hash = route.query.hash;
 	let result = null;
 	
-	if(id) {
-		result = await getUserFromId(id);
+	if(route.query.id) {
+		result = await getUserFromId(route.query.id);
 	}else{
-		result = await getUserFromHash(hash);
+		result = await getUserFromHash(route.query.hash);
 	}
 	
 	return {

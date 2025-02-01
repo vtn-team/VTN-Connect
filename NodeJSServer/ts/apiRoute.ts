@@ -24,7 +24,8 @@ exports.Routes = {
 			"/ai" :{
 				"/gamestart" : "vc#gameStartAI#     ゲーム開始",
 				"/gameend" : "vc#gameEndAI#         ゲーム終了",
-			}
+			},
+			"/epictest" : "vc#epictest#             冒険の書を作る",
 		},
 		"/tools" : {
 			"/masterupdate" : "tools#masterupdate#   マスタデータ更新"

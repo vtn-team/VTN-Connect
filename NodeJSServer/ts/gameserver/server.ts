@@ -27,7 +27,8 @@ class Server {
 	//データ送信
 	broadcast(data: any) {
 		let msg = JSON.stringify(data);
-		console.log("send:" + msg);
+		
+		this.messagelog(msg, data);
 		
 		//let msg = msgpack.pack(data);
 		for(var k in this.sessions) {
@@ -160,6 +161,12 @@ class Server {
 			ActiveUsers: this.portal.getActiveUsers()
 		}
 		this.broadcast(createMessage("", CMD.GAMESTAT, TARGET.ALL, stats));
+	}
+	
+	messagelog(msg: string, data: any) {
+		if(data.Command == CMD.GAMESTAT) return;
+		
+		console.log("send:" + msg);
 	}
 
 	public setupGameConnect() {
