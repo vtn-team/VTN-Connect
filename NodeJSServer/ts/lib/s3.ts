@@ -8,7 +8,7 @@ export async function uploadToS3(logHash: string, text: string) {
 		const putData = await s3.putObject(
 		{
 			Bucket:backet,
-			Key: `vc/log/${logHash}.json`,
+			Key: `vc/log/${logHash}`,
 			Body: text
 		}).promise();
 	}catch(ex){

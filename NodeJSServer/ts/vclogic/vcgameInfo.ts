@@ -1,6 +1,7 @@
 import { getMaster, getGameInfo, getGameEvent, getAIRule } from "../lib/masterDataCache"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { chatWithContextsText } from "./../lib/chatgpt"
+import { query } from "./../lib/database"
 import { uploadToS3 } from "./../lib/s3"
 const { v4: uuidv4 } = require('uuid')
 
@@ -117,6 +118,10 @@ class EpisodeBook {
 		return this.gameId;
 	}
 	
+	public getUserId() {
+		return this.userInfo.UserId;
+	}
+	
 	public stockEpisode(data: GameEpisode) {
 		this.episodes.push(data);
 	}
@@ -145,6 +150,11 @@ class Epic {
 	public getGameId(gameHash: string) {
 		if(!this.books[gameHash]) return 0;
 		return this.books[gameHash].getGameId();
+	}
+	
+	public getUserId(gameHash: string) {
+		if(!this.books[gameHash]) return 0;
+		return this.books[gameHash].getUserId();
 	}
 	
 	public stockEpisode(gameHash: string, data: GameEpisode) {
@@ -200,14 +210,15 @@ export async function saveEpisode(gameHash: string, gameResult: boolean) {
 		prompt += "\n\n# 冒険の結末\n- 失敗";
 	}
 	messages.push({ role: "user", content: prompt });
-	console.log(messages);
 	
 	let msg:any = await chatWithContextsText(messages);
-	console.log(msg);
+	
+	let userId = epic.getUserId(gameHash);
+	let logId = uuidv4();
+	await query("INSERT INTO Adventure (GameHash, UserId, Result, LogId) VALUES (?, ?, ?, ?)", [gameHash, userId, gameResult ? 1 : 0, logId]);
+	await uploadToS3(logId, msg.content);
 	
 	epic.deleteEpisode(gameHash);
-	
-	await uploadToS3(gameHash, msg.content);
 	
 	console.log("complete message");
 }

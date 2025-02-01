@@ -78,7 +78,6 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		//Gameにプレイ開始したゲームの情報を記録
 		if(userId > 0) {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
-			await query("INSERT INTO Adventure (GameHash, UserId) VALUES (?, ?)", [gameHash, userId]);
 			let userInfo = await getUserFromId(userId);
 			createEpisode(gameId, gameHash, userInfo);
 		} else {
