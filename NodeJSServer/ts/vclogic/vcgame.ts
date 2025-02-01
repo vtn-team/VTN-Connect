@@ -1,5 +1,5 @@
 import { updateMainGameInfo } from "./vcinfo"
-import { createEpisode, saveEpisode } from "./vcgameinfo"
+import { createEpisode, saveEpisode } from "./vcgameInfo"
 import { getUniqueUsers, getUserFromId } from "./vcuser"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { query } from "./../lib/database"

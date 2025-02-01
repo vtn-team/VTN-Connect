@@ -1,7 +1,7 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
-import { stockEpisode } from "./../vclogic/vcgameinfo"
+import { stockEpisode } from "./../vclogic/vcgameInfo"
 import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
 
