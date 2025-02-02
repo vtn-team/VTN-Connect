@@ -42,6 +42,9 @@ exports.Routes = {
 				"/gamestart" : "vc#gameStartAI#     ゲーム開始",
 				"/gameend" : "vc#gameEndAI#         ゲーム終了",
 			}
+		},
+		"/tools" : {
+			"/realtimeai" : "tools#realtimeai#      リアルタイムAI用のトークンを取得する"
 		}
 	}
 }

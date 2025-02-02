@@ -5,6 +5,7 @@ import { CHATGPT_API_TOKEN } from "./../config/config"
 const openai = new OpenAI({ apiKey: CHATGPT_API_TOKEN });
 
 const dataModel = "gpt-4o-mini";
+const realtimeDataModel = "gpt-4o-realtime-preview-2024-12-17";
 
 let chatSession:any = {};
 
@@ -17,6 +18,19 @@ export async function modelList() {
 	list.body.data.sort(compare);
 	return list.body.data;
 }
+
+//セッション取得
+export async function getEphemeralKey(instructions: string) {
+	var result:any = await openai.beta.realtime.sessions.create({
+	    "model": realtimeDataModel,
+	    "modalities": ["audio", "text"],
+	    "instructions": instructions,
+	});
+	
+	console.log(result);
+	return result;
+}
+
 
 //コンテキスト無し
 export async function chat(prompt:any) {
