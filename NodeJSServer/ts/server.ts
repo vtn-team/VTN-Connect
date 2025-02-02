@@ -173,6 +173,7 @@ async function run(req: any, res: any, route: any) {
 		let vChk = true;
 		if(apiScript.varCheck) vChk = apiScript.varCheck(route);
 		if(!vChk || !apiScript[target]) {
+			console.log("INVALID ROUTE:" + req.url);
 			res.writeHead(404, {'Content-Type': 'text/html'});
 			res.write("invalid parameter.");
 			res.end();
