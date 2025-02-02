@@ -33,7 +33,7 @@ namespace VTNConnect
         /// <returns>リザルト</returns>
         async public UniTask<GameStartAIGameResult> Request()
         {
-            string request = String.Format("{0}/ai/gamestart", VantanConnect.Environment.APIServerURI);
+            string request = String.Format("{0}/vc/ai/gamestart", VantanConnect.Environment.APIServerURI);
             string json = await Network.WebRequest.PostRequest(request, "{}");
             var ret = JsonUtility.FromJson<GameStartAIGameResult>(json);
             return ret;
