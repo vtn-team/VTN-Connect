@@ -29,7 +29,10 @@ exports.Routes = {
 		},
 		"/tools" : {
 			"/masterupdate" : "tools#masterupdate#   マスタデータ更新",
-			"/modelist" : "tools#modelist#   モデルリスト"
+			"/modelist" : "ai#modelist#            モデルリスト"
+		},
+		"/ai" : {
+			"/modelist" : "ai#modelist#            モデルリスト"
 		}
 	},
 	POST: {
@@ -44,7 +47,21 @@ exports.Routes = {
 			}
 		},
 		"/tools" : {
-			"/realtimeai" : "tools#realtimeai#      リアルタイムAI用のトークンを取得する"
+			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"
+		},
+		"/ai" : {
+			"/all" : {
+				"/eval" : "ai#chateval#          チャット比較"
+			},
+			"/openai" : {
+				"/chat" : "ai#chatToOpenAIWithModel#          チャット"
+			},
+			"/anthropic" : {
+				"/chat" : "ai#chatToClaudeWithModel#          チャット"
+			},
+			"/google" : {
+				"/chat" : "ai#chatToGeminiWithModel#          チャット"
+			}
 		}
 	}
 }

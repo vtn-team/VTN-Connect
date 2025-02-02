@@ -1,5 +1,4 @@
 import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
-import { chatWithSession } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
 import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
@@ -39,18 +38,6 @@ export async function stat(req: any,res: any,route: any)
 		Status: 200,
 		IsServerAlive: getConnectionAddress() != null,
 		ActiveNum: getActiveSessionNum(),
-	};
-}
-
-//ChatGPTと会話する
-export async function chat(req: any,res: any,route: any)
-{
-	let threadHash = route.query.threadHash;
-	let result = await chatWithSession(threadHash, route.query.prompt);
-	
-	return {
-		Status: 200,
-		Result: result
 	};
 }
 

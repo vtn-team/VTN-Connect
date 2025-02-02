@@ -7,6 +7,12 @@ export const INFORMATION_NOTION_DB_TOKEN = "notion token";
 //chat gpt
 export const CHATGPT_API_TOKEN = "chatgpt token";
 
+//gemini
+export const GEMINI_API_TOKEN = "";
+
+//calude
+export const CLAUDE_API_TOKEN = "";
+
 //http server port
 export const HTTP_SERVER_PORT = 80;
 

@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
+    "@google/generative-ai": "^0.21.0",
     "@notionhq/client": "^2.2.7",
     "aws-sdk": "^2.789.0",
     "cron": "^1.8.2",

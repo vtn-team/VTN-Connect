@@ -32,6 +32,22 @@ export async function getEphemeralKey(instructions: string) {
 }
 
 
+//モデル選択可能
+export async function chatWithModel(model: string, prompt:any) {
+	const completion = await openai.chat.completions.create({
+		messages: [{ role: "user", content: prompt }],
+		model : model,
+		response_format : {"type": "json_object"}
+	});
+
+	//console.log(completion);
+	if(completion && completion.choices[0]){
+		return completion.choices[0].message;
+	}
+	return "";
+}
+
+
 //コンテキスト無し
 export async function chat(prompt:any) {
 	const completion = await openai.chat.completions.create({
