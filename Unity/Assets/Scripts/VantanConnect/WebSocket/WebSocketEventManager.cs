@@ -68,6 +68,8 @@ namespace VTNConnect
 
         void Update()
         {
+            _client.Update();
+
             //切断されていたら再接続
             if (_client.IsClosed)
             {
