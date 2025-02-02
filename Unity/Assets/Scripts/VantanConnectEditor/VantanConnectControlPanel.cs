@@ -106,7 +106,11 @@ public class VantanConnectControlPanel : EditorWindow
                 isDirty |= CheckParam(ref _saveData.UseConnectUserId, EditorGUILayout.IntField("デバッグ用のコネクト処理に使用するテスト用ID", _saveData.UseConnectUserId, GUILayout.Width(400)));
             }
 
-            if(isDirty)
+            EditorGUILayout.Space(50);
+            EditorGUILayout.LabelField("AI系");
+            isDirty |= CheckParam(ref _saveData.OpenAIAPIKey, EditorGUILayout.TextField("OPENAI_API_KEY", _saveData.OpenAIAPIKey, GUILayout.Width(400)));
+
+            if (isDirty)
             {
                 Debug.Log("システムデータを保存");
                 LocalData.Save<SystemSaveData>("SystemSave.json", _saveData);
