@@ -1,6 +1,7 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
+import { getGameSessions } from "./../vclogic/vcgame"
 import { stockEpisode } from "./../vclogic/vcgameInfo"
 import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
@@ -35,11 +36,17 @@ class GameContainer {
 	}
 	
 	public getStat() {
-		if(!this.session) return null;
+		if(!this.session) {
+			return {
+				GameId: this.gameId,
+				Title: this.gameInfo.GameTitle,
+				ActiveTime: 0
+			};
+		}
 		
 		return {
 			GameId: this.gameId,
-			Name: this.gameInfo.ProjectCode,
+			Title: this.gameInfo.GameTitle,
 			ActiveTime: this.session.getActiveTime()
 		};
 	}
@@ -266,12 +273,11 @@ export class GameConnect {
 	
 	public getActiveGames() {
 		let games:any = [];
-		
+		let sessions:any = getGameSessions();
 		for(var gId in this.games) {
 			let stat = this.games[gId].getStat();
-			if(stat){
-				games.push(stat);
-			}
+			stat.Session = sessions[gId];
+			games.push(stat);
 		}
 		
 		return games;
