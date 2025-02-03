@@ -136,6 +136,8 @@ export async function createUserWithAI() { //status: UserStatus
 		let status: Array<any> = [userId, json.DisplayName, json.AvatarType, json.Gender, json.Age, json.Job, json.Personality, json.Motivation,json.Weaknesses, json.Background];
 		query("INSERT INTO UserGameStatus (UserId, DisplayName, AvatarType, Gender, Age, Job, Personality, Motivation, Weaknesses, Background) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", status);
 		
+		result.Name = json.FullName;
+		delete json["FullName"];
 		result.UserId = userId;
 		result.UserHash = userHash;
 		result.Type = 1;	//NOTE: ハードコード
@@ -166,4 +168,34 @@ export async function getUserFromHash(hash: string) {
 	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE UserHash = ?", [hash]);
 	if(result.length == 0) return null;
 	return result[0];
+}
+
+export async function getUserHistory(userId: number, page: number = 0) {
+	let result = await query("SELECT * FROM Adventure WHERE UserId = ?", [userId]);
+	let count = await query("SELECT count(GameHash) as Count FROM Adventure WHERE UserId = ?", [userId]);
+	
+	return {
+		History: result,
+		Count: Number(count[0].Count)
+	};
+}
+
+export async function getUserMessages(userId: number, page: number = 0) {
+	let result = await query("SELECT * FROM Message WHERE ToUserId = ?", [userId]);
+	let count = await query("SELECT count(Id) as Count FROM Message WHERE ToUserId = ?", [userId]);
+	
+	return {
+		Messages: result,
+		Count: Number(count[0].Count)
+	};
+}
+
+export async function getUserFriends(userId: number, page: number = 0) {
+	let result = await query("SELECT * FROM Friend WHERE UserId = ?", [userId]);
+	let count = await query("SELECT count(UserId) as Count FROM Message WHERE UserId = ?", [userId]);
+	
+	return {
+		Friends: result,
+		Count: Number(count[0].Count)
+	};
 }

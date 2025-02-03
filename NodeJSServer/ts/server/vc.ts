@@ -1,6 +1,6 @@
 import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
 import { query } from "./../lib/database"
-import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
+import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash, getUserHistory, getUserMessages, getUserFriends } from "./../vclogic/vcuser"
 import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
 import { uploadToS3 } from "./../lib/s3"
 const { v4: uuidv4 } = require('uuid')
@@ -55,6 +55,37 @@ export async function getUser(req: any,res: any,route: any)
 	return {
 		Status: 200,
 		UserData: result
+	};
+}
+
+//冒険の記録を取得する
+export async function userHistory(req: any,res: any,route: any)
+{
+	let result:any = await getUserHistory(route.query.id, route.query.page);
+	
+	result.Status = 200;
+	
+	return result;
+}
+
+//応援の記録を取得する
+export async function userMessage(req: any,res: any,route: any)
+{
+	let result = await getUserMessages(route.query.id, route.query.page);
+	
+	result.Status = 200;
+	
+	return result;
+}
+
+//出会いの記録を取得する
+export async function friendList(req: any,res: any,route: any)
+{
+	let result = await getUserFriends(route.query.id, route.query.page);
+	
+	return {
+		Status: 200,
+		Friends: result
 	};
 }
 
