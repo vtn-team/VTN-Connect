@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,19 @@ namespace GameLoopTest
         {
             //タイトルに戻ってきたとき、過去の情報がリセットされる仕組み
             VantanConnect.SystemReset();
+
+            if (VantanConnect.SystemSave.IsDebugConnect)
+            {
+                TestMessageRecv();
+            }
+        }
+
+        async void TestMessageRecv()
+        {
+            //メッセージ
+            APIGetMessagesImplement api = new APIGetMessagesImplement();
+            var messages = await api.Request(VantanConnect.SystemSave.UseConnectUserId);
+            Debug.Log(messages.Messages.Length);
         }
 
         private void Update()
