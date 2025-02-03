@@ -1,5 +1,5 @@
 {
-  "Version": 588,
+  "Version": 590,
   "Data": [
     {
       "Id": "101",
@@ -704,8 +704,8 @@
     {
       "Id": "1005",
       "Description": "",
-      "From": "0",
-      "Target": "1",
+      "From": "",
+      "Target": "",
       "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
@@ -714,8 +714,8 @@
     {
       "Id": "1006",
       "Description": "",
-      "From": "0",
-      "Target": "1",
+      "From": "",
+      "Target": "",
       "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
@@ -724,8 +724,8 @@
     {
       "Id": "1007",
       "Description": "",
-      "From": "0",
-      "Target": "1",
+      "From": "",
+      "Target": "",
       "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
@@ -734,8 +734,8 @@
     {
       "Id": "1008",
       "Description": "",
-      "From": "0",
-      "Target": "1",
+      "From": "",
+      "Target": "",
       "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
@@ -744,8 +744,8 @@
     {
       "Id": "1009",
       "Description": "",
-      "From": "0",
-      "Target": "1",
+      "From": "",
+      "Target": "",
       "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
