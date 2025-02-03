@@ -24,10 +24,15 @@ exports.Routes = {
 			"/ai" :{
 				"/gamestart" : "vc#gameStartAI#     ゲーム開始",
 				"/gameend" : "vc#gameEndAI#         ゲーム終了",
-			}
+			},
+			"/epictest" : "vc#epictest#             冒険の書を作る",
 		},
 		"/tools" : {
-			"/masterupdate" : "tools#masterupdate#   マスタデータ更新"
+			"/masterupdate" : "tools#masterupdate#   マスタデータ更新",
+			"/modelist" : "ai#modelist#            モデルリスト"
+		},
+		"/ai" : {
+			"/modelist" : "ai#modelist#            モデルリスト"
 		}
 	},
 	POST: {
@@ -39,6 +44,23 @@ exports.Routes = {
 			"/ai" :{
 				"/gamestart" : "vc#gameStartAI#     ゲーム開始",
 				"/gameend" : "vc#gameEndAI#         ゲーム終了",
+			}
+		},
+		"/tools" : {
+			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"
+		},
+		"/ai" : {
+			"/all" : {
+				"/eval" : "ai#chateval#          チャット比較"
+			},
+			"/openai" : {
+				"/chat" : "ai#chatToOpenAIWithModel#          チャット"
+			},
+			"/anthropic" : {
+				"/chat" : "ai#chatToClaudeWithModel#          チャット"
+			},
+			"/google" : {
+				"/chat" : "ai#chatToGeminiWithModel#          チャット"
 			}
 		}
 	}

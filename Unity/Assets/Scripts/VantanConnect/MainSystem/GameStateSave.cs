@@ -12,6 +12,7 @@ namespace VTNConnect
     public class GameStateSave
     {
         public bool IsInGame => _gameHash != null;
+        public string GameHash => _gameHash;
 
         string _gameHash = null;
 
@@ -82,7 +83,7 @@ namespace VTNConnect
             return _saveData.ToArray();
         }
 
-        void StackUser(int userId, bool gameResult, bool isMissionClear)
+        public void StackUser(int userId, bool gameResult, bool isMissionClear)
         {
             bool isFind = false;
             foreach (var u in _users)

@@ -19,8 +19,8 @@ namespace VTNConnect
 
 
     /// <summary>
-    /// ゲーム終了
-    /// NOTE: https://candle-stoplight-544.notion.site/API-def8a39d6b524c0fbf9e1a552d4b5428#16a39cbfbab980d1b861f696d0f99f8e
+    /// ユーザデータ取得
+    /// NOTE: https://www.notion.so/API-def8a39d6b524c0fbf9e1a552d4b5428?pvs=4#16a39cbfbab980d1b861f696d0f99f8e
     /// </summary>
     public class APIGetUserImplement
     {
@@ -31,7 +31,7 @@ namespace VTNConnect
         /// <returns>ユーザ情報</returns>
         async public UniTask<GetUserResult> Request(int userId, bool withLog = false, int logCount = 0)
         {
-            string request = String.Format("{0}/user/{1}", VantanConnect.Environment.APIServerURI, userId);
+            string request = String.Format("{0}/vc/user/{1}", VantanConnect.Environment.APIServerURI, userId);
             if (withLog)
             {
                 request += "?withLog=1&logCount" + logCount;
@@ -49,7 +49,7 @@ namespace VTNConnect
         /// <returns>ユーザ情報</returns>
         async public UniTask<GetUserResult> Request(string userHash, bool withLog, int logCount)
         {
-            string request = String.Format("{0}/user/{1}", VantanConnect.Environment.APIServerURI, userHash);
+            string request = String.Format("{0}/vc/user/{1}", VantanConnect.Environment.APIServerURI, userHash);
             if (withLog)
             {
                 request += "?withLog=1&logCount" + logCount;

@@ -1,4 +1,5 @@
-//いずれ動的生成される予定です
+
+//動的生成されます
 namespace VTNConnect
 {
     public class ProjectSettings

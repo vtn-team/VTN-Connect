@@ -1,12 +1,12 @@
 {
-  "Version": 309,
+  "Version": 588,
   "Data": [
     {
       "Id": "101",
       "Description": "岩垂UIの憑依",
       "From": "3",
       "Target": "-1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "None",
       "EnumCode": "DemonUI",
       "Release": "",
       "System": ""
@@ -16,7 +16,7 @@
       "Description": "死んだらおもちゃの熊が落ちてくる",
       "From": "4",
       "Target": "1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "DeathTrap",
       "Release": "〇",
       "System": ""
@@ -26,7 +26,7 @@
       "Description": "死ぬと死体が増える",
       "From": "3",
       "Target": "4",
-      "SendFlag": "対象のみ",
+      "SendFlag": "None",
       "EnumCode": "DeathStack",
       "Release": "",
       "System": ""
@@ -36,7 +36,7 @@
       "Description": "ジェンガ1本抜くと材質に応じた何かが起きる",
       "From": "5",
       "Target": "1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "JengaInfo",
       "Release": "〇",
       "System": ""
@@ -46,7 +46,7 @@
       "Description": "アクターにランダム効果",
       "From": "-1",
       "Target": "2",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "ActorEffect",
       "Release": "〇",
       "System": ""
@@ -56,7 +56,7 @@
       "Description": "ステージギミック復活(罠系)",
       "From": "-1",
       "Target": "2",
-      "SendFlag": "対象のみ",
+      "SendFlag": "None",
       "EnumCode": "ReviveGimmick",
       "Release": "",
       "System": ""
@@ -66,7 +66,7 @@
       "Description": "照明の光度が一定時間低下する。",
       "From": "-1",
       "Target": "2",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "DarkRoom",
       "Release": "〇",
       "System": ""
@@ -76,7 +76,7 @@
       "Description": "冒険者がアイテムを取ると…",
       "From": "1",
       "Target": "2",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "PickupItem",
       "Release": "〇",
       "System": ""
@@ -86,7 +86,7 @@
       "Description": "プレイヤーの頭上から雑魚敵が降ってくる",
       "From": "-1",
       "Target": "2",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "SummonEnemy",
       "Release": "〇",
       "System": ""
@@ -96,7 +96,7 @@
       "Description": "冒険者が死ぬと悲鳴をだす",
       "From": "1",
       "Target": "4",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "DeathScream",
       "Release": "〇",
       "System": ""
@@ -106,7 +106,7 @@
       "Description": "敵を倒すと弾幕を消すボム的なものが出る",
       "From": "1",
       "Target": "3",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "DefeatBomb",
       "Release": "〇",
       "System": ""
@@ -116,7 +116,7 @@
       "Description": "ジェンガを倒すと何か起こる(ダメージ)",
       "From": "5",
       "Target": "1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "BadJengaInfo",
       "Release": "〇",
       "System": ""
@@ -126,7 +126,7 @@
       "Description": "ヘリが落ちる",
       "From": "3",
       "Target": "1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "SummonHeliCopter",
       "Release": "〇",
       "System": ""
@@ -136,7 +136,7 @@
       "Description": "台詞が冒険者に共有される。",
       "From": "4",
       "Target": "1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "UserTalk",
       "Release": "〇",
       "System": ""
@@ -146,7 +146,7 @@
       "Description": "アイテムを取ると冒険者が回復する。",
       "From": "2",
       "Target": "1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "ConfrontHeal",
       "Release": "〇",
       "System": ""
@@ -156,7 +156,7 @@
       "Description": "窓をたたく音を出す",
       "From": "-1",
       "Target": "4",
-      "SendFlag": "対象のみ",
+      "SendFlag": "GameOnly",
       "EnumCode": "KnockWindow",
       "Release": "〇",
       "System": ""
@@ -166,7 +166,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -176,7 +176,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -186,7 +186,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -196,7 +196,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -206,7 +206,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -216,7 +216,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -226,7 +226,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -236,7 +236,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -246,7 +246,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -256,7 +256,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -266,7 +266,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -276,7 +276,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -286,19 +286,19 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
       "Id": "130",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "",
-      "EnumCode": "",
-      "Release": "",
+      "Description": "敵が逃げた",
+      "From": "100",
+      "Target": "-1",
+      "SendFlag": "GameOnly",
+      "EnumCode": "EnemyEscape",
+      "Release": "〇",
       "System": ""
     },
     {
@@ -306,7 +306,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -316,7 +316,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -326,7 +326,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -336,7 +336,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -346,7 +346,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -356,7 +356,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -366,7 +366,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -376,7 +376,7 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -386,117 +386,267 @@
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "140",
+      "Id": "200",
+      "Description": "冒険者と会話した",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "VCMainTalk",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "201",
+      "Description": "冒険者を倒した",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "VCMainAttack",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "202",
+      "Description": "アイテムを入手",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "VCMainItem",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "203",
+      "Description": "オブジェクトを調べた",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "VCMainSearch",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "204",
+      "Description": "敵を倒した",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "VCMainEnemy",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "205",
+      "Description": "情報を整理した",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "VCMainReset",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "206",
+      "Description": "アーティファクトを奪った",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "ALL",
+      "EnumCode": "VCMainSnatch",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "207",
+      "Description": "冒険の目的",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "VCMainPurpose",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "208",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "141",
+      "Id": "209",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "142",
+      "Id": "210",
+      "Description": "エリアボスを倒した",
+      "From": "2",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "CfDefeatBoss",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "211",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "143",
+      "Id": "212",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "144",
+      "Id": "213",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "145",
+      "Id": "214",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "146",
+      "Id": "215",
+      "Description": "ボスを倒した",
+      "From": "3",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "BADefeatBoss",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "216",
+      "Description": "死んだ",
+      "From": "3",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "BADead",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "217",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "147",
+      "Id": "218",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "148",
+      "Id": "219",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "149",
+      "Id": "220",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "150",
+      "Id": "221",
       "Description": "",
       "From": "",
       "Target": "",
-      "SendFlag": "",
+      "SendFlag": "None",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "222",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "None",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "500",
+      "Description": "敵を取り逃がした",
+      "From": "100",
+      "Target": "0",
+      "SendFlag": "UserOnly",
+      "EnumCode": "SGEnemyLeave",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "501",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "None",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "502",
+      "Description": "",
+      "From": "",
+      "Target": "",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
@@ -506,7 +656,7 @@
       "Description": "コインいっこ入れる",
       "From": "0",
       "Target": "-1",
-      "SendFlag": "自分のみ",
+      "SendFlag": "Self",
       "EnumCode": "Link",
       "Release": "〇",
       "System": "〇"
@@ -516,7 +666,7 @@
       "Description": "おうえんメッセージ",
       "From": "0",
       "Target": "-1",
-      "SendFlag": "対象のみ",
+      "SendFlag": "ALL",
       "EnumCode": "Cheer",
       "Release": "〇",
       "System": ""
@@ -526,29 +676,159 @@
       "Description": "コイン増える",
       "From": "0",
       "Target": "-1",
-      "SendFlag": "自分のみ",
+      "SendFlag": "ALL",
       "EnumCode": "BonusCoin",
       "Release": "〇",
       "System": ""
     },
     {
       "Id": "1003",
+      "Description": "レベルが上がった",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "ALL",
+      "EnumCode": "Levelup",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1004",
+      "Description": "アーティファクトを獲得",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "ALL",
+      "EnumCode": "GetArtifact",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1005",
       "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
       "System": ""
     },
     {
-      "Id": "1004",
+      "Id": "1006",
       "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "None",
       "EnumCode": "",
       "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "1007",
+      "Description": "",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "None",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "1008",
+      "Description": "",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "None",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "1009",
+      "Description": "",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "None",
+      "EnumCode": "",
+      "Release": "",
+      "System": ""
+    },
+    {
+      "Id": "1010",
+      "Description": "会場イベント1",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "FieldEvent01",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1011",
+      "Description": "会場イベント2",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "FieldEvent02",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1012",
+      "Description": "会場イベント3",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "FieldEvent03",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1013",
+      "Description": "会場イベント4",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "FieldEvent04",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1014",
+      "Description": "会場イベント5",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "FieldEvent05",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1100",
+      "Description": "アーティファクト出現(1)",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "Artifact01",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1101",
+      "Description": "アーティファクト出現(2)",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "Artifact02",
+      "Release": "〇",
+      "System": ""
+    },
+    {
+      "Id": "1102",
+      "Description": "アーティファクト出現(3)",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "Artifact03",
+      "Release": "〇",
       "System": ""
     }
   ]

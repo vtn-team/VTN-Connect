@@ -1,6 +1,7 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
+import { stockEpisode } from "./../vclogic/vcgameInfo"
 import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
 
@@ -94,8 +95,6 @@ export class GameConnect {
 		this.sessionDic = {};
 		this.recordingHash = {};
 		this.broadcast = bc;
-
-		console.log(getMaster("GameEvent"));
 	}
 	
 	parsePayload(payload: any) {
@@ -208,6 +207,14 @@ export class GameConnect {
 
 			usePortal = this.execCommand(data);
 			this.castEvent(gameId, data);
+		}
+		break;
+		
+		case CMD.SEND_EPISODE:
+		{
+			if(!data["GameHash"]) break;
+			
+			stockEpisode(data["GameHash"], data["UserId"], data);
 		}
 		break;
 		}

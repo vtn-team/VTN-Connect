@@ -1,8 +1,9 @@
 import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
-import { chatWithSession } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
 import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC } from "./../vclogic/vcgame"
+import { uploadToS3 } from "./../lib/s3"
+const { v4: uuidv4 } = require('uuid')
 
 //デフォルト関数
 export async function index(req: any,res: any,route: any)
@@ -40,29 +41,15 @@ export async function stat(req: any,res: any,route: any)
 	};
 }
 
-//ChatGPTと会話する
-export async function chat(req: any,res: any,route: any)
-{
-	let threadHash = route.query.threadHash;
-	let result = await chatWithSession(threadHash, route.query.prompt);
-	
-	return {
-		Status: 200,
-		Result: result
-	};
-}
-
 //ユーザーを取得する
 export async function getUser(req: any,res: any,route: any)
 {
-	let id = route.query.id;
-	let hash = route.query.hash;
 	let result = null;
 	
-	if(id) {
-		result = await getUserFromId(id);
+	if(route.query.id) {
+		result = await getUserFromId(route.query.id);
 	}else{
-		result = await getUserFromHash(hash);
+		result = await getUserFromHash(route.query.hash);
 	}
 	
 	return {
@@ -150,5 +137,29 @@ export async function gameEnd(req: any,res: any,route: any)
 	result.Status = 200;
 	
 	return result;
+}
+
+//AIゲームの冒険の書を作るテスト
+export async function epictest(req: any,res: any,route: any)
+{
+	let result:any = await gameStartAIGame(0);
+	setTimeout(async () => {
+		let rnd1 = (Math.random() < 0.5);
+		let rnd2 = (Math.random() < 0.5);
+		
+		let gameData = [];
+		for(let u of result.GameUsers) {
+			gameData.push({
+				UserId: u.UserId,
+				GameResult: rnd1,
+				MissionClear: rnd2
+			});
+		}
+		
+		await gameEndAIGame({
+			GameHash: result.GameHash,
+			UserResults: gameData
+		});
+	}, 1000);
 }
 

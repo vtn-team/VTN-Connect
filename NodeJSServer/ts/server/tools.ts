@@ -1,5 +1,6 @@
 import { loadMaster } from "./../lib/masterDataCache"
 
+
 export async function index(req: any,res: any,route: any)
 {
 	console.log(route);
@@ -14,4 +15,3 @@ export async function masterupdate(req: any,res: any,route: any)
 		status: 200
 	};
 }
-
