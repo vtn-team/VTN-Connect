@@ -18,17 +18,21 @@ namespace VTNConnect
 
         private void Start()
         {
+#if !AIGAME_IMPLEMENT
             QRCodeSetup();
             _connect.SetActive(false);
+#endif
         }
 
         public void QRCodeSetup()
         {
+#if !AIGAME_IMPLEMENT
             _qrRoot.SetActive(VantanConnect.SystemSave.IsUseQRCode);
             if (VantanConnect.SystemSave.IsUseQRCode)
             {
                 _outQRImage.texture = QRCodeMaker.BakeCode(VantanConnectQRString.MakeQRStringLinkage());
             }
+#endif
         }
 
         public void SetEnable(bool isEnable)

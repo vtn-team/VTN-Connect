@@ -36,6 +36,10 @@ namespace VTNConnect
         {
             //状態をリセット
             _user = null;
+
+#if AIGAME_IMPLEMENT
+            SetViewEnable(false);
+#else
             SetViewEnable(true);
 
             //リセットをフックにデバッグ処理をコール
@@ -57,6 +61,7 @@ namespace VTNConnect
                     _view.Link(_user.DisplayName);
                 }).Forget();
             }
+#endif
         }
 
         public void SetViewEnable(bool isEnableView)
@@ -67,6 +72,9 @@ namespace VTNConnect
         //チェインするデータを受け取り処理する
         public void OnEventCall(EventData data)
         {
+#if AIGAME_IMPLEMENT
+            return;
+#endif
             switch ((VC_LinkageEvent)data.EventId)
             {
                 case VC_LinkageEvent.Link:
