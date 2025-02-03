@@ -36,3 +36,22 @@ export async function serviceworker(req: any,res: any,route: any)
 	}
 }
 
+export async function animejs(req: any,res: any,route: any)
+{
+	const text = await fs.readFile(__dirname+"/../../../Web/anime.min.js");
+	return {
+		statusCode: 200,
+		type: 'text/javascript',
+		html: text.toString()
+	}
+}
+
+export async function bg(req: any,res: any,route: any)
+{
+	const image = await fs.readFile(__dirname+"/../../../Web/bg.gif");
+	return {
+		statusCode: 200,
+		type: 'image/gif',
+		html: image
+	}
+}

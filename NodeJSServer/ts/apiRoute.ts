@@ -5,6 +5,8 @@ exports.Routes = {
 		"/favicon.ico"	: "resource#favicon#favicon",
 		"/manifest.json" : "debug#manifest#Webテスト",
 		"/serviceworker.js" : "debug#serviceworker#Webテスト",
+		"/bg.gif" : "debug#bg#Webテスト",
+		"/anime.min.js" : "debug#animejs#Webテスト",
 		"/stat" : {
 			"/" : "stat#check#状態確認"
 		},
@@ -16,15 +18,17 @@ exports.Routes = {
 				"@id%d" : "vc#getUser#             ユーザ取得",
 				"@hash%s" : "vc#getUser#           ユーザ取得",
 			},
-			"/gameusers" : "vc#getGameUsers#       ゲーム参加ユーザの取得",
-			"/usercreate" : "vc#createUser#        ユーザ生成(テスト用)",
-			
-			"/gamestart" : "vc#gameStart#           ゲーム開始",
-			"/gameend" : "vc#gamEend#               ゲーム終了",
-			"/ai" :{
-				"/gamestart" : "vc#gameStartAI#     ゲーム開始",
-				"/gameend" : "vc#gameEndAI#         ゲーム終了",
+			"/history" : {
+				"@id%d" : "vc#userHistory#         冒険の記録を取得",
 			},
+			"/messages" : {
+				"@id%d" : "vc#userMessage#         もらったメッセージを取得",
+			},
+			"/friend" : {
+				"@id%d" : "vc#friendList#          トモダチを取得",
+			},
+			"/gameusers" : "vc#getGameUsers#       ゲーム参加ユーザの取得",
+			
 			"/epictest" : "vc#epictest#             冒険の書を作る",
 		},
 		"/tools" : {
@@ -42,9 +46,10 @@ exports.Routes = {
 			"/gamestart" : "vc#gameStart#          ゲーム開始",
 			"/gameend" : "vc#gameEnd#              ゲーム終了",
 			"/ai" :{
-				"/gamestart" : "vc#gameStartAI#     ゲーム開始",
-				"/gameend" : "vc#gameEndAI#         ゲーム終了",
-			}
+				"/gamestart" : "vc#gameStartAI#    ゲーム開始",
+				"/gameend" : "vc#gameEndAI#        ゲーム終了",
+			},
+			"/cheer" : "vc#cheer#                  おうえん(API経由)",
 		},
 		"/tools" : {
 			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"
