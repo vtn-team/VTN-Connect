@@ -6,15 +6,10 @@ const { v4: uuidv4 } = require('uuid')
 let userSession:any = {};
 let uniqueUsers:any = [];
 
-/*
-export class UserStatus {
-	public Name:string;
-	public PromptA :string;
-	public PromptB:string;
-	public PromptC:string;
-	public PromptD:string;
+interface UserStatus {
+	Name:string;
+	Questions :Array<string>;
 }
-*/
 
 //ユニークユーザをあっためておく
 export async function preloadUniqueUsers() {
@@ -65,8 +60,45 @@ export function getAllUniqueUsers() {
 	return uniqueUsers;
 }
 
-async function createUserFromChatGPT(sessionId:string|null) {
+async function createUserFromChatGPT(sessionId:string|null, userInput: UserStatus) {
 	let prompt = getAIRule("CreateUser").RuleText;
+	
+	const questions = [
+	[
+		"貴族の屋敷",
+		"馬小屋",
+		"一般家庭",
+		"山中(野生児化)",
+	],
+	[
+		"お宝見つけて一攫千金を狙う",
+		"最強のプレイヤーになる",
+		"安全に細々と暮らす",
+		"ワンワン！！ ワオーン！！",
+	],
+	[
+		"無謀である",
+		"承認欲求が強い",
+		"飽きっぽい",
+		"ワンワン！！ ワオーン！！",
+	],
+	[
+		"安全に頑張りましょう",
+		"命懸けの冒険をしよう",
+		"友達たくさん作ってね",
+		"ワンワン！！ ワオーン！！",
+	]];
+	prompt = prompt.replace("<UserName>", userInput.Name);
+	for(let i=0; i<4; ++i) {
+		let q = parseInt(userInput.Questions[i])-1;
+		if(q < 0 || q >= 4) {
+			prompt = prompt.replace(`<Q${(i+1)}>`, "無回答");
+			continue;
+		}
+		console.log(q);
+		prompt = prompt.replace(`<Q${(i+1)}>`, questions[i][q]);
+	}
+	
 	prompt += `
 # 出力例(JSON)\n
 {
@@ -102,7 +134,7 @@ async function checkCreateUserFromChatGPT(sessionId:string) {
 
 
 //ユーザを作成する
-export async function createUserWithAI() { //status: UserStatus
+export async function createUserWithAI(userInput: UserStatus) {
 	let userHash = uuidv4();
 	let success = false;
 	let result: any = {};
@@ -111,7 +143,7 @@ export async function createUserWithAI() { //status: UserStatus
 		let json:any = {};
 		let session:string|null = null;
 		for(let i=0; i<5; ++i) {
-			let data:any = await createUserFromChatGPT(session);
+			let data:any = await createUserFromChatGPT(session, userInput);
 			json = JSON.parse(data.content);
 			session = data.sessionId;
 			if(session == null) throw new Error("session無効");

@@ -121,7 +121,7 @@ export async function getGameUsers(req: any,res: any,route: any)
 //ユーザーを作成する
 export async function createUser(req: any,res: any,route: any)
 {
-	let result = await createUserWithAI();
+	let result = await createUserWithAI(route.query);
 	
 	return {
 		Status: 200,
