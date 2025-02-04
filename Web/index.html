@@ -207,7 +207,11 @@ window.addEventListener("load", async (event) => {
 	if(document.location.hostname.indexOf("www.vtn-game.com") == -1) {
 		enableUIById("debugitem");
 		setupDebugMenu();
-		wssURI = await getaddr();
+		
+		//localhostだけ
+		if(document.location.hostname.indexOf("localhost") != -1) {
+			wssURI = await getaddr();
+		}
 	}
 	
 	//animating wallpaper

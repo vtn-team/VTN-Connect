@@ -12,6 +12,8 @@ exports.Routes = {
 		},
 		"/vc" : {
 			"/" : "debug#web#                      Webテスト",
+			"/bg.gif" : "debug#bg#                 Webテスト",
+			"/anime.min.js" : "debug#animejs#      Webテスト",
 			"/stat" : "vc#stat#                    ゲームの状況確認",
 			"/getaddr" : "vc#getaddr#              ゲームサーバ接続情報取得",
 			"/user" : {
