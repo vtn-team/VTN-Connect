@@ -184,6 +184,7 @@ let wsSessionId = "";
 
 let qrReader = null;
 let baseURI = "https://vc.vtn-game.com";
+let wssURI = "wss://wss.vtn-game.com/ws/";
 
 
 //サービスワーカーの登録
@@ -206,6 +207,7 @@ window.addEventListener("load", async (event) => {
 	if(document.location.hostname.indexOf("www.vtn-game.com") == -1) {
 		enableUIById("debugitem");
 		setupDebugMenu();
+		wssURI = await getaddr();
 	}
 	
 	//animating wallpaper
@@ -321,9 +323,8 @@ function userSetup() {
 // EVENT 
 //////////
 //WebSocket接続
-async function connectDGS() {
-	let addr = await getaddr();
-	ws = new WebSocket(addr);
+function connectDGS() {
+	ws = new WebSocket(wssURI);
 	
 	ws.onopen = (event) => {
 	};
