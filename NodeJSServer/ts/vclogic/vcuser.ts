@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid')
 
 let userSession:any = {};
 let uniqueUsers:any = [];
+let userCountCache = 0;
 
 /*
 export class UserStatus {
@@ -21,6 +22,8 @@ export async function preloadUniqueUsers() {
 	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?",[999]);
 	uniqueUsers = result;
 	//console.log(uniqueUsers);
+	let cc:any = await query("SELECT count(GameHash) as Count FROM User", []);
+	userCountCache = Number(cc[0].Count);
 }
 
 //ユニークユーザを特定数分取得
@@ -136,6 +139,8 @@ export async function createUserWithAI() { //status: UserStatus
 		let status: Array<any> = [userId, json.DisplayName, json.AvatarType, json.Gender, json.Age, json.Job, json.Personality, json.Motivation,json.Weaknesses, json.Background];
 		query("INSERT INTO UserGameStatus (UserId, DisplayName, AvatarType, Gender, Age, Job, Personality, Motivation, Weaknesses, Background) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", status);
 		
+		userCountCache++;
+		
 		result.Name = json.FullName;
 		delete json["FullName"];
 		result.UserId = userId;
@@ -156,6 +161,16 @@ export async function createUserWithAI() { //status: UserStatus
 		success: success,
 		result: result
 	}
+}
+
+export async function getUsers(page: number = 0) {
+	let limit = 25;
+	let result = await query("SELECT * FROM User LIMIT 0,?", [limit]);
+	
+	return {
+		History: result,
+		Count: userCountCache
+	};
 }
 
 export async function getUserFromId(id: number) {
