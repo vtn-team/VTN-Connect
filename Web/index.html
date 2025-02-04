@@ -22,6 +22,50 @@ body {
   background-attachment: fixed;
 }
 
+/* モーダル */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+}
+
+#cheer {
+  /*width: 300px;*/
+  /*height: 60px;*/
+  background-color: #fefefe;
+  border: 1px solid #888;
+  border-radius: 10px;
+}
+
+#closeModal {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 2%;
+  right: 2%;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #FFF;
+  width: 40px;
+  height: 40px;
+  background-color: #333;
+}
+
 /* レイアウト */
 .layout {
   width: 100%;
@@ -29,7 +73,6 @@ body {
   display: grid;
   grid:
     "header header" auto
-    "debugitem important" auto
     "debugitem main" 1fr
     "footer footer" auto
     / auto 1fr;
@@ -348,6 +391,35 @@ function execMessage(data) {
 	return ret;
 }
 
+async function cheerMessage() {
+	let toUserId = -1;
+	let fromUserId = -1;
+	let name = "nanashi";
+	if(userData.DisplayName) {
+		name = userData.DisplayName;
+	}
+	if(userData.UserId) {
+		fromUserId = userData.UserId;
+	}
+	
+	//SessionIdをキーにしてJoinを返す
+	let data = {
+		ToUserId: toUserId,
+		FromUserId: fromUserId,
+		Avatar: 1,
+		Name: name,
+		Message: getElm("msg").value
+	};
+	let json = {
+		SessionId: wsSessionId,
+		Command: CMD.SEND_EVENT,
+		GameId: 99,
+		EventId: 1001,
+		Data: data
+	};
+	ws.send(JSON.stringify(json));
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HTML生成回り 
@@ -594,55 +666,8 @@ async function onScanSuccess(decodedText, decodedResult) {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TEST 
+// SYSTEM 
 //////////
-async function testEvent() {
-	let toUserId = -1;
-	let fromUserId = -1;
-	let name = "nanashi";
-	if(userData.DisplayName) {
-		name = userData.DisplayName;
-	}
-	if(userData.UserId) {
-		fromUserId = userData.UserId;
-	}
-	
-	//SessionIdをキーにしてJoinを返す
-	let data = {
-		ToUserId: toUserId,
-		FromUserId: fromUserId,
-		Avatar: 1,
-		Name: name,
-		Message: getElm("msg").value
-	};
-	let json = {
-		SessionId: wsSessionId,
-		Command: CMD.SEND_EVENT,
-		GameId: 101,
-		EventId: 1001,
-		Data: data
-	};
-	ws.send(JSON.stringify(json));
-}
-
-function debugLoad() {
-	userData = {
-		"userId": 1058,
-		"userHash": "e74a75f4-78b1-4d91-8b72-e83946cc21ae",
-		"Type": 1,
-		"Level": 1,
-		"Gold": 500,
-		"Name": "ルフィ・D・エース",
-		"DisplayName": "モンキー・D・ルフィ",
-		"Gender": "男性",
-		"Age": 19,
-		"Job": "海賊",
-		"Personality": "活発で無邪気だが、仲間思いで責任感が強い",
-		"Motivation": "海賊王になるため、仲間と共に冒険すること",
-		"Weaknesses": "熱い感情に流されやすく、戦略的思考に欠ける",
-		"Background": "東の海出身で、ゴムゴムの実を食べて超人間の能力を得た。仲間と共に冒険し、様々な敵と戦いながら成長している。"
-	};
-}
 
 // 連想配列に格納
 function getCookieArray() {
@@ -730,6 +755,39 @@ function createUserInfoUI() {
 	getElm("backstory").innerText = userData.Background;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DEBUG 
+//////////
+
+async function sendTestEvent() {
+	let toUserId = -1;
+	let fromUserId = -1;
+	let name = "nanashi";
+	if(userData.DisplayName) {
+		name = userData.DisplayName;
+	}
+	if(userData.UserId) {
+		fromUserId = userData.UserId;
+	}
+	
+	//SessionIdをキーにしてJoinを返す
+	let data = {
+		ToUserId: toUserId,
+		FromUserId: fromUserId,
+		Avatar: 1,
+		Name: name,
+		Message: getElm("msg").value
+	};
+	let json = {
+		SessionId: wsSessionId,
+		Command: CMD.SEND_EVENT,
+		GameId: 99,
+		EventId: 1001,
+		Data: data
+	};
+	ws.send(JSON.stringify(json));
+}
 let debugData = {};
 async function reqCheck(reqKey) {
 	let host = "http://localhost:4649"; //"https://vc.vtn-game.com";
@@ -834,40 +892,36 @@ function notifyMe() {
 	<button type="button" id=""class="nes-btn is-primary" onclick="window.location.reload();">更新</button>
 	</div>
 	
-	<div class="important">
+	<div id="modal-connects" class="modal">
 		<div class="nes-container with-title status">
 			<p class="title">ツウシンジョウタイ</p>
 			<div id="ws-state" class="center">未接続</div>
 		</div>
-		
-		<div style="height:50px;"></div>
-		
-		<div class="nes-container with-title status">
-			<p class="title">メニュー</p>
-			<div class="center">
-				<button type="button" id="" class="nes-btn is-primary">最新の冒険を見る</button>
+	</div>
+	
+	<div id="modal-cheer" class="modal">
+		<div class="modal-content">
+			<div id="cheer" class="nes-container with-title status">
+				<p class="title">オウエン</p>
+				
+				<div id="cheerMsg">
+				○○サンにメッセージを届けよう！<br /><br />
+				書いたメッセージの内容に応じて、良い事や悪いことが起きるぞ。
+				</div>
+				<br /><br />
+				
+				<div class="nes-field">
+					<label for="name_field">オウエン</label>
+					<input type="text" id="msg" class="nes-input">
+				</div>
 				<div style="height:10px;"></div>
-				<button type="button" id="" class="nes-btn is-primary">過去の冒険を見る</button>
-				<div style="height:10px;"></div>
-				<button type="button" id="" class="nes-btn is-primary">冒険者を見る</button>
-				<div style="height:10px;"></div>
-				<button type="button" id="" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
+				<div class="right">
+					<button type="button" id="test" class="nes-btn is-primary" onclick="testEvent();">ソウシン</button>
+				</div>
 			</div>
+			
+			<div id="closeModal" onclick=disableUIById("modal-cheer")>&times;</div>
 		</div>
-		
-		<div style="height:50px;"></div>
-		
-		<div class="nes-container with-title status">
-			<p class="title">リクエストチェック</p>
-			<div class="center">
-				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameStart");>gamestart</button>
-				<div style="height:10px;"></div>
-				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameEnd");>gameend</button>
-				<div style="height:10px;"></div>
-			</div>
-		</div>
-		
-		<div style="height:50px;"></div>
 	</div>
 	
 	<div class="main">
@@ -894,6 +948,15 @@ function notifyMe() {
 					<div style="height:25px;"></div>
 					<button type="button" id="friend" class="nes-btn is-primary" onclick="showHistory()">出会いの記録</button>
 					<div style="height:10px;"></div>
+				</div>
+			</div>
+			
+			<div class="nes-container with-title status">
+				<p class="title">ログ</p>
+				<div class="nes-field">
+					<section id="msglog" class="message-list">
+					</section>
+					<div style="height:50px;"></div>
 				</div>
 			</div>
 			
@@ -1090,11 +1153,77 @@ function notifyMe() {
 		</div>
 		
 		<div style="height:50px;"></div>
+	</div>
+	
+	<div id="debugitem" style="display:none;">
+		
+					<!--
+		<div class="nes-container with-title status">
+			<p class="title">リクエストチェック</p>
+			<div class="center">
+				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameStart");>gamestart</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary" onclick=reqCheck("gameEnd");>gameend</button>
+				<div style="height:10px;"></div>
+			</div>
+		</div>
+		
+		<div style="height:50px;"></div>
 		
 		<div class="nes-container with-title status">
-			<p class="title">ログ</p>
-			<div class="nes-field">
-				<section id="msglog" class="message-list">
+			<p class="title">メニュー</p>
+			<div class="center">
+				<button type="button" id="" class="nes-btn is-primary">最新の冒険を見る</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary">過去の冒険を見る</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary">冒険者を見る</button>
+				<div style="height:10px;"></div>
+				<button type="button" id="" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
+			</div>
+		</div>
+		-->
+		
+		<div class="nes-container with-title leftmenu">
+			<p class="title">デバッグメニュー</p>
+			
+			<div class="nes-container with-title">
+				<p class="title">機能テスト</p>
+				
+				<div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
+				
+			</div>
+			
+			<div style="height:50px;"></div>
+			
+			<div class="nes-container with-title">
+				<p class="title">ユーザパラメータ</p>
+				
+				<button type="button" class="nes-btn is-primary" onclick="levelUp();">レベルアップ</button>
+			</div>
+
+			<div style="height:50px;"></div>
+			
+			<div class="nes-container with-title">
+				<p class="title">テストイベント</p>
+
+				NOTE: 会場イベントは連投できない(ゲームに飛ぶのは10秒に1回のみ)<br />
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1010)>会場イベント1</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1011)>会場イベント2</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1012)>会場イベント3</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1013)>会場イベント4</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1014)>会場イベント5</button><div style="height:10px;"></div>
+				<br /><br />
+				NOTE: アーティファクト出現イベントは、一回の冒険中に1度しか出ない<br />
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1100)>アーティファクト出現(1)</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1101)>アーティファクト出現(2)</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1102)>アーティファクト出現(3)</button><div style="height:10px;"></div>
+				<br />
+				<div style="height:50px;"></div>
+			</div>
+		</div>
+		
 					<!--
 					<section style="height:120px;">
 						<div class="nes-container is-rounded with-title" style="height:80px;">
@@ -1147,25 +1276,6 @@ function notifyMe() {
 						</div>
 					</section>
 					-->
-				</section>
-				<div style="height:50px;"></div>
-			</div>
-		</div>
-		<div style="height:50px;"></div>
-	</div>
-	
-	<div id="debugitem" style="display:none;">
-		<div class="nes-container with-title leftmenu">
-			<p class="title">デバッグメニュー</p>
-			
-			<div class="nes-container with-title">
-				<p class="title">ユーザパラメータ</p>
-			</div>
-			
-			<div class="nes-container with-title">
-				<p class="title">テストイベント</p>
-			</div>
-		</div>
 	<div>
 	
 	<div class="footer">

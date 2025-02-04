@@ -32,6 +32,9 @@ exports.Routes = {
 			"/epictest" : "vc#epictest#             冒険の書を作る",
 		},
 		"/tools" : {
+			"/getmaster" : {
+				"@name%s" : "tools#getmaster#   マスタデータ更新",
+			},
 			"/masterupdate" : "tools#masterupdate#   マスタデータ更新",
 			"/modelist" : "ai#modelist#            モデルリスト"
 		},
