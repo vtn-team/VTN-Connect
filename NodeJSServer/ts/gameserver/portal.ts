@@ -112,8 +112,16 @@ export class UserPortal {
 		{
 		case CMD.SEND_EVENT:
 		{
+		/*
 			usePortal = this.execCommand(data);
 			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
+		*/
+		}
+		break;
+		
+		case CMD.SEND_CHEER:
+		{
+			this.cheerMessage(data);
 		}
 		break;
 		}
@@ -169,11 +177,32 @@ export class UserPortal {
 		return false;
 	}
 	
-	async messageRelay(data: any) {
+	async cheerMessage(data: any) {
 		try {
-			let json = JSON.parse(data.Data);
-			let to = json.ToUserId;
-			let from = json.FromUserId;
+		/*
+	//SessionIdをキーにしてJoinを返す
+	let data = {
+		Avatar: userData.AvatarType,
+		Name: name,
+		Message: msg,
+	};
+	
+	if(emo) {
+		data.Emotion = emo;
+	}
+	
+	let json = {
+		SessionId: wsSessionId,
+		Command: CMD.SEND_CHEER,
+		GameId: tgtGameId,
+		ToUserId: toUserId,
+		FromUserId: fromUserId,
+		Data: data
+	};
+		*/
+			let to = data.ToUserId;
+			let from = data.FromUserId;
+			let msg = data.Data;
 			if(!to) {
 				to = -1;
 			}
@@ -184,13 +213,35 @@ export class UserPortal {
 			let message = {
 				ToUserId: to,
 				FromUserId: from,
-				Name: json.Name,
-				Message: json.Message
+				AvatarType: msg.Avatar,
+				Name: msg.Name,
+				Message: msg.Message
 			}
 			
-			let result = await checkMessageAndWrite(message);
+			//Webページにリレーする
+			let result:any = {};
+			if(msg.Emotion) {
+				result = {
+					Message: msg.Message,
+					Emotion: msg.Emotion
+				}
+			} else {
+				result = await checkMessageAndWrite(message);
+			}
 			data.Data = result.result;
-			this.broadcast(createMessage(from, CMD.EVENT, TARGET.ALL, data));
+			this.broadcast(createMessage(to, CMD.CHEER, TARGET.SELF, data));
+			
+			//応援イベントをゲームに飛ばす
+			let evtPacket = {
+				Message: result.Message,
+				Emotion: result.Emotion
+			}
+			let evtData = {
+				EventId: 1001,
+				FromId: from,
+				Payload: this.createdPayload(evtPacket)
+			};
+			this.broadcast(createGameMessage(from, parseInt(data.GameId), CMD.EVENT, TARGET.SELF, evtData));
 		}catch(ex){
 			console.log(ex);
 		}

@@ -201,19 +201,16 @@ export class GameConnect {
 				let result = chatWithSession(data.ThreadId, data.Prompt);
 				return;
 			}
+			}
 			
-			case 100:
-			{
-				this.messageRelay(data);
-				return;
+			if(this.games[gameId]) {
+				this.games[gameId].recordMessage(gameId, data);
+				usePortal = this.execCommand(data);
+				this.castEvent(gameId, data);
+			}else{
+				usePortal = this.execCommand(data);
+				this.castEvent(data.GameId, data);
 			}
-			break;
-			}
-
-			this.games[gameId].recordMessage(gameId, data);
-
-			usePortal = this.execCommand(data);
-			this.castEvent(gameId, data);
 		}
 		break;
 		
@@ -224,6 +221,13 @@ export class GameConnect {
 			stockEpisode(data["GameHash"], data["UserId"], data);
 		}
 		break;
+		/*
+		case CMD.SEND_CHEER:
+		{
+			this.cheerMessage(data);
+		}
+		break;
+		*/
 		}
 		
 		return usePortal;
@@ -286,33 +290,6 @@ export class GameConnect {
 	//処理
 	execCommand(data: any) {
 		return false;
-	}
-	
-	async messageRelay(data: any) {
-		try {
-			let json = JSON.parse(data.Data);
-			let to = json.ToUserId;
-			let from = json.FromUserId;
-			if(!to) {
-				to = -1;
-			}
-			if(!from) {
-				from = -1;
-			}
-			
-			let message = {
-				ToUserId: to,
-				FromUserId: from,
-				Name: json.Name,
-				Message: json.Message
-			}
-			
-			let result = await checkMessageAndWrite(message);
-			data.Data = result.result;
-			this.broadcast(createMessage(from, CMD.EVENT, TARGET.ALL, data));
-		}catch(ex){
-			console.log(ex);
-		}
 	}
 	
 	public startRecord(gameId:number, gameHash: string) {

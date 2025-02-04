@@ -11,9 +11,11 @@ export enum CMD {
 	JOIN = 2,
 	EVENT = 3,
 	GAMESTAT = 4,
+	CHEER = 5,
 	SEND_JOIN = 100,
 	SEND_EVENT = 101,
 	SEND_EPISODE = 102,
+	SEND_CHEER = 103,
 	SEND_USER_JOIN = 110,
 };
 
@@ -111,12 +113,14 @@ export class VCUserSession extends UserSession {
 	}
 	
 	public chkTarget(data: any) {
+		if(data.GameId) return false;
+		
 		let tgt: TARGET = data.Target;
-		let senderId: string = data.UserId;
+		let senderId: number = data.UserId;
 		switch(tgt) {
 		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.sessionId == senderId);
-		case TARGET.OTHER: return (this.sessionId != senderId);
+		case TARGET.SELF: return (this.userId == senderId);
+		case TARGET.OTHER: return (this.userId != senderId);
 		}
 	}
 };
@@ -137,17 +141,19 @@ export class VCGameSession extends UserSession {
 	}
 	
 	public chkTarget(data: any) {
+		if(data.GameId === undefined) return false;
+		
 		let tgt: TARGET = data.Target;
-		let senderId: string = data.UserId;
+		let senderId: number = data.GameId;
 		switch(tgt) {
 		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.sessionId == senderId);
-		case TARGET.OTHER: return (this.sessionId != senderId);
+		case TARGET.SELF: return (this.gameId == senderId);
+		case TARGET.OTHER: return (this.gameId != senderId);
 		}
 	}
 };
 
-export function createMessage(senderId: string, command: CMD, target:TARGET, data: any) {
+export function createMessage(senderId: number, command: CMD, target:TARGET, data: any) {
 	//let msg = msgpack.pack(data);
 	delete data["Command"]
 	let msg = JSON.stringify(data);
@@ -160,7 +166,7 @@ export function createMessage(senderId: string, command: CMD, target:TARGET, dat
 	return ret;
 }
 
-export function createGameMessage(senderId: string, senderGameId: number, command: CMD, target:TARGET, data: any) {
+export function createGameMessage(senderId: number, senderGameId: number, command: CMD, target:TARGET, data: any) {
 	//let msg = msgpack.pack(data);
 	delete data["Command"]
 	let msg = JSON.stringify(data);

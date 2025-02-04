@@ -77,6 +77,7 @@ class Server {
 						case CMD.SEND_EVENT:
 						default:
 							this.contents.execMessage(data);
+							this.portal.execMessage(data);
 							break;
 						}
 					}else{
@@ -96,7 +97,7 @@ class Server {
 			});
 
 			//Joinをもらうためのエコーバック
-			let echoback = createMessage("None", CMD.WELCOME, TARGET.SELF, { SessionId: uuid });
+			let echoback = createMessage(-1, CMD.WELCOME, TARGET.SELF, { SessionId: uuid });
 			let payload = JSON.stringify(echoback);
 			ws.send(payload);
 		});
@@ -160,7 +161,7 @@ class Server {
 			ActiveGames: this.contents.getActiveGames(),
 			ActiveUsers: this.portal.getActiveUsers()
 		}
-		this.broadcast(createMessage("", CMD.GAMESTAT, TARGET.ALL, stats));
+		this.broadcast(createMessage(-1, CMD.GAMESTAT, TARGET.ALL, stats));
 	}
 	
 	messagelog(msg: string, data: any) {
