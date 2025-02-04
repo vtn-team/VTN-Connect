@@ -161,6 +161,8 @@ const CMD = {
 	GAMESTAT: 4,
 	SEND_JOIN: 100,
 	SEND_EVENT: 101,
+	SEND_EPISODE: 102,
+	SEND_CHEER: 103,
 	SEND_USER_JOIN: 110,
 };
 
@@ -171,6 +173,7 @@ const PAGE = {
 }
 
 let userData = {};
+let gameInfo = {};
 let elementCache = [];
 let elementStatus = [];
 let currentPageCode = -1;
@@ -196,9 +199,13 @@ window.addEventListener("load", async (event) => {
 		baseURI = "http://localhost:4649";
 	}
 	
+	//最終的に埋め込む
+	gameInfo = await getMaster("GameInfo");
+	
 	//PCの場合デバッグメニューだす
 	if(document.location.hostname.indexOf("www.vtn-game.com") == -1) {
 		enableUIById("debugitem");
+		setupDebugMenu();
 	}
 	
 	//animating wallpaper
@@ -252,6 +259,15 @@ async function getaddr() {
 	});
 	let result = await req.json();
 	return result.Address;
+}
+
+//マスタ取得
+async function getMaster(name) {
+	let req = await fetch(`${baseURI}/tools/getmaster/${name}`, {
+		mode: 'cors'
+	});
+	let result = await req.json();
+	return result.Master;
 }
 
 //ユーザ読み込み
@@ -391,30 +407,38 @@ function execMessage(data) {
 	return ret;
 }
 
-async function cheerMessage() {
-	let toUserId = -1;
+function sendCheerMessage(toUserId, tgtGameId) {
+	let msg = getElm("msg").value;
+	cheerMessage(toUserId, tgtGameId, msg, 0);
+}
+
+function cheerMessage(toUserId, tgtGameId, msg, emo) {
 	let fromUserId = -1;
+	if(userData.UserId) {
+		fromUserId = userData.UserId;
+	}
 	let name = "nanashi";
 	if(userData.DisplayName) {
 		name = userData.DisplayName;
 	}
-	if(userData.UserId) {
-		fromUserId = userData.UserId;
-	}
 	
 	//SessionIdをキーにしてJoinを返す
 	let data = {
-		ToUserId: toUserId,
-		FromUserId: fromUserId,
-		Avatar: 1,
+		Avatar: userData.AvatarType,
 		Name: name,
-		Message: getElm("msg").value
+		Message: msg,
 	};
+	
+	if(emo) {
+		data.Emotion = emo;
+	}
+	
 	let json = {
 		SessionId: wsSessionId,
-		Command: CMD.SEND_EVENT,
-		GameId: 99,
-		EventId: 1001,
+		Command: CMD.SEND_CHEER,
+		GameId: tgtGameId,
+		ToUserId: toUserId,
+		FromUserId: fromUserId,
 		Data: data
 	};
 	ws.send(JSON.stringify(json));
@@ -710,6 +734,20 @@ function disableUIById(elmId) {
 	elm.style.display = "none";
 }
 
+function createdPayload(data) {
+	let payload = [];
+	if(data) {
+		for(var k in data) {
+			payload.push({
+				Key: k,
+				TypeName: typeof data[k],
+				Data: data[k]
+			});
+		}
+	}
+	return payload;
+}
+
 function updateGameStat(data) {
 	var html="";
 	
@@ -753,6 +791,9 @@ function createUserInfoUI() {
 	getElm("motivation").innerText = userData.Motivation;
 	getElm("weakness").innerText = userData.Weaknesses;
 	getElm("backstory").innerText = userData.Background;
+	
+	getElm("dbgUserId").innerText = userData.UserId;
+	getElm("dbgAvatarType").innerText = userData.AvatarType;
 }
 
 
@@ -760,31 +801,68 @@ function createUserInfoUI() {
 // DEBUG 
 //////////
 
-async function sendTestEvent() {
-	let toUserId = -1;
-	let fromUserId = -1;
-	let name = "nanashi";
-	if(userData.DisplayName) {
-		name = userData.DisplayName;
-	}
-	if(userData.UserId) {
-		fromUserId = userData.UserId;
+let myGameId = -1;
+let gameIngo = {};
+let gameEvent = {};
+async function setupDebugMenu() {
+	gameEvent = await getMaster("GameEvent");
+	
+	let elm = getElm("dbgSelector");
+	for(let game of gameInfo) {
+		var option = document.createElement("option");
+		option.text = game.GameTitle;
+		option.value = game.Id;
+		elm.appendChild(option);
 	}
 	
-	//SessionIdをキーにしてJoinを返す
-	let data = {
-		ToUserId: toUserId,
-		FromUserId: fromUserId,
-		Avatar: 1,
-		Name: name,
-		Message: getElm("msg").value
-	};
+	elm.addEventListener("change", (event)=>{
+		let elm = getElm("dbgSelector");
+		filterAndShowDebugEvent(elm.value);
+		localStorage.setItem("myGame", elm.value);
+		myGameId = parseInt(elm.value);
+	});
+	
+	const myGame = localStorage.getItem("myGame");
+	console.log("here:" + myGame);
+	if(myGame) {
+		elm.selectedIndex = myGame;
+		filterAndShowDebugEvent(myGame);
+		myGameId = parseInt(myGame);
+	}
+}
+
+function goodCheer() {
+	cheerMessage(userData.UserId, myGameId, "がんばれ", 50);
+}
+
+function badCheer() {
+	cheerMessage(userData.UserId, myGameId, "くたばれ", -50);
+}
+
+function filterAndShowDebugEvent(gameId) {
+	let elm = getElm("eventDebug");
+	let html = "";
+	for(let evt of gameEvent) {
+		if(evt.Release == "") continue;
+		if(evt.Target == -1 || evt.Target == gameId) {
+			html += `<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(${evt.Id})>${evt.Description}</button><div style="height:10px;"></div>`;
+		}
+	}
+	elm.innerHTML = html;
+	enableUIById("cheerDebug");
+}
+
+function reCreateUser() {
+	loadPage(PAGE.USER_CREATE);
+}
+
+async function sendTestEvent(evtId) {
 	let json = {
 		SessionId: wsSessionId,
 		Command: CMD.SEND_EVENT,
-		GameId: 99,
-		EventId: 1001,
-		Data: data
+		GameId: myGameId,
+		EventId: evtId,
+		Payload: []
 	};
 	ws.send(JSON.stringify(json));
 }
@@ -950,6 +1028,8 @@ function notifyMe() {
 					<div style="height:10px;"></div>
 				</div>
 			</div>
+			
+			<div style="height:50px;"></div>
 			
 			<div class="nes-container with-title status">
 				<p class="title">ログ</p>
@@ -1193,6 +1273,9 @@ function notifyMe() {
 				<div style="height:10px;"></div>
 				<button type="button" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
 				
+				<div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick="reCreateUser();">ユーザ登録やり直す</button>
+				NOTE: 作り直すまでデータは消えない<br />
 			</div>
 			
 			<div style="height:50px;"></div>
@@ -1200,6 +1283,18 @@ function notifyMe() {
 			<div class="nes-container with-title">
 				<p class="title">ユーザパラメータ</p>
 				
+				<table class="nes-table is-bordered is-centered">
+				<tbody>
+					<tr>
+						<td>UserId</td>
+						<td id="dbgUserId"></td>
+					</tr>
+					<tr>
+						<td>AvatarType</td>
+						<td id="dbgAvatarType"></td>
+					</tr>
+				</tbody>
+				</table>
 				<button type="button" class="nes-btn is-primary" onclick="levelUp();">レベルアップ</button>
 			</div>
 
@@ -1207,19 +1302,32 @@ function notifyMe() {
 			
 			<div class="nes-container with-title">
 				<p class="title">テストイベント</p>
-
-				NOTE: 会場イベントは連投できない(ゲームに飛ぶのは10秒に1回のみ)<br />
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1010)>会場イベント1</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1011)>会場イベント2</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1012)>会場イベント3</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1013)>会場イベント4</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1014)>会場イベント5</button><div style="height:10px;"></div>
-				<br /><br />
-				NOTE: アーティファクト出現イベントは、一回の冒険中に1度しか出ない<br />
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1100)>アーティファクト出現(1)</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1101)>アーティファクト出現(2)</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(1102)>アーティファクト出現(3)</button><div style="height:10px;"></div>
-				<br />
+				
+				<div id="cheerDebug" style="display:none;">
+					NOTE: Emotionはそれぞれ50)<br />
+					<button type="button" class="nes-btn is-primary" onclick=goodCheer()>よい応援</button><div style="height:10px;"></div>
+					<button type="button" class="nes-btn is-primary" onclick=badCheer()>わるい応援</button><div style="height:10px;"></div>
+				</div>
+				
+				<div style="height:20px;"></div>
+				
+				<label for="error_select">イベントを送信するデバッグ対象のゲーム</label>
+				<div id="dbgEvent" class="nes-select is-normal">
+					<select required id="dbgSelector">
+					<option value="0" disabled selected hidden>選択しましょう...</option>
+					</select>
+				</div>
+				
+				<div style="height:20px;"></div>
+				
+				<div id="eventDebug"></div>
+				
+				<div style="height:20px;"></div>
+				
+				<div id="debugNote">
+					NOTE: 会場イベントは連投できない(ゲームに飛ぶのは10秒に1回のみ)<br />
+					NOTE: アーティファクト出現イベントは、一回の冒険中に1度しか出ない<br />
+				</div>
 				<div style="height:50px;"></div>
 			</div>
 		</div>
