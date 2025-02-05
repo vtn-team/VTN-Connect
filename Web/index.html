@@ -337,11 +337,17 @@ function connectDGS() {
 		console.log("Connection Error");
 		console.log(error)
 		getElm("ws-state").innerText = "エラー";
+		
+		//再接続する
+		setTimeout(()=>{ connectDGS(); }, 5000);
 	};
 		
 	ws.onclose = (event) => {
 		console.log("close");
 		getElm("ws-state").innerText = "切断";
+		
+		//再接続する
+		setTimeout(()=>{ connectDGS(); }, 5000);
 	};
 
 	ws.onmessage = (event) => {
@@ -356,6 +362,11 @@ function connectDGS() {
 
 function execMessage(data) {
 	let ret = "";
+	let payload = parsePayload(data.Data.Payload);
+	delete data.Data.Payload;
+	console.log(payload);
+	data.Data.Payload = payload;
+	
 	switch(data.Command){
 	case CMD.WELCOME:
 	{
@@ -372,7 +383,6 @@ function execMessage(data) {
 	break;
 	
 	case CMD.GAMESTAT:
-		console.log(data.Data);
 		activeGameInfo = data.Data.ActiveGames;
 		updateGameStat(data.Data);
 		break;
@@ -412,9 +422,36 @@ function execMessage(data) {
 	return ret;
 }
 
-function sendCheerMessage(toUserId, tgtGameId) {
-	let msg = getElm("msg").value;
-	cheerMessage(toUserId, tgtGameId, msg, 0);
+let cheerTarget = null;
+function cheerSetup(tgtGameId, toUserId) {
+	let playingUserName = "";
+	for(let game of activeGameInfo) {
+		if(game.GameId == tgtGameId) {
+			console.log(game)
+			playingUserName = game.Session.UserInfo.Name;
+		}
+	}
+	cheerTarget = {
+		ToUserId: toUserId,
+		TgtGameId: tgtGameId
+	};
+	
+	enableUIById("modal-cheer");
+	getElm("cheerUserName").innerHTML = playingUserName;
+}
+
+function closeCheer() {
+	getElm("cheerMessage").value = "";
+	disableUIById("modal-cheer");
+	cheerTarget=null;
+}
+
+function sendCheerMessage() {
+	if(!cheerTarget) return;
+	let msg = getElm("cheerMessage").value;
+	cheerMessage(cheerTarget.ToUserId, cheerTarget.TgtGameId, msg, 0);
+	
+	closeCheer();
 }
 
 function cheerMessage(toUserId, tgtGameId, msg, emo) {
@@ -446,6 +483,7 @@ function cheerMessage(toUserId, tgtGameId, msg, emo) {
 		FromUserId: fromUserId,
 		Data: data
 	};
+	console.log(json)
 	ws.send(JSON.stringify(json));
 }
 
@@ -543,10 +581,12 @@ function addSysLog(evtName, evtMessage) {
 }
 
 function addLog(evtData) {
-	let isSelf = wsSessionId == evtData.SessionId
-	let name = evtData.Data.Name;
-	let text = evtData.Data.Message;
-	let emo = evtData.Data.Emotion;
+	let isSelf = userData.UserId == evtData.UserId
+
+	let name = evtData.Payload.Name;
+	let text = evtData.Payload.Message;
+	let emo = evtData.Payload.Emotion;
+
 	var left=`
 					<section class="message -left" style="height:120px;">
 						<div style="display:flex;">
@@ -753,6 +793,31 @@ function createdPayload(data) {
 	return payload;
 }
 
+function parsePayload(payload) {
+	let data = {};
+	if(payload) {
+		for(var d of payload) {
+			switch(d.TypeName)
+			{
+			case "Integer":
+			case "number":
+				data[d.Key] = Number(d.Data);
+				break;
+				
+			case "String":
+				data[d.Key] = d.Data;
+				break;
+				
+			default:
+				data[d.Key] = d.Data;
+				break;
+			}
+		}
+	}
+	
+	return data;
+}
+
 function updateGameStat(data) {
 	var html="";
 	
@@ -766,11 +831,10 @@ function updateGameStat(data) {
 				active = "メンテナンス中…";
 			}
 		}
-		if(game.Session && game.Session.Status == 1 && game.Session.UserId) {
-			active = "プレイ中！";
-			plusOn = `<button type="button" id="cheer${game.GameId}" class="nes-btn is-primary" onclick="cheerAct(${game.GameId}, ${game.Session.UserId})">応援する！</button>`;
+		if(game.Session && game.Session.Status == 1 && game.Session.UserId && game.Session.UserInfo) {
+			active = game.Session.UserInfo.Name + "がプレイ中！";
+			plusOn = `<button type="button" id="cheer${game.GameId}" class="nes-btn is-primary" onclick="cheerSetup(${game.GameId}, ${game.Session.UserId})">応援する！</button>`;
 		}
-		
 		
 		html += `
 		<div class="nes-container with-title">
@@ -783,7 +847,7 @@ function updateGameStat(data) {
 	}
 	
 	getElm("gamelist").innerHTML = html;
-	getElm("ws-state").innerHTML = "接続中のユーザ:" + data.ActiveUsers.length + "人";
+	getElm("ws-state").innerHTML = "接続中"; //のユーザ:" + data.ActiveUsers.length + "人";
 }
 
 function createUserInfoUI() {
@@ -988,22 +1052,22 @@ function notifyMe() {
 				<p class="title">オウエン</p>
 				
 				<div id="cheerMsg">
-				○○サンにメッセージを届けよう！<br /><br />
+				<span id="cheerUserName"></span>サンにメッセージを届けよう！<br /><br />
 				書いたメッセージの内容に応じて、良い事や悪いことが起きるぞ。
 				</div>
 				<br /><br />
 				
 				<div class="nes-field">
 					<label for="name_field">オウエン</label>
-					<input type="text" id="msg" class="nes-input">
+					<input type="text" id="cheerMessage" class="nes-input">
 				</div>
 				<div style="height:10px;"></div>
 				<div class="right">
-					<button type="button" id="test" class="nes-btn is-primary" onclick="testEvent();">ソウシン</button>
+					<button type="button" id="test" class="nes-btn is-primary" onclick="sendCheerMessage();">ソウシン</button>
 				</div>
 			</div>
 			
-			<div id="closeModal" onclick=disableUIById("modal-cheer")>&times;</div>
+			<div id="closeModal" onclick=closeCheer()>&times;</div>
 		</div>
 	</div>
 	
