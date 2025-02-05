@@ -70,12 +70,14 @@ class GameContainer {
 	public recordMessage(gameId: number, data: any) {
 		if(!this.recorder) return;
 
+		console.log("record events");
 		delete data["SessionId"];
 		this.recorder.recordMessage(gameId, data);
 	}
 
 	public stopRecord(gameHash: string) {
 		this.recorder?.save(gameHash);
+		console.log("save events");
 	}
 
 	public term() {
@@ -208,6 +210,7 @@ export class GameConnect {
 				usePortal = this.execCommand(data);
 				this.castEvent(gameId, data);
 			}else{
+				console.log("not found game:" + gameId);
 				usePortal = this.execCommand(data);
 				this.castEvent(data.GameId, data);
 			}
@@ -280,7 +283,10 @@ export class GameConnect {
 		let sessions:any = getGameSessions();
 		for(var gId in this.games) {
 			let stat = this.games[gId].getStat();
-			stat.Session = sessions[gId];
+			if(sessions[gId]) {
+				stat.Session = sessions[gId];
+				//プレイ中のゲームの情報を送信する
+			}
 			games.push(stat);
 		}
 		

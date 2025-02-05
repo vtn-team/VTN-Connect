@@ -113,8 +113,6 @@ export class VCUserSession extends UserSession {
 	}
 	
 	public chkTarget(data: any) {
-		if(data.GameId) return false;
-		
 		let tgt: TARGET = data.Target;
 		let senderId: number = data.UserId;
 		switch(tgt) {

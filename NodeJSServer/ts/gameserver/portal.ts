@@ -233,6 +233,8 @@ export class UserPortal {
 			
 			//応援イベントをゲームに飛ばす
 			let evtPacket = {
+				AvatarType: msg.Avatar,
+				Name: msg.Name,
 				Message: result.Message,
 				Emotion: result.Emotion
 			}

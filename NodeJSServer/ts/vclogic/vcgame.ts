@@ -13,6 +13,26 @@ enum GameOption {
 	Recording = (1<<0),
 }
 
+function simpleUserInfo(userInfo: any) : any
+{
+	if(userInfo.length && userInfo.length > 1) {
+		let ret = [];
+		for(let u of userInfo) {
+			ret.push(simpleUserInfo(u));
+		}
+		return ret;
+	}else{
+		//シンプルにする
+		return {
+			UserId: userInfo.UserId,
+			Name: userInfo.DisplayName,
+			AvatarType: userInfo.AvatarType,
+		};
+	}
+	
+	return null;
+}
+
 //AIゲーム開始
 //NOTE: 誰を使うかはサーバが決定する
 export async function gameStartAIGame(option: number) {
@@ -66,7 +86,7 @@ export async function gameStartAIGame(option: number) {
 		gameSessions[gameId] = {
 			Status: 1,
 			GameHash: gameHash,
-			GameUsers: users,
+			GameUsers: simpleUserInfo(users),
 			GameTitle: title,
 		}
 	} catch(ex) {
@@ -132,7 +152,7 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		//Gameにプレイ開始したゲームの情報を記録
 		if(userId > 0) {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
-			let userInfo = await getUserFromId(userId);
+			userInfo = await getUserFromId(userId);
 			createEpisodeNormalGame(gameId, gameHash, userInfo);
 		} else {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 3)", [gameHash, gameId]);
@@ -169,7 +189,9 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 			Status: 1,
 			GameHash: gameHash,
 			UserId: userId,
-			UserInfo: userInfo,
+		}
+		if(userInfo) {
+			gameSessions[gameId]["UserInfo"] = simpleUserInfo(userInfo);
 		}
 	} catch(ex) {
 		console.log(ex);
