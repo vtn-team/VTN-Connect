@@ -16,6 +16,16 @@ export async function web(req: any,res: any,route: any)
 	}
 }
 
+export async function webDev(req: any,res: any,route: any)
+{
+	const text = await fs.readFile(__dirname+"/../../../Web/debug.html");
+	return {
+		statusCode: 200,
+		type: 'text/html',
+		html: text.toString()
+	}
+}
+
 export async function manifest(req: any,res: any,route: any)
 {
 	const text = await fs.readFile(__dirname+"/../../../Web/manifest.json");

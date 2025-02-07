@@ -12,6 +12,7 @@ exports.Routes = {
 		},
 		"/vc" : {
 			"/" : "debug#web#                      Webテスト",
+			"/debug" : "debug#webDev#              Webテスト(開発)",
 			"/bg.gif" : "debug#bg#                 Webテスト",
 			"/anime.min.js" : "debug#animejs#      Webテスト",
 			"/stat" : "vc#stat#                    ゲームの状況確認",

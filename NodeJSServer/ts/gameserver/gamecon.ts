@@ -65,17 +65,20 @@ class GameContainer {
 	
 	public startRecord(gameHash: string) {
 		this.recorder = new EventRecorder(this.gameId, gameHash);
+		console.log("start record");
 	}
 	
 	public recordMessage(gameId: number, data: any) {
 		if(!this.recorder) return;
 
+		console.log("record event");
 		delete data["SessionId"];
 		this.recorder.recordMessage(gameId, data);
 	}
 
 	public stopRecord(gameHash: string) {
 		this.recorder?.save(gameHash);
+		console.log("save record");
 	}
 
 	public term() {
@@ -154,8 +157,9 @@ export class GameConnect {
 			console.log("NO DATA:" + data.EventId);
 			return;
 		}
+		//console.log(event)
 
-		let msg = createGameMessage(data.SessionId, gameId, CMD.EVENT, TARGET.SELF, data);
+		let msg = createGameMessage(data.UserId, gameId, CMD.EVENT, TARGET.SELF, data);
 		for (var gId in this.games) {
 			if (!this.games[gId].isActiveSession()) continue;
 
@@ -208,6 +212,7 @@ export class GameConnect {
 				usePortal = this.execCommand(data);
 				this.castEvent(gameId, data);
 			}else{
+				console.log("not found game:" + gameId);
 				usePortal = this.execCommand(data);
 				this.castEvent(data.GameId, data);
 			}
@@ -280,7 +285,10 @@ export class GameConnect {
 		let sessions:any = getGameSessions();
 		for(var gId in this.games) {
 			let stat = this.games[gId].getStat();
-			stat.Session = sessions[gId];
+			if(sessions[gId]) {
+				stat.Session = sessions[gId];
+				//プレイ中のゲームの情報を送信する
+			}
 			games.push(stat);
 		}
 		

@@ -33,7 +33,7 @@ class Server {
 		//let msg = msgpack.pack(data);
 		for(var k in this.sessions) {
 			let us = this.sessions[k];
-			if(!us.chkTarget(data)) return;
+			if(!us.chkTarget(data)) continue;
 			
 			us.sendMessage(msg);
 		}
@@ -159,7 +159,7 @@ class Server {
 	sendGameStatus() {
 		let stats = {
 			ActiveGames: this.contents.getActiveGames(),
-			ActiveUsers: this.portal.getActiveUsers()
+			//ActiveUsers: this.portal.getActiveUsers()
 		}
 		this.broadcast(createMessage(-1, CMD.GAMESTAT, TARGET.ALL, stats));
 	}
