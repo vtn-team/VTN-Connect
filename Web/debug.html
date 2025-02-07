@@ -623,20 +623,62 @@ console.log("no:" + no)
 
 let youtubeIndex = 0;
 let movieList = [
-	"https://www.youtube.com/embed/XFcWZaUxXVs?si=q8y39QsV_wCUoRaA",
-	"https://www.youtube.com/embed/WVQ7l9VP1L4?si=ZMzJqIio0gYJqoQ-",
-	"https://www.youtube.com/embed/MeMtJwZb7Fs?si=d16zWQX5KicnZDM4",
+	"XFcWZaUxXVs",
+	"WVQ7l9VP1L4",
+	"MeMtJwZb7Fs",
 ];
 function embedYoutubeLink() {
+	var tag = document.createElement('script');
+	tag.src = "https://www.youtube.com/iframe_api";
+	var firstScriptTag = document.getElementsByTagName('script')[0];
+	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
 	var elm = getElm("youtubeLive");
+	elm.innerHTML = `<div class="nes-container is-rounded with-title video"><p class="title">配信中</p><div id="ytPlayer"></div></div>`;
+	//elm.innerHTML += `<div class="nes-container is-rounded with-title video"><p class="title">配信中</p><iframe width="320" height="178" src="${link}&autoplay=1&mute=1" title="Vantan Game Contents" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
+}
+
+// 3. This function creates an <iframe> (and YouTube player)
+//    after the API code downloads.
+var ytPlayer;
+function onYouTubeIframeAPIReady() {
 	let link = movieList[youtubeIndex];
 	youtubeIndex++;
 	if(youtubeIndex >= movieList.length) {
 		youtubeIndex = 0;
 	}
 	
-	//
-	elm.innerHTML += `<div class="nes-container is-rounded with-title video"><p class="title">配信中</p><iframe width="320" height="178" src="${link}&autoplay=1&mute=1" title="Vantan Game Contents" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
+	ytPlayer = new YT.Player('ytPlayer', {
+		height: '178',
+		width: '320',
+		playerVars: { 'autoplay': 1, 'controls': 0 },
+		videoId: link,
+		events: {
+			'onStateChange': onPlayerStateChange
+		}
+	});
+}
+
+function playNextVideo() {
+	console.log("next video");
+	let link = movieList[youtubeIndex];
+	youtubeIndex++;
+	if(youtubeIndex >= movieList.length) {
+		youtubeIndex = 0;
+	}
+	
+	ytPlayer.loadVideoById(link);
+}
+
+var done = false;
+function onPlayerStateChange(event) {
+	ytPlayer = event.target;
+	console.log("here:" + ytPlayer.getPlayerState());
+	if(ytPlayer.getPlayerState() == 0) {
+		setTimeout(() => {
+			playNextVideo();
+		}, 100);
+	}
 }
 
 function addSysLog(evtName, evtMessage) {
@@ -1026,6 +1068,10 @@ function filterAndShowDebugEvent(gameId) {
 	}
 	elm.innerHTML = html;
 	enableUIById("cheerDebug");
+}
+
+function nextVideo() {
+	onYouTubeIframeAPIReady();
 }
 
 function reCreateUser() {
@@ -1467,6 +1513,9 @@ function notifyMe() {
 			
 			<div class="nes-container with-title">
 				<p class="title">機能テスト</p>
+				
+				<div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick="nextVideo();">次の動画</button>
 				
 				<div style="height:10px;"></div>
 				<button type="button" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
