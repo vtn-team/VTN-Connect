@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace VTNConnect
 {
@@ -170,6 +171,27 @@ namespace VTNConnect
             _instance._eventSystem.SetEventSystem(_instance._wsManager);
             _instance._eventSystem.RegisterReceiver(_instance._linkageSystem);
             _instance._eventSystem.SystemInitialSave();
+
+            if (_instance._systemSave.IsDebugSceneLaunch)
+            {
+                SystemReset();
+
+                UniTask.RunOnThreadPool(async () =>
+                {
+                    if (_instance._systemSave.IsDebugConnect)
+                    {
+                        await UniTask.WaitUntil(() => { return _instance._linkageSystem.IsLink; });
+                        Debug.Log("Wait");
+                    }
+                    await GameStart();
+                    Debug.Log("GameStart");
+                }).Forget();
+
+                SceneManager.sceneUnloaded += async (evt) =>
+                {
+                    await GameEnd(false);
+                };
+            }
         }
 
         // ゲーム管理系 ///////////////////

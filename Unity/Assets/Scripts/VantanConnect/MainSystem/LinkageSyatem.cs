@@ -30,6 +30,7 @@ namespace VTNConnect
         public void Setup(VC_LoginView view)
         {
             _view = view;
+            SetViewEnable(false);
         }
 
         public void Reset()
@@ -38,10 +39,13 @@ namespace VTNConnect
             _user = null;
 
 #if AIGAME_IMPLEMENT
-            SetViewEnable(false);
-#else
-            SetViewEnable(true);
-
+            return ;
+#endif
+            if (!VantanConnect.SystemSave.IsDebugSceneLaunch)
+            {
+                SetViewEnable(true);
+            }
+            
             //リセットをフックにデバッグ処理をコール
             //コネクト処理を常時行う
             if(VantanConnect.SystemSave.IsDebugConnect)
@@ -61,7 +65,6 @@ namespace VTNConnect
                     _view.Link(_user.DisplayName);
                 }).Forget();
             }
-#endif
         }
 
         public void SetViewEnable(bool isEnableView)

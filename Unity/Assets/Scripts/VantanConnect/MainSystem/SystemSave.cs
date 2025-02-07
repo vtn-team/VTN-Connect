@@ -23,6 +23,7 @@ namespace VTNConnect
         public bool IsRecording = false;        //イベントを記録する
 
         //ここからコネクト処理
+        public bool IsDebugSceneLaunch = false; //デバッグ用に即コネクトする
         public bool IsUseQRCode = false;        //コネクト処理用のQRコードを表示する
         public bool IsDebugConnect = false;     //コネクト処理をローカル実行する
         public int UseConnectUserId = 0;        //デバッグ用のコネクト処理に使用するテスト用ID

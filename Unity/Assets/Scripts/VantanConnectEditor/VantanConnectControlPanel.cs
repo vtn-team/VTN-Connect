@@ -97,6 +97,7 @@ public class VantanConnectControlPanel : EditorWindow
             EditorGUILayout.LabelField("コネクト系");
 
             EditorGUIUtility.labelWidth = 250;
+            isDirty |= CheckParam(ref _saveData.IsDebugSceneLaunch, EditorGUILayout.Toggle("自動でゲームスタート", _saveData.IsDebugSceneLaunch, GUILayout.Width(400)));
             isDirty |= CheckParam(ref _saveData.IsRecording, EditorGUILayout.Toggle("イベントを記録する", _saveData.IsRecording, GUILayout.Width(400)));
             isDirty |= CheckParam(ref _saveData.IsUseQRCode, EditorGUILayout.Toggle("コネクト処理用のQRコードを表示する", _saveData.IsUseQRCode, GUILayout.Width(400)));
             isDirty |= CheckParam(ref _saveData.IsDebugConnect, EditorGUILayout.Toggle("コネクト処理をローカル実行する", _saveData.IsDebugConnect, GUILayout.Width(400)));

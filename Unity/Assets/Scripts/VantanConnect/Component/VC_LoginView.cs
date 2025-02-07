@@ -18,10 +18,8 @@ namespace VTNConnect
 
         private void Start()
         {
-#if !AIGAME_IMPLEMENT
             QRCodeSetup();
             _connect.SetActive(false);
-#endif
         }
 
         public void QRCodeSetup()
