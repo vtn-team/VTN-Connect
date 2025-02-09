@@ -1,5 +1,5 @@
-import { GameConnect } from "./gamecon"
-import { UserPortal } from "./portal"
+import { GameConnect, GameConnectInterface } from "./gamecon"
+import { UserPortal, UserPortalInterface } from "./portal"
 import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
@@ -8,6 +8,14 @@ import { UserSession, CMD, TARGET, createMessage } from "./session"
 
 //サーバキャッシュ
 let gServer:Server|null = null;
+
+//Export
+//分離
+export enum ServerType {
+	Both,
+	GameConnect,
+	UserPortal,
+}
 
 
 //サーバ本体
@@ -19,8 +27,11 @@ class Server {
 	protected server: any;				//WebSocketサーバ本体
 	protected roomCheck: any;			//ルーム監視用のタイマー
 	protected sendStatsTimer:any;		//スタッツ送信用タイマー
-	protected contents: GameConnect;	//ゲームコネクター(ゲーム同士をつなげるGameServerの本体)
-	protected portal: UserPortal;		//ユーザールーム(ユーザを管理するGameServerの本体)
+	
+	//どちらかしか起動しない
+	protected contents: GameConnectInterface;	//ゲームコネクター(ゲーム同士をつなげるGameServerの本体)
+	protected portal: UserPortalInterface;		//ユーザールーム(ユーザを管理するGameServerの本体)
+	
 	protected lastActiveNum: number;	//現在のアクティブ人数キャッシュ
 	protected port: number;				//接続するポート
 
@@ -40,12 +51,33 @@ class Server {
 	};
 	
 	//コンストラクタ
-	constructor(port: number) {
+	constructor(mode:ServerType, port: number) {
 		this.sessions = {};
 		this.port = port;
 		this.server = new WebSocketServer({ port });
-		this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
-		this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
+		
+		switch(mode) {
+		default:
+		case ServerType.Both:
+			this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
+			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
+			console.log("server content is both type.");
+			
+			break;
+			
+		case ServerType.GameConnect:
+			this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
+			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
+			console.log("server content is gameconnect only.");
+			break;
+			
+		case ServerType.UserPortal:
+			this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
+			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
+			console.log("server content is userportal only.");
+			break;
+		}
+		
 		this.lastActiveNum = 0;
 		this.server.on ('connection', (ws: any) => {
 			let uuid = randomUUID();
@@ -205,10 +237,10 @@ class Server {
 
 
 //(公開関数)サーバを起動する
-export function launchDGS(port: number) {
+export function launchDGS(mode: ServerType, port: number) {
 	if(gServer != null) return;
 	
-	gServer = new Server(port);
+	gServer = new Server(mode, port);
 	gServer.setupGameConnect();
 }
 

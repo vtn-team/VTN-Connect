@@ -1,7 +1,7 @@
 require('dotenv').config()
 import { launch } from "./server"
 import { findElasticIP } from "./elasticip"
-import { launchDGS } from "./gameserver/server"
+import { launchDGS, ServerType } from "./gameserver/server"
 import { connect } from "./lib/database"
 import { HTTP_SERVER_PORT, GAME_SERVER_PORT } from "./config/config"
 import { loadMaster, loadMasterFromCache } from "./lib/masterDataCache"
@@ -38,5 +38,5 @@ import { preloadUniqueUsers } from "./vclogic/vcuser"
 	launch(HTTP_SERVER_PORT);
 	
 	//ゲームサーバ起動
-	launchDGS(GAME_SERVER_PORT);
+	launchDGS(ServerType.Both, GAME_SERVER_PORT);
 })();

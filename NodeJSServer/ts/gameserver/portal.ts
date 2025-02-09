@@ -13,6 +13,17 @@ export interface VCActiveUser
 	ActiveTime: number;
 }
 
+export interface UserPortalInterface {
+
+	setupSakuraConnect() : void;
+
+	joinRoom(userId: number, us: UserSession, data: any) : any; //逃げ
+	execMessage(data: any) : void;
+	removeSession(sessionId: string) : void;
+	getActiveUsers() : any;
+	sendAPIEvent(data: any) : void;
+}
+
 class UserContainer {
 	protected userId: number;
 	protected userInfo: any;
@@ -131,7 +142,7 @@ export class UserPortal {
 	async joinRoom(userId: number, us: UserSession, data: any) {
 		if(userId === 0) {
 			console.log(`GAME ID:0 reject.`);
-			return ;
+			return null;
 		}
 		
 		let userInfo = await getUserFromId(userId);
@@ -145,6 +156,7 @@ export class UserPortal {
 		}else{
 			console.log(`USER ID:${userId} not found.`);
 		}
+		return null;
 	}
 	
 	public removeSession(sessionId: string) {

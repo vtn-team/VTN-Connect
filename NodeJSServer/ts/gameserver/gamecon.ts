@@ -11,6 +11,20 @@ export enum SP_EVENT {
 	AI_CHAT = 10000,
 };
 
+export interface GameConnectInterface {
+
+	setupGameConnect() : void;
+
+	joinGame(gameId: number, us: UserSession, data: any) : VCGameSession | null;
+	execMessage(data: any) : void;
+	removeSession(sessionId: string) : void;
+	getActiveGames() : any;
+	
+	startRecord(gameId:number, gameHash: string) : void;
+	stopRecord(gameHash: string) : void;
+	sendAPIEvent(data: any) : void;
+}
+
 class GameContainer {
 	protected gameId: number;
 	protected recorder: EventRecorder|null;  //イベントレコーダー
@@ -245,7 +259,7 @@ export class GameConnect {
 		
 		if(gameId === 0) {
 			console.log(`GAME ID:0 reject.`);
-			return ;
+			return null;
 		}
 		
 		let find = false;
@@ -263,6 +277,7 @@ export class GameConnect {
 		}else{
 			console.log(`GAME ID:${gameId} not found.`);
 		}
+		return null;
 	}
 	
 	public removeSession(sessionId: string) {
