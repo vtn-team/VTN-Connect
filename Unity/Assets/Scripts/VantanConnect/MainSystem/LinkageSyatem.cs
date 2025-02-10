@@ -19,12 +19,14 @@ namespace VTNConnect
         public UserData UserData => _user;
 
         APIGetUserImplement _getUser = new APIGetUserImplement();
+        APIGameHandOverImplement _gameHandOverUser = new APIGameHandOverImplement();
         UserData _user = null;
         VC_LoginView _view = null;
 
         public enum VC_LinkageEvent
         {
             Link = 1000,    //リンク
+            ReLink = 1005,  //交代
         }
 
         public void Setup(VC_LoginView view)
@@ -100,6 +102,32 @@ namespace VTNConnect
 
                             await UniTask.SwitchToMainThread();
                             _view.Link(_user.DisplayName);
+                        }).Forget();
+                    }
+                    break;
+
+                case VC_LinkageEvent.ReLink:
+                    {
+                        Debug.Log(JsonUtility.ToJson(data));
+                        var gameId = data.GetIntData("GameId");
+                        if (gameId != ProjectSettings.GameID) break;
+
+                        UniTask.RunOnThreadPool(async () =>
+                        {
+                            //GameStartとGameEndとUserGet
+                            var result = await _gameHandOverUser.Request(_user.UserId);
+                            var status = APIUtility.PacketCheck(result);
+                            if (status != VC_StatusCode.OK)
+                            {
+                                Debug.LogError("エラーです");
+                                return;
+                            }
+                            _user = result.UserData;
+
+                            await UniTask.SwitchToMainThread();
+                            /*
+                            _view.Link(_user.DisplayName);
+                            */
                         }).Forget();
                     }
                     break;

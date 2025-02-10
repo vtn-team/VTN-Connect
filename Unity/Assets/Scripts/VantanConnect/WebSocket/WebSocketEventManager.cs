@@ -58,7 +58,7 @@ namespace VTNConnect
             string address = await _getAddress.Request();
             _isReconnect = false;
             if (address == "") return;
-            Connect(address);
+            await _client.Connect(address, Message);
         }
 
         public void Setup(EventDataCallback callback)
@@ -100,12 +100,6 @@ namespace VTNConnect
 #if UNITY_EDITOR
             _sendEventLog.Add(d);
 #endif
-        }
-
-
-        void Connect(string address)
-        {
-            _client.Connect(address, Message);
         }
 
         public void Send(EventData data)

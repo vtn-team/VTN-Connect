@@ -172,6 +172,7 @@ namespace VTNConnect
             _instance._eventSystem.RegisterReceiver(_instance._linkageSystem);
             _instance._eventSystem.SystemInitialSave();
 
+#if !AIGAME_IMPLEMENT
             if (_instance._systemSave.IsDebugSceneLaunch)
             {
                 SystemReset();
@@ -192,6 +193,7 @@ namespace VTNConnect
                     await GameEnd(false);
                 };
             }
+#endif
         }
 
         // ゲーム管理系 ///////////////////
