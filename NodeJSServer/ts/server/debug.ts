@@ -1,4 +1,5 @@
 const fs = require('fs').promises;
+const { v4: uuidv4 } = require('uuid')
 
 export async function index(req: any,res: any,route: any)
 {
@@ -65,3 +66,12 @@ export async function bg(req: any,res: any,route: any)
 		html: image
 	}
 }
+
+export async function uuid(req: any,res: any,route: any)
+{
+	return {
+		statusCode: 200,
+		text: uuidv4()
+	}
+}
+
