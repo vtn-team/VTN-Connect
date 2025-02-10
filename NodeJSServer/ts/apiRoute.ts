@@ -52,6 +52,7 @@ exports.Routes = {
 			"/usercreate" : "vc#createUser#        ユーザ生成(テスト用)",
 			"/gamestart" : "vc#gameStart#          ゲーム開始",
 			"/gameend" : "vc#gameEnd#              ゲーム終了",
+			"/handover" : "vc#handOver#            ゲーム交代",
 			"/ai" :{
 				"/gamestart" : "vc#gameStartAI#    ゲーム開始",
 				"/gameend" : "vc#gameEndAI#        ゲーム終了",
