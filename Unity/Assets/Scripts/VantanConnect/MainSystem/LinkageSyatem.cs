@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks.Triggers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 
@@ -50,19 +51,36 @@ namespace VTNConnect
             
             //リセットをフックにデバッグ処理をコール
             //コネクト処理を常時行う
+            //ゲームステート保全のため、常にリリンク処理を使用する
             if(VantanConnect.SystemSave.IsDebugConnect)
             {
                 UniTask.RunOnThreadPool(async () =>
                 {
-                    var result = await _getUser.Request(VantanConnect.SystemSave.UseConnectUserId);
+                    int userId = VantanConnect.SystemSave.UseConnectUserId;
+                    if (userId == 0) return;
+
+                    GameHandOverRequest req = new GameHandOverRequest()
+                    {
+                        GameId = ProjectSettings.GameID,
+                        UserId = userId
+                    };
+
+                    //特殊なステータス
+                    if (VantanConnect.SystemSave.IsRecording)
+                    {
+                        req.Option |= (int)GameOption.Recording;
+                    }
+
+                    //GameStartとGameEndとUserGet
+                    var result = await _gameHandOverUser.Request(req);
                     var status = APIUtility.PacketCheck(result);
                     if (status != VC_StatusCode.OK)
                     {
                         Debug.LogError("エラーです");
                         return;
                     }
-
                     _user = result.UserData;
+
                     await UniTask.SwitchToMainThread();
                     _view.Link(_user.DisplayName);
                 }).Forget();
@@ -112,10 +130,25 @@ namespace VTNConnect
                         var gameId = data.GetIntData("GameId");
                         if (gameId != ProjectSettings.GameID) break;
 
+                        var userId = data.GetIntData("UserId");
+                        if (userId == 0) break;
+
+                        GameHandOverRequest req = new GameHandOverRequest()
+                        {
+                            GameId = gameId,
+                            UserId = userId
+                        };
+
+                        //特殊なステータス
+                        if (VantanConnect.SystemSave.IsRecording)
+                        {
+                            req.Option |= (int)GameOption.Recording;
+                        }
+
                         UniTask.RunOnThreadPool(async () =>
                         {
                             //GameStartとGameEndとUserGet
-                            var result = await _gameHandOverUser.Request(_user.UserId);
+                            var result = await _gameHandOverUser.Request(req);
                             var status = APIUtility.PacketCheck(result);
                             if (status != VC_StatusCode.OK)
                             {
