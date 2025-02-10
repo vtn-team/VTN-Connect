@@ -7,6 +7,7 @@ exports.Routes = {
 		"/serviceworker.js" : "debug#serviceworker#Webテスト",
 		"/bg.gif" : "debug#bg#Webテスト",
 		"/anime.min.js" : "debug#animejs#Webテスト",
+		"/uuid" : "debug#uuid# uuid生成",
 		"/stat" : {
 			"/" : "stat#check#状態確認"
 		},
