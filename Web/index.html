@@ -170,6 +170,7 @@ const CMD = {
 	SEND_EVENT: 101,
 	SEND_EPISODE: 102,
 	SEND_CHEER: 103,
+	SEND_QR: 104,
 	SEND_USER_JOIN: 110,
 };
 
@@ -178,7 +179,24 @@ const PAGE = {
 	USER_CREATE: 1,
 	MAIN_MENU: 2,
 	SUMMON_EFFECT: 3,
-}
+};
+
+const qrMagicScrollList = [
+	"810f1f50-6a2b-4a8d-8908-a37b9afe9ec2",	//魔法スクロール1
+];
+
+const qrLinkList = [
+	"a4cf1e07-cd1a-40ab-9d6f-755d344cf550",	//リンク
+];
+
+const movieList = [
+	"koyxhykV3bo",
+	"fjt6bEuDQU4",
+	"XFcWZaUxXVs",
+	"WVQ7l9VP1L4",
+	"MeMtJwZb7Fs",
+];
+
 
 let userData = {};
 let gameInfo = {};
@@ -622,11 +640,6 @@ console.log("no:" + no)
 }
 
 let youtubeIndex = 0;
-let movieList = [
-	"XFcWZaUxXVs",
-	"WVQ7l9VP1L4",
-	"MeMtJwZb7Fs",
-];
 function embedYoutubeLink() {
 	var tag = document.createElement('script');
 	tag.src = "https://www.youtube.com/iframe_api";
@@ -748,23 +761,6 @@ function addLog(evtData) {
 // QR 
 //////////
 
-function setupQRHtml() {
-	var html=`
-		<div class="nes-container with-title status">
-			<p class="title">QR読み込み</p>
-			<div class="center">
-				<button type="button" id="qrscan" class="nes-btn is-primary" onclick="readQR();">読み込み</button><br /><br />
-				<button type="button" id="qrscancancel" class="nes-btn is-primary" onclick="cencelQR();">キャンセル</button>
-				<div id="reader"></div>
-				<div id="qrresult">読み込み結果</div>
-			</div>
-		</div>
-	`;
-	
-	var elm = getElm("important");
-	elm.innerHTML += html;
-}
-
 async function readQR() {
 	disableUIById("qrscancancel");
 	enableUIById("qrscancancel");
@@ -822,35 +818,22 @@ async function onScanSuccess(decodedText, decodedResult) {
 		return;
 	}
 	
-	decodedText = decodedText.replace("VantanConnectQR:","");
+	//URLをパースしてシリアルコードだけ引き出す
+	let qrSerialCode = decodedText.replace("http://www.vtn-game.com/vc/index.html?qrcode=","");
 	
 	try{
-		
-		let data = JSON.parse(decodedText);
-		
 		//SessionIdをキーにしてJoinを返す
 		let json = {
 			SessionId: wsSessionId,
-			Command: CMD.SEND_EVENT,
-			EventId: data.EventId,
-			Payload: [{
-				Key: "GameId",
-				TypeName: "Integer",
-				Data: data.GameID
-			},
-			{
-				Key: "UserId",
-				TypeName: "Integer",
-				Data: userData.UserId
-			}]
+			Command: CMD.SEND_QR,
+			SerialCode: qrSerialCode,
+			UserId: userData.UserId
 		};
 		ws.send(JSON.stringify(json));
-		
 	}catch(ex){
 		console.log(ex);
 	}
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SYSTEM 
@@ -1260,6 +1243,17 @@ function notifyMe() {
 			<div id="main-api-effect" class="nes-container status" style="display:none;">
 				<p>通信中！！</p>
 				<progress class="nes-progress is-primary" id="mainworkgauge" value="0" max="100"></progress>
+			</div>
+			
+			<div class="nes-container with-title status">
+				<p class="title">探索 <QR></p>
+				<div class="center">
+					会場のQRコードを読み込んで、冒険を有利にしよう！<br /><br />
+					<button type="button" id="qrscan" class="nes-btn is-primary" onclick="readQR();">QR読み込み</button><br /><br />
+					<button type="button" id="qrscancancel" class="nes-btn is-primary" onclick="cencelQR();">キャンセル</button>
+					<div id="reader"></div>
+					<div id="qrresult">読み込み結果</div>
+				</div>
 			</div>
 			
 			<div id ="mainmenu" class="nes-container is-rounded with-title status">

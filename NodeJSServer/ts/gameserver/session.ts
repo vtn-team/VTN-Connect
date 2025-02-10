@@ -16,6 +16,7 @@ export enum CMD {
 	SEND_EVENT = 101,
 	SEND_EPISODE = 102,
 	SEND_CHEER = 103,
+	SEND_QR = 104,
 	SEND_USER_JOIN = 110,
 };
 
