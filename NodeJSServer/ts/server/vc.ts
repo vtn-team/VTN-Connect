@@ -1,7 +1,7 @@
 import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
 import { query } from "./../lib/database"
 import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash, getUserHistory, getUserMessages, getUserFriends } from "./../vclogic/vcuser"
-import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC, getGameHistory } from "./../vclogic/vcgame"
+import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC, getGameHistory, gameHandOver } from "./../vclogic/vcgame"
 import { uploadToS3 } from "./../lib/s3"
 const { v4: uuidv4 } = require('uuid')
 
@@ -191,9 +191,22 @@ export async function gameStart(req: any,res: any,route: any)
 //ゲーム終了
 export async function gameEnd(req: any,res: any,route: any)
 {
-	let result:any = await gameEndVC(route.query.GameHash, route.query.GameResult);
+	let resultCode = route.query.GameResult ? 2 : 3;
+	let result:any = await gameEndVC(route.query.GameHash, resultCode);
 	
 	result.Status = 200;
+	
+	return result;
+}
+
+//交代
+export async function handOver(req: any,res: any,route: any)
+{
+	let result:any = await gameHandOver(route.query.GameId, route.query.UserId, route.query.Option);
+	let user: any = await getUserFromId(route.query.UserId);
+	
+	result.Status = 200;
+	result.UserData = user;
 	
 	return result;
 }

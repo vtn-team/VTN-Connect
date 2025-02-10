@@ -1,5 +1,5 @@
 import { updateMainGameInfo } from "./vcinfo"
-import { createEpisodeNormalGame, createEpisodeAIGame, saveEpisodeNormalGame, saveEpisodeAIGame, createAdvTitle } from "./vcgameInfo"
+import { createEpisodeNormalGame, createEpisodeAIGame, saveEpisodeNormalGame, saveEpisodeAIGame, createAdvTitle, ResultCode } from "./vcgameInfo"
 import { getUniqueUsers, getUserFromId } from "./vcuser"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { query } from "./../lib/database"
@@ -207,26 +207,26 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 
 
 //ゲーム終了
-export async function gameEndVC(gameHash: string, gameResult: boolean) {
+export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 	let result = {
 		Success: false,
 	};
 	
 	try {
-		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [gameResult ? 2 : 3, gameHash]);
+		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [resultCode, gameHash]);
 		result.Success = true;
 		
 		stopRecord(gameHash);
 		
 		//awaitはしない
-		saveEpisodeNormalGame(gameHash, gameResult);
+		saveEpisodeNormalGame(gameHash, resultCode);
 		
 		//DGSにイベントリレー
 		//NOTE: UserInfoは取ろうと思えばとれる
 		sendAPIEvent({
 			API: gameStartVC,
 			GameHash: gameHash,
-			GameResult: gameResult
+			GameResult: resultCode
 		});
 		
 		//稼働中ログ
@@ -243,6 +243,40 @@ export async function gameEndVC(gameHash: string, gameResult: boolean) {
 	
 	return result;
 }
+
+
+//ゲーム交代
+export async function gameHandOver(gameId: number, userId: number, option: number) {
+	let result = {
+		Success: false,
+		GameHash: ""
+	};
+	
+	try {
+		//稼働中であればGameEndする
+		let gameHash = "";
+		for(let k in gameHashDic) {
+			if(gameHashDic[k] == gameId){
+				gameHash = k;
+				break;
+			}
+		}
+		if(gameHash != "") {
+			await gameEndVC(gameHash, 4);
+		}
+		
+		let res = await gameStartVC(gameId, userId, option);
+		
+		result.GameHash = res.GameHash;
+		
+	} catch(ex) {
+		console.log(ex);
+	}
+	
+	return result;
+}
+
+
 
 async function choiceAIGameUsers() {
 	//DBから更新日時が最も古い3人を抜き出す

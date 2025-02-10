@@ -10,6 +10,14 @@ interface Episode {
 	getEpisodePrompt(userInfo: any) : any;
 }
 
+export enum ResultCode {
+	INVALID = 0,
+	IN_PROGRESS = 1,
+	SUCCESS = 2,
+	FAILED = 3,
+	HANDOVER = 4,
+}
+
 //ゲーム情報構造体
 export class GameEpisode {
 	episode: any;
@@ -187,7 +195,7 @@ export function createEpisodeNormalGame(gameId: number, gameHash: string, userIn
 }
 
 //
-export async function saveEpisodeNormalGame(gameHash: string, gameResult: boolean) {
+export async function saveEpisodeNormalGame(gameHash: string, resultCode: ResultCode) {
 	let userInfo = getCachedUser(gameHash);
 	if(!userInfo) return;
 	let episode = epic.getEpisodeBook(gameHash, userInfo.UserId);
@@ -201,11 +209,24 @@ export async function saveEpisodeNormalGame(gameHash: string, gameResult: boolea
 	let rule = getAIRule("CreateEpic_" + master.ProjectCode);
 	if(!rule) rule = getAIRule("CreateEpic");
 	let prompt = rule.RuleText;
-	if(gameResult) {
+	switch(resultCode) {
+	case ResultCode.INVALID:
+	case ResultCode.IN_PROGRESS:
+		break;
+		
+	case ResultCode.SUCCESS:
 		prompt += "\n\n# 冒険の結末\n- 成功";
-	}else{
-		prompt += "\n\n# 冒険の結末\n- 失敗";
+		break;
+		
+	case ResultCode.FAILED:
+	prompt += "\n\n# 冒険の結末\n- 失敗";
+		break;
+		
+	case ResultCode.HANDOVER:
+		prompt += "\n\n# 冒険の結末\n- 別の人に託した";
+		break;
 	}
+	
 	messages.push({ role: "user", content: prompt });
 	console.log(messages);
 	
@@ -216,7 +237,7 @@ export async function saveEpisodeNormalGame(gameHash: string, gameResult: boolea
 	console.log(msg);
 	
 	let logId = uuidv4();
-	await query("INSERT INTO Adventure (GameHash, UserId, Title, Result, LogId) VALUES (?, ?, ?, ?, ?)", [gameHash, userInfo.UserId, title, gameResult ? 1 : 0, logId]);
+	await query("INSERT INTO Adventure (GameHash, UserId, Title, Result, LogId) VALUES (?, ?, ?, ?, ?)", [gameHash, userInfo.UserId, title, resultCode, logId]);
 	await uploadToS3(logId, msg.content);
 	
 	epic.deleteEpisode(gameHash, userInfo.UserId);
