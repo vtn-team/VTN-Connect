@@ -91,8 +91,6 @@ export class SakuraConnect {
 			}
 			this.sakuraEvents.push(data);
 		}
-		
-		console.log(this.sakuraUsers);
 	}
 	
 	/**
@@ -168,6 +166,7 @@ export class SakuraConnect {
 		let users = this.getSakuraUser(evt.SendFlag);
 		let index = crypto.randomInt(0, users.length);
 		let userId = data.UserId;
+		let delay = 0;
 		
 		//SendFlagによる振る舞い
 		if(evt.SendFlag.indexOf("Random") != -1) {
@@ -192,6 +191,7 @@ export class SakuraConnect {
 		switch(evt.Trigger) {
 		case "GameStart":
 			//GameStartはParamsの範囲内で遅延する
+			delay = evt.Params[0] + crypto.randomInt(0, evt.Params[1]);
 			break;
 		}
 		
@@ -216,10 +216,21 @@ export class SakuraConnect {
 			Data: msgData
 		};
 		
-		//DBに保存
-		let ins = await query("INSERT INTO Message (ToUserId, FromUserId, AvatarType, Message, Emotion) VALUES (?, ?, ?, ?, ?)", [json.ToUserId, json.FromUserId, users[index].AvatarType, msgData.Message, msgData.Emotion]);
-		
-		this.msgSender(json);
+		//遅延処理がある場合はそう実行する
+		if(delay > 0)
+		{
+			setTimeout(async () => {
+				//DBに保存
+				await query("INSERT INTO Message (ToUserId, FromUserId, AvatarType, Message, Emotion) VALUES (?, ?, ?, ?, ?)", [json.ToUserId, json.FromUserId, json.Data.Avatar, json.Data.Message, json.Data.Emotion]);
+				this.msgSender(json);
+			}, delay);
+		}
+		else
+		{
+			//DBに保存
+			await query("INSERT INTO Message (ToUserId, FromUserId, AvatarType, Message, Emotion) VALUES (?, ?, ?, ?, ?)", [json.ToUserId, json.FromUserId, json.Data.Avatar, json.Data.Message, json.Data.Emotion]);
+			this.msgSender(json);
+		}
 	}
 
     /**
@@ -375,6 +386,12 @@ export class SakuraConnect {
 		switch(data.API) {
 			case "createUser":
 			{
+				/*
+				data = {
+					API: "createUser",
+					UserData: result
+				}
+				*/
 				let evts = this.getEvents("Register");
 				for(let s of evts) {
 					this.execSakura(s, data);
@@ -384,18 +401,51 @@ export class SakuraConnect {
 
 		case "gameStartAIGame":
 			{
+				/*
+				data = {
+					API: "gameStartAIGame",
+					GameHash: gameHash,
+					GameId: gameId,
+					GameTitle: title,
+					GameUsers: users,
+				}
+				*/
 				let evts = this.getEvents("GameStart");
-				for(let s of evts) {
-					this.execSakura(s, data);
+				for(let evt of evts) {
+					if(evt.GameId != data.GameId) continue;
+					
+					let index = 0;
+					for(let ud of data.GameUsers) {
+						let d = {
+							API: "gameStartAIGame",
+							GameHash: data.GameHash,
+							GameId: data.GameId,
+							GameTitle: data.GameTitle,
+							UserId: ud.UserId,
+							UserData: ud,
+							Index: index++
+						};
+						this.execSakura(evt, d);
+					}
 				}
 			}
 			break;
 			
 		case "gameStartVC":
 			{
+				/*
+				data = {
+					API: 'gameStartVC',
+					GameHash: 'hash',
+					GameId: gameId,
+					UserId: userId,
+					UserData: userInfo,
+				}
+				*/
 				let evts = this.getEvents("GameStart");
-				for(let s of evts) {
-					this.execSakura(s, data);
+				for(let evt of evts) {
+					if(evt.GameId != data.GameId) continue;
+					this.execSakura(evt, data);
 				}
 			}
 			break;

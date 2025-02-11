@@ -188,7 +188,7 @@ export async function createUserWithAI(userInput: UserStatus) {
 		//DGSにイベントリレー
 		sendAPIEvent({
 			API: "createUser",
-			GameUser: result
+			UserData: result
 		});
 		
 		success = true;

@@ -69,6 +69,8 @@ export async function gameStartAIGame(option: number) {
 		sendAPIEvent({
 			API: "gameStartAIGame",
 			GameHash: gameHash,
+			GameId: gameId,
+			GameTitle: title,
 			GameUsers: users,
 		});
 		
@@ -87,6 +89,7 @@ export async function gameStartAIGame(option: number) {
 		gameSessions[gameId] = {
 			Status: 1,
 			GameHash: gameHash,
+			GameId: gameId,
 			GameUsers: simpleUserInfo(users),
 			GameTitle: title,
 		}
@@ -173,8 +176,9 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		sendAPIEvent({
 			API: "gameStartVC",
 			GameHash: gameHash,
+			GameId: gameId,
 			UserId: userId,
-			UserInfo: userInfo,
+			UserData: userInfo,
 		});
 		
 		//稼働中ログ
@@ -192,6 +196,7 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		gameSessions[gameId] = {
 			Status: 1,
 			GameHash: gameHash,
+			GameId: gameId,
 			UserId: userId,
 		}
 		if(userInfo) {
