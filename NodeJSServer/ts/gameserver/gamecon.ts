@@ -204,6 +204,8 @@ export class GameConnect {
 
 	public execMessage(data: any) {
 		let usePortal = false;
+		if(!data["Command"]) return;
+		
 		let payload = this.parsePayload(data["Payload"]);
 		let gameId = this.sessionDic[data.SessionId];
 		

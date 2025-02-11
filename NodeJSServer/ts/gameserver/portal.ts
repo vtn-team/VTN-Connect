@@ -116,6 +116,7 @@ export class UserPortal {
 
 	public execMessage(data: any) {
 		let usePortal = false;
+		if(!data["Command"]) return;
 		let payload = this.parsePayload(data["Payload"]);
 		let userId = this.sessionDic[data.SessionId];
 		

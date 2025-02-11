@@ -48,6 +48,7 @@ exports.Routes = {
 	},
 	POST: {
 		"/login" : "user#login",
+		"/maintain" : "vc#maintenance#             メンテナンス",
 		"/vc" : {
 			"/usercreate" : "vc#createUser#        ユーザ生成(テスト用)",
 			"/gamestart" : "vc#gameStart#          ゲーム開始",

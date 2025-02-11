@@ -36,6 +36,8 @@ class Server {
 	protected qrEventer: QREventer;		//QR
 	protected lastActiveNum: number;	//現在のアクティブ人数キャッシュ
 	protected port: number;				//接続するポート
+	protected isMaintenance: boolean;	//メンテナンス情報
+	
 
 	//データ送信
 	broadcast(data: any) {
@@ -56,6 +58,7 @@ class Server {
 	constructor(mode:ServerType, port: number) {
 		this.sessions = {};
 		this.port = port;
+		this.isMaintenance = false;
 		this.server = new WebSocketServer({ port });
 		this.qrEventer = new QREventer();
 		
@@ -65,7 +68,6 @@ class Server {
 			this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
 			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
 			console.log("server content is both type.");
-			
 			break;
 			
 		case ServerType.GameConnect:
@@ -96,6 +98,8 @@ class Server {
 				{
 					let data = JSON.parse(message);
 					let sessionId = data["SessionId"];
+					
+					if(this.isMaintenance) return;
 					
 					if(this.sessions[sessionId]) {
 						//重要なメッセージはここでさばく
@@ -203,6 +207,7 @@ class Server {
 	
 	sendGameStatus() {
 		let stats = {
+			IsMaintenance: this.isMaintenance,
 			ActiveGames: this.contents.getActiveGames(),
 			//ActiveUsers: this.portal.getActiveUsers()
 		}
@@ -219,6 +224,10 @@ class Server {
 		this.contents.setupGameConnect();
 	}
 	
+	public updateMaintenance(isMaintenance: boolean) {
+		this.isMaintenance = isMaintenance;
+	}
+	
 	public startRecord(gameId:number, gameHash: string) {
 		this.contents.startRecord(gameId, gameHash);
 	}
@@ -229,6 +238,7 @@ class Server {
 	
 	public sendAPIEvent(data: any) {
 		this.contents.sendAPIEvent(data);
+		this.portal.sendAPIEvent(data);
 	}
 	
 	public getPort() {
@@ -255,6 +265,13 @@ export function launchDGS(mode: ServerType, port: number) {
 	
 	gServer = new Server(mode, port);
 	gServer.setupGameConnect();
+}
+
+//(公開関数)アクティブなゲーム数を返す
+export function updateMaintenance(isMaintenance: boolean) {
+	if(gServer == null) return 0;
+	
+	return gServer.updateMaintenance(isMaintenance);
 }
 
 //(公開関数)WebSocketに接続するホストアドレスとポートを返す

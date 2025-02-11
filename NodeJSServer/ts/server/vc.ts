@@ -1,4 +1,4 @@
-import { getConnectionAddress, getActiveSessionNum } from "./../gameserver/server"
+import { getConnectionAddress, getActiveSessionNum, updateMaintenance } from "./../gameserver/server"
 import { query } from "./../lib/database"
 import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash, getUserHistory, getUserMessages, getUserFriends } from "./../vclogic/vcuser"
 import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC, getGameHistory, gameHandOver } from "./../vclogic/vcgame"
@@ -28,6 +28,17 @@ export async function getaddr(req: any,res: any,route: any)
 	return {
 		Status: 200,
 		Address: ret
+	};
+}
+
+//メンテナンス
+export async function maintenance(req: any,res: any,route: any)
+{
+	updateMaintenance(route.query.MaintenanceFlag);
+
+	return {
+		Status: 200,
+		MaintenanceFlag: route.query.MaintenanceFlag
 	};
 }
 
