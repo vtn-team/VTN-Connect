@@ -48,7 +48,11 @@ class Server {
 		//let msg = msgpack.pack(data);
 		for(var k in this.sessions) {
 			let us = this.sessions[k];
-			if(!us.chkTarget(data)) continue;
+			if(!us.chkTarget(data)) {
+				//console.log("はじかれた:");
+				//console.log(data);
+				continue;
+			}
 			
 			us.sendMessage(msg);
 		}
