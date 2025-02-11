@@ -1,5 +1,5 @@
 {
-  "Version": 182,
+  "Version": 271,
   "Data": [
     {
       "Id": "1",
@@ -9,7 +9,8 @@
       "ClearBonusCoin": "200",
       "GameOverBonusCoin": "200",
       "PlayTime": "300",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "1",
+      "IsReLink": "0"
     },
     {
       "Id": "2",
@@ -19,17 +20,19 @@
       "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
       "PlayTime": "600",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "1",
+      "IsReLink": "1"
     },
     {
       "Id": "3",
       "ProjectCode": "BossBattle2D",
-      "GameTitle": "ブルスラアクション",
+      "GameTitle": "ブルスラアクション！",
       "Difficulty": "100",
       "ClearBonusCoin": "5000",
       "GameOverBonusCoin": "100",
       "PlayTime": "600",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "1",
+      "IsReLink": "0"
     },
     {
       "Id": "4",
@@ -39,27 +42,63 @@
       "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
       "PlayTime": "800",
-      "IsReplayTarget": "0"
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
       "Id": "5",
-      "ProjectCode": "Jenga",
+      "ProjectCode": "Nexus",
+      "GameTitle": "NEXUS",
+      "Difficulty": "10",
+      "ClearBonusCoin": "500",
+      "GameOverBonusCoin": "100",
+      "PlayTime": "600",
+      "IsReplayTarget": "0",
+      "IsReLink": "1"
+    },
+    {
+      "Id": "6",
+      "ProjectCode": "Chenga",
       "GameTitle": "チェンガ",
       "Difficulty": "20",
       "ClearBonusCoin": "1000",
       "GameOverBonusCoin": "100",
       "PlayTime": "300",
-      "IsReplayTarget": "0"
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
-      "Id": "6",
-      "ProjectCode": "Nexus",
-      "GameTitle": "Nexus",
-      "Difficulty": "10",
-      "ClearBonusCoin": "500",
+      "Id": "7",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
       "GameOverBonusCoin": "100",
-      "PlayTime": "600",
-      "IsReplayTarget": "0"
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
+    },
+    {
+      "Id": "8",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "100",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
+    },
+    {
+      "Id": "9",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "100",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
       "Id": "99",
@@ -69,7 +108,8 @@
       "ClearBonusCoin": "0",
       "GameOverBonusCoin": "0",
       "PlayTime": "0",
-      "IsReplayTarget": "0"
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
       "Id": "100",
@@ -79,7 +119,8 @@
       "ClearBonusCoin": "100",
       "GameOverBonusCoin": "50",
       "PlayTime": "10",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "0",
+      "IsReLink": "1"
     },
     {
       "Id": "101",
@@ -89,7 +130,8 @@
       "ClearBonusCoin": "200",
       "GameOverBonusCoin": "100",
       "PlayTime": "10",
-      "IsReplayTarget": "0"
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     }
   ]
 }

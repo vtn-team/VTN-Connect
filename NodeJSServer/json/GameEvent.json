@@ -1,16 +1,6 @@
 {
-  "Version": 590,
+  "Version": 611,
   "Data": [
-    {
-      "Id": "101",
-      "Description": "岩垂UIの憑依",
-      "From": "3",
-      "Target": "-1",
-      "SendFlag": "None",
-      "EnumCode": "DemonUI",
-      "Release": "",
-      "System": ""
-    },
     {
       "Id": "102",
       "Description": "死んだらおもちゃの熊が落ちてくる",
@@ -18,17 +8,6 @@
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "DeathTrap",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "103",
-      "Description": "死ぬと死体が増える",
-      "From": "3",
-      "Target": "4",
-      "SendFlag": "None",
-      "EnumCode": "DeathStack",
-      "Release": "",
       "System": ""
     },
     {
@@ -38,7 +17,6 @@
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "JengaInfo",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -48,17 +26,6 @@
       "Target": "2",
       "SendFlag": "GameOnly",
       "EnumCode": "ActorEffect",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "106",
-      "Description": "ステージギミック復活(罠系)",
-      "From": "-1",
-      "Target": "2",
-      "SendFlag": "None",
-      "EnumCode": "ReviveGimmick",
-      "Release": "",
       "System": ""
     },
     {
@@ -68,7 +35,6 @@
       "Target": "2",
       "SendFlag": "GameOnly",
       "EnumCode": "DarkRoom",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -78,7 +44,6 @@
       "Target": "2",
       "SendFlag": "GameOnly",
       "EnumCode": "PickupItem",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -88,7 +53,6 @@
       "Target": "2",
       "SendFlag": "GameOnly",
       "EnumCode": "SummonEnemy",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -98,7 +62,6 @@
       "Target": "4",
       "SendFlag": "GameOnly",
       "EnumCode": "DeathScream",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -108,7 +71,6 @@
       "Target": "3",
       "SendFlag": "GameOnly",
       "EnumCode": "DefeatBomb",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -118,7 +80,6 @@
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "BadJengaInfo",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -128,7 +89,6 @@
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "SummonHeliCopter",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -138,7 +98,6 @@
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "UserTalk",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -148,7 +107,6 @@
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "ConfrontHeal",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -158,137 +116,6 @@
       "Target": "4",
       "SendFlag": "GameOnly",
       "EnumCode": "KnockWindow",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "117",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "118",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "119",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "120",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "121",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "122",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "123",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "124",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "125",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "126",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "127",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "128",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "129",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
       "System": ""
     },
     {
@@ -298,97 +125,6 @@
       "Target": "-1",
       "SendFlag": "GameOnly",
       "EnumCode": "EnemyEscape",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "131",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "132",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "133",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "134",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "135",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "136",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "137",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "138",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "139",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
       "System": ""
     },
     {
@@ -398,7 +134,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "VCMainTalk",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -408,7 +143,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "VCMainAttack",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -418,7 +152,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "VCMainItem",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -428,7 +161,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "VCMainSearch",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -438,7 +170,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "VCMainEnemy",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -448,7 +179,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "VCMainReset",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -458,7 +188,6 @@
       "Target": "-1",
       "SendFlag": "ALL",
       "EnumCode": "VCMainSnatch",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -468,27 +197,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "VCMainPurpose",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "208",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "209",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
       "System": ""
     },
     {
@@ -498,47 +206,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "CfDefeatBoss",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "211",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "212",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "213",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "214",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
       "System": ""
     },
     {
@@ -548,7 +215,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "BADefeatBoss",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -558,67 +224,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "BADead",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "217",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "218",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "219",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "220",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "221",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "222",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
       "System": ""
     },
     {
@@ -628,27 +233,6 @@
       "Target": "0",
       "SendFlag": "UserOnly",
       "EnumCode": "SGEnemyLeave",
-      "Release": "〇",
-      "System": ""
-    },
-    {
-      "Id": "501",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "502",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
       "System": ""
     },
     {
@@ -658,7 +242,6 @@
       "Target": "-1",
       "SendFlag": "Self",
       "EnumCode": "Link",
-      "Release": "〇",
       "System": "〇"
     },
     {
@@ -668,7 +251,6 @@
       "Target": "-1",
       "SendFlag": "ALL",
       "EnumCode": "Cheer",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -678,7 +260,6 @@
       "Target": "-1",
       "SendFlag": "ALL",
       "EnumCode": "BonusCoin",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -688,7 +269,6 @@
       "Target": "-1",
       "SendFlag": "ALL",
       "EnumCode": "Levelup",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -698,57 +278,33 @@
       "Target": "-1",
       "SendFlag": "ALL",
       "EnumCode": "GetArtifact",
-      "Release": "〇",
       "System": ""
     },
     {
       "Id": "1005",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
+      "Description": "リンク交代",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "ALL",
+      "EnumCode": "ReLink",
+      "System": "〇"
     },
     {
       "Id": "1006",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
+      "Description": "冒険が始まった",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "ALL",
+      "EnumCode": "GameStart",
       "System": ""
     },
     {
       "Id": "1007",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "1008",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
-      "System": ""
-    },
-    {
-      "Id": "1009",
-      "Description": "",
-      "From": "",
-      "Target": "",
-      "SendFlag": "None",
-      "EnumCode": "",
-      "Release": "",
+      "Description": "冒険が終わった",
+      "From": "0",
+      "Target": "-1",
+      "SendFlag": "ALL",
+      "EnumCode": "GameEnd",
       "System": ""
     },
     {
@@ -758,7 +314,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "FieldEvent01",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -768,7 +323,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "FieldEvent02",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -778,7 +332,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "FieldEvent03",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -788,7 +341,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "FieldEvent04",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -798,7 +350,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "FieldEvent05",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -808,7 +359,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "Artifact01",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -818,7 +368,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "Artifact02",
-      "Release": "〇",
       "System": ""
     },
     {
@@ -828,7 +377,6 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "Artifact03",
-      "Release": "〇",
       "System": ""
     }
   ]
