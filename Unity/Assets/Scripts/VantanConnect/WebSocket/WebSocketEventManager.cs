@@ -54,7 +54,7 @@ namespace VTNConnect
 
         async public void Setup()
         {
-            _gameId = ProjectSettings.GameID;
+            _gameId = VantanConnect.GameID;
             string address = await _getAddress.Request();
             _isReconnect = false;
             if (address == "") return;

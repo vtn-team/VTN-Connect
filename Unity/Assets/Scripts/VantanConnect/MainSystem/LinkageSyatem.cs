@@ -61,7 +61,7 @@ namespace VTNConnect
 
                     GameHandOverRequest req = new GameHandOverRequest()
                     {
-                        GameId = ProjectSettings.GameID,
+                        GameId = VantanConnect.GameID,
                         UserId = userId
                     };
 
@@ -104,7 +104,7 @@ namespace VTNConnect
                     {
                         Debug.Log(JsonUtility.ToJson(data));
                         var gameId = data.GetIntData("GameId");
-                        if (gameId != ProjectSettings.GameID) break;
+                        if (gameId != VantanConnect.GameID) break;
 
                         UniTask.RunOnThreadPool(async () =>
                         {
@@ -128,7 +128,7 @@ namespace VTNConnect
                     {
                         Debug.Log(JsonUtility.ToJson(data));
                         var gameId = data.GetIntData("GameId");
-                        if (gameId != ProjectSettings.GameID) break;
+                        if (gameId != VantanConnect.GameID) break;
 
                         var userId = data.GetIntData("UserId");
                         if (userId == 0) break;
