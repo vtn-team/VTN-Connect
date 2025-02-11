@@ -6,16 +6,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
 <title>VANTAN - CONNECT (DEV LOCATION)</title>
+<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+<link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript" ></script>
+<script src="anime.min.js"></script>
 <style>
 /* ドット調のフォントに変更 */
 @font-face {
-  font-family: "dotfont";
-  src: url("/togalite.woff2") format("woff2");
-  url("/togalite.woff") format("woff");
+  font-family: "PixelMplus12-Bold";
+  src: 
+    local("PixelMplus12-Bold"),
+    url("PixelMplus12-Bold.woff2") format("woff2"),
+    url("PixelMplus12-Bold.woff") format("woff"),
+    url("PixelMplus12-Bold.ttf");
+}
+
+html, body, pre, code, kbd, samp {
+  font-family: "PixelMplus12-Bold", serif;
 }
 
 body {
-  font-family: ; "dotfont";
   background-image: url('bg.gif');
   background-size: auto 100vh;
   background-repeat: no-repeat;
@@ -124,7 +134,7 @@ header.nav p {
 }
 
 .important { grid-area: important; }
-.main { grid-area: main; }
+.main { grid-area: main; margin: 0 auto; }
 .debugitem { grid-area: debugitem; }
 .footer { grid-area: footer; }
 .sidebar {  }
@@ -156,9 +166,6 @@ header.nav p {
   background-color: #eeeeeeee
 }
 </style>
-<link href="https://unpkg.com/nes.css/css/nes-core.min.css" rel="stylesheet" />
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript" ></script>
-<script src="anime.min.js"></script>
 <script type="text/javascript">
 
 const CMD = {
@@ -172,6 +179,7 @@ const CMD = {
 	SEND_CHEER: 103,
 	SEND_QR: 104,
 	SEND_USER_JOIN: 110,
+	ERROR: 500,
 };
 
 const PAGE = {
@@ -240,6 +248,10 @@ window.addEventListener("load", async (event) => {
 		}
 	}
 	
+	//セーブ
+	loadSaveData();
+	
+	//Youtubeのリンクを生成
 	embedYoutubeLink();
 	
 	//animating wallpaper
@@ -268,8 +280,11 @@ window.addEventListener("load", async (event) => {
 		return;
 	}
 	
+	//セーブデータ取得
+	
 	//クッキー取得
 	var cookie = getCookieArray();
+	console.log(cookie);
 	if(!cookie.user_hash || cookie.user_hash === "undefined") {
 		//初回登録
 		loadPage(PAGE.USER_CREATE);
@@ -491,8 +506,25 @@ function execMessage(data) {
 	}
 	break;
 	
+	case CMD.ERROR:
+	{
+		console.log(data);
+		setupErrorDialog(data);
+	}
+	break;
+	
 	}
 	return ret;
+}
+
+function setupErrorDialog(data) {
+	enableUIById("modal-error");
+	getElm("errorMessage").innerHTML = "エラー";
+}
+
+function closeError() {
+	getElm("errorMessage").innerHTML = "";
+	disableUIById("modal-error");
 }
 
 let cheerTarget = null;
@@ -558,6 +590,21 @@ function cheerMessage(toUserId, tgtGameId, msg, emo) {
 	};
 	console.log(json)
 	ws.send(JSON.stringify(json));
+}
+
+function sendQREvent(code) {
+	try{
+		//SessionIdをキーにしてJoinを返す
+		let json = {
+			SessionId: wsSessionId,
+			Command: CMD.SEND_QR,
+			SerialCode: code,
+			UserId: userData.UserId
+		};
+		ws.send(JSON.stringify(json));
+	}catch(ex){
+		console.log(ex);
+	}
 }
 
 
@@ -821,18 +868,7 @@ async function onScanSuccess(decodedText, decodedResult) {
 	//URLをパースしてシリアルコードだけ引き出す
 	let qrSerialCode = decodedText.replace("http://www.vtn-game.com/vc/index.html?qrcode=","");
 	
-	try{
-		//SessionIdをキーにしてJoinを返す
-		let json = {
-			SessionId: wsSessionId,
-			Command: CMD.SEND_QR,
-			SerialCode: qrSerialCode,
-			UserId: userData.UserId
-		};
-		ws.send(JSON.stringify(json));
-	}catch(ex){
-		console.log(ex);
-	}
+	sendQREvent(qrSerialCode);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -864,6 +900,16 @@ function saveUserSession(userHash) {
 	var path = "path=/";
 	
 	document.cookie = cookievalue + expires + path;
+}
+
+function loadSaveData() {
+	let save = localStorage.getItem("SaveData");
+	if(save) {
+		try{
+			saveData = JSON.parse(save);
+		}catch(ex){
+		}
+	}
 }
 
 function getElm(elmId) {
@@ -1011,12 +1057,35 @@ async function setupDebugMenu() {
 	});
 	
 	const myGame = localStorage.getItem("myGame");
-	console.log("here:" + myGame);
 	if(myGame) {
 		elm.selectedIndex = myGame;
 		filterAndShowDebugEvent(myGame);
 		myGameId = parseInt(myGame);
 	}
+}
+
+async function gameShutdown() {
+	let tgtGameId = parseInt(getElm("dbgShutdownId").value);
+	if(isNaN(tgtGameId)) return;
+	
+	let gameHash = "";
+	for(let game of activeGameInfo) {
+		if(game.GameId == tgtGameId && game.Session && game.Session.Status == 1) {
+			gameHash = game.Session.GameHash;
+			break;
+		}
+	}
+	if(gameHash == "") return;
+	
+	let req = await fetch(`${baseURI}/vc/gameend`, {
+		method: 'POST',
+		mode: 'cors',
+		body: JSON.stringify({
+			GameHash: gameHash,
+			GameResult: 4
+		})
+	});
+	let result = await req.json();
 }
 
 function goodCheer() {
@@ -1051,10 +1120,6 @@ function filterAndShowDebugEvent(gameId) {
 	}
 	elm.innerHTML = html;
 	enableUIById("cheerDebug");
-}
-
-function nextVideo() {
-	onYouTubeIframeAPIReady();
 }
 
 function reCreateUser() {
@@ -1191,6 +1256,22 @@ function notifyMe() {
 		</div>
 	</div>
 	
+	<div id="modal-error" class="modal">
+		<div class="modal-content">
+			<div id="cheer" class="nes-container is-rounded with-title status">
+				<p class="title">エラー</p>
+				
+				<div id="errorMessage"></div>
+				<div style="height:10px;"></div>
+				<div class="right">
+					<button type="button" class="nes-btn is-primary" onclick="closeError();">ＯＫ</button>
+				</div>
+			</div>
+			
+			<div id="closeModal" onclick=closeError()>&times;</div>
+		</div>
+	</div>
+	
 	<div id="modal-cheer" class="modal">
 		<div class="modal-content">
 			<div id="cheer" class="nes-container is-rounded with-title status">
@@ -1218,7 +1299,7 @@ function notifyMe() {
 	
 	<div class="main">
 	
-		<div id="youtubeLive">
+		<div id="youtubeLive" class="center">
 		</div>
 		
 		<div id="page-launch">
@@ -1245,7 +1326,7 @@ function notifyMe() {
 				<progress class="nes-progress is-primary" id="mainworkgauge" value="0" max="100"></progress>
 			</div>
 			
-			<div class="nes-container with-title status">
+			<div id="aaa" class="nes-container is-rounded with-title status">
 				<p class="title">探索 <QR></p>
 				<div class="center">
 					会場のQRコードを読み込んで、冒険を有利にしよう！<br /><br />
@@ -1255,6 +1336,8 @@ function notifyMe() {
 					<div id="qrresult">読み込み結果</div>
 				</div>
 			</div>
+			
+			<div style="height:50px;"></div>
 			
 			<div id ="mainmenu" class="nes-container is-rounded with-title status">
 				<p class="title">キロク</p>
@@ -1269,7 +1352,7 @@ function notifyMe() {
 			
 			<div style="height:50px;"></div>
 			
-			<div class="nes-container is-rounded with-title status">
+			<div class="nes-container is-rounded is-rounded with-title status">
 				<p class="title">ログ</p>
 				<div class="nes-field">
 					<section id="msglog" class="message-list">
@@ -1474,7 +1557,6 @@ function notifyMe() {
 	</div>
 	
 	<div id="debugitem" style="display:none;">
-		
 					<!--
 		<div class="nes-container with-title status">
 			<p class="title">リクエストチェック</p>
@@ -1509,7 +1591,11 @@ function notifyMe() {
 				<p class="title">機能テスト</p>
 				
 				<div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick="nextVideo();">次の動画</button>
+				GameId<input type="text" id="dbgShutdownId" class="nes-input">
+				<button type="button" class="nes-btn is-primary" onclick="gameShutdown();">ゲーム終了</button>
+				
+				<div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick="playNextVideo();">次の動画</button>
 				
 				<div style="height:10px;"></div>
 				<button type="button" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
@@ -1586,6 +1672,15 @@ function notifyMe() {
 				</div>
 				<div style="height:50px;"></div>
 			</div>
+			
+			<div style="height:50px;"></div>
+			
+			<div class="nes-container with-title">
+				<p class="title">テストQR</p>
+				<br />
+				<button type="button" class="nes-btn is-primary" onclick=sendQREvent("810f1f50-6a2b-4a8d-8908-a37b9afe9ec2")>リンク1</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendQREvent("a4cf1e07-cd1a-40ab-9d6f-755d344cf550")>スクロール1</button><div style="height:10px;"></div>
+			</div>
 		</div>
 		
 					<!--
@@ -1645,6 +1740,5 @@ function notifyMe() {
 	<div class="footer">
 	</div>
 </section>
-<div class="sidebar">1</div>
 </body>
 </html>

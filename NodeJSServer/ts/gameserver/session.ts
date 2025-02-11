@@ -18,6 +18,7 @@ export enum CMD {
 	SEND_CHEER = 103,
 	SEND_QR = 104,
 	SEND_USER_JOIN = 110,
+	ERROR = 500,
 };
 
 export enum SESSION_TYPE {

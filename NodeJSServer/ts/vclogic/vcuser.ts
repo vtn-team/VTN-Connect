@@ -225,7 +225,7 @@ export async function getUserFromHash(hash: string) {
 }
 
 export async function getUserHistory(userId: number, page: number = 0) {
-	let result = await query("SELECT * FROM Adventure WHERE UserId = ?", [userId]);
+	let result = await query("SELECT * FROM Adventure WHERE UserId = ? ORDER BY CreatedAt DESC LIMIT 0, 10", [userId]);
 	let count = await query("SELECT count(GameHash) as Count FROM Adventure WHERE UserId = ?", [userId]);
 	
 	return {
@@ -235,7 +235,7 @@ export async function getUserHistory(userId: number, page: number = 0) {
 }
 
 export async function getUserMessages(userId: number, page: number = 0) {
-	let result = await query("SELECT * FROM Message WHERE ToUserId = ?", [userId]);
+	let result = await query("SELECT * FROM Message WHERE ToUserId = ? ORDER BY CreatedAt DESC LIMIT 0, 10", [userId]);
 	let count = await query("SELECT count(Id) as Count FROM Message WHERE ToUserId = ?", [userId]);
 	
 	return {
@@ -245,7 +245,7 @@ export async function getUserMessages(userId: number, page: number = 0) {
 }
 
 export async function getUserFriends(userId: number, page: number = 0) {
-	let result = await query("SELECT * FROM Friend WHERE UserId = ?", [userId]);
+	let result = await query("SELECT * FROM Friend WHERE UserId = ? ORDER BY CreatedAt DESC LIMIT 0, 10", [userId]);
 	let count = await query("SELECT count(UserId) as Count FROM Message WHERE UserId = ?", [userId]);
 	
 	return {

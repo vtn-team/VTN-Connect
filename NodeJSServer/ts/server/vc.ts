@@ -75,7 +75,7 @@ export async function getUser(req: any,res: any,route: any)
 		result.MessageCount = message.Count;
 	}
 	
-	if(route.query.withMessage) {
+	if(route.query.withFriends) {
 		let message = await getUserFriends(route.query.id);
 		result.Friends = message.Friends;
 		result.FriendCount = message.Count;

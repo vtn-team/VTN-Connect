@@ -132,6 +132,13 @@ export class UserPortal {
 			this.cheerMessage(data);
 		}
 		break;
+		
+		case CMD.ERROR:
+		{
+			console.log(data)
+			this.broadcast(createMessage(data.UserId, CMD.ERROR, TARGET.SELF, data));
+		}
+		break;
 		}
 		return usePortal;
 	}
