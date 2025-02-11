@@ -1,5 +1,6 @@
 import { GameConnect, GameConnectInterface } from "./gamecon"
 import { UserPortal, UserPortalInterface } from "./portal"
+import { QREventer } from "./qrevents"
 import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
@@ -32,6 +33,7 @@ class Server {
 	protected contents: GameConnectInterface;	//ゲームコネクター(ゲーム同士をつなげるGameServerの本体)
 	protected portal: UserPortalInterface;		//ユーザールーム(ユーザを管理するGameServerの本体)
 	
+	protected qrEventer: QREventer;		//QR
 	protected lastActiveNum: number;	//現在のアクティブ人数キャッシュ
 	protected port: number;				//接続するポート
 
@@ -55,6 +57,7 @@ class Server {
 		this.sessions = {};
 		this.port = port;
 		this.server = new WebSocketServer({ port });
+		this.qrEventer = new QREventer();
 		
 		switch(mode) {
 		default:
@@ -110,6 +113,16 @@ class Server {
 						default:
 							this.contents.execMessage(data);
 							this.portal.execMessage(data);
+							break;
+							
+						case CMD.SEND_QR:
+							{
+								let result:any = this.qrEventer.execEvent(data);
+								if(result.Status == 1) {
+									this.contents.execMessage(result.Data);
+								}
+								this.portal.execMessage(result.Message);
+							}
 							break;
 						}
 					}else{
