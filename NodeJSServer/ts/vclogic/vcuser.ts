@@ -1,5 +1,6 @@
 import { chatWithSession } from "./../lib/chatgpt"
 import { getAIRule } from "./../lib/masterDataCache"
+import { sendAPIEvent } from "../gameserver/server"
 import { query } from "./../lib/database"
 const { v4: uuidv4 } = require('uuid')
 
@@ -183,6 +184,12 @@ export async function createUserWithAI(userInput: UserStatus) {
 		for(var k in json) {
 			result[k] = json[k];
 		}
+		
+		//DGSにイベントリレー
+		sendAPIEvent({
+			API: "createUser",
+			GameUser: result
+		});
 		
 		success = true;
 	} catch(ex) {

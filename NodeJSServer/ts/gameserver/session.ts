@@ -178,3 +178,46 @@ export function createGameMessage(senderId: number, senderGameId: number, comman
 	};
 	return ret;
 }
+
+export function parsePayload(payload: any) {
+	let data:any = {};
+	let types:any = {};
+	if(payload) {
+		for(var d of payload) {
+			types[d.Key] = d.TypeName;
+			
+			switch(d.TypeName)
+			{
+			case "Integer":
+				data[d.Key] = Number(d.Data);
+				break;
+				
+			case "String":
+				data[d.Key] = d.Data;
+				break;
+				
+			default:
+				data[d.Key] = d.Data;
+				break;
+			}
+		}
+	}
+	return {
+		data: data,
+		types: types
+	};
+}
+
+export function createdPayload(data: any) {
+	let payload:any = [];
+	if(data) {
+		for(var k in data) {
+			payload.push({
+				Key: k,
+				TypeName: typeof data[k],
+				Data: data[k]
+			});
+		}
+	}
+	return payload;
+}

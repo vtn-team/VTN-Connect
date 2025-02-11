@@ -5,8 +5,9 @@ let mCache:any = {};
 let mDicCache:any = {};
 let versionInfo:any = {};
 
-let masterFiles = ["GameInfo", "GameEvent", "AIRule"];
-const sheetUri = "https://script.google.com/macros/s/AKfycbwxrmXMYPwuDnCTugeCQ3XYUeNv54FeFQG7h_nPmnQBj7zDj_qRibqklzxZPu__NydlSQ/exec";
+let masterFiles = ["GameInfo", "GameEvent", "AIRule", "SakuraEvent"];
+const sheetUri = "https://script.google.com/macros/s/AKfycbyz1bYamLTqUP_RY6uVGyaUKs-DV_ey7awWuMzsxLN86yY79kTq3OuqhflwvXBlXoU-GQ/exec";
+//"https://script.google.com/macros/s/AKfycbwxrmXMYPwuDnCTugeCQ3XYUeNv54FeFQG7h_nPmnQBj7zDj_qRibqklzxZPu__NydlSQ/exec";
 
 async function getSheetJson(sheet: string)
 {
@@ -121,6 +122,11 @@ export function getGameEvent(id: number)
 export function getAIRule(ruleId: string)
 {
 	return mDicCache["AIRule"][ruleId];
+}
+
+export function getSakuraEvent(ruleKey: string)
+{
+	return mDicCache["SakuraEvent"][ruleKey];
 }
 
 export function getVersionInfo()

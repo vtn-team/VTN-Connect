@@ -1,4 +1,3 @@
-import { updateMainGameInfo } from "./vcinfo"
 import { createEpisodeNormalGame, createEpisodeAIGame, saveEpisodeNormalGame, saveEpisodeAIGame, createAdvTitle, ResultCode } from "./vcgameInfo"
 import { getUniqueUsers, getUserFromId } from "./vcuser"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
@@ -68,7 +67,7 @@ export async function gameStartAIGame(option: number) {
 		
 		//DGSにイベントリレー
 		sendAPIEvent({
-			API: gameStartAIGame,
+			API: "gameStartAIGame",
 			GameHash: gameHash,
 			GameUsers: users,
 		});
@@ -122,7 +121,7 @@ export async function gameEndAIGame(gameResult: any) {
 		
 		//DGSにイベントリレー
 		sendAPIEvent({
-			API: gameStartAIGame,
+			API: "gameEndAIGame",
 			GameHash: gameHash,
 			GameResult: gameResult,
 		});
@@ -172,7 +171,7 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		
 		//DGSにイベントリレー
 		sendAPIEvent({
-			API: gameStartVC,
+			API: "gameStartVC",
 			GameHash: gameHash,
 			UserId: userId,
 			UserInfo: userInfo,
@@ -224,7 +223,7 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 		//DGSにイベントリレー
 		//NOTE: UserInfoは取ろうと思えばとれる
 		sendAPIEvent({
-			API: gameStartVC,
+			API: "gameEndVC",
 			GameHash: gameHash,
 			GameResult: resultCode
 		});

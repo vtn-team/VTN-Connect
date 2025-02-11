@@ -4,8 +4,9 @@ import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
 import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { UserSession, VCUserSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
+import { SakuraConnect } from "./sakuracon"
 
-
+ 
 export interface VCActiveUser
 {
 	UserId: number;
@@ -14,9 +15,6 @@ export interface VCActiveUser
 }
 
 export interface UserPortalInterface {
-
-	setupSakuraConnect() : void;
-
 	joinRoom(userId: number, us: UserSession, data: any) : any; //逃げ
 	execMessage(data: any) : void;
 	removeSession(sessionId: string) : void;
@@ -56,11 +54,15 @@ export class UserPortal {
 	users: any;
 	sessionDic: any;
 	broadcast: any;
+	sakura: SakuraConnect;
 
 	constructor(bc: any) {
 		this.users = {};
 		this.sessionDic = {};
 		this.broadcast = bc;
+		this.sakura = new SakuraConnect((message: any) => {
+			this.cheerMessage(message)
+		});
 	}
 	
 	parsePayload(payload: any) {
@@ -107,11 +109,7 @@ export class UserPortal {
 	}
 
 	public setupDummyUser() {
-		//TBD
-	}
-
-	public setupSakuraConnect() {
-		//TBD
+		
 	}
 
 	public execMessage(data: any) {
@@ -124,10 +122,8 @@ export class UserPortal {
 		{
 		case CMD.SEND_EVENT:
 		{
-		/*
-			usePortal = this.execCommand(data);
-			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
-		*/
+			//イベントフック用
+			this.sakura.eventHook(data.EventId, data)
 		}
 		break;
 		
@@ -192,27 +188,6 @@ export class UserPortal {
 	
 	async cheerMessage(data: any) {
 		try {
-		/*
-	//SessionIdをキーにしてJoinを返す
-	let data = {
-		Avatar: userData.AvatarType,
-		Name: name,
-		Message: msg,
-	};
-	
-	if(emo) {
-		data.Emotion = emo;
-	}
-	
-	let json = {
-		SessionId: wsSessionId,
-		Command: CMD.SEND_CHEER,
-		GameId: tgtGameId,
-		ToUserId: toUserId,
-		FromUserId: fromUserId,
-		Data: data
-	};
-		*/
 			let to = data.ToUserId;
 			let from = data.FromUserId;
 			let msg = data.Data;
@@ -262,7 +237,19 @@ export class UserPortal {
 		}
 	}
 	
+	async execQREvent(data: any) {
+		
+	}
+	
 	public sendAPIEvent(data: any) {
-		//TBD
+		this.sakura.apiHook(data);
+		
+		switch(data.API) {
+		case "createUser":
+		case "gameStartAIGame":
+		case "gameStartVC":
+		case "gameEndAIGame":
+		case "gameEndVC":
+		}
 	}
 };
