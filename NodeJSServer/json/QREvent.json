@@ -1,0 +1,455 @@
+{
+  "Version": 48,
+  "Data": [
+    {
+      "Id": "1",
+      "QRId": "1",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "2",
+      "QRId": "1",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "3",
+      "QRId": "1",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "4",
+      "QRId": "1",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "5",
+      "QRId": "1",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "6",
+      "QRId": "2",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "7",
+      "QRId": "2",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "8",
+      "QRId": "2",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "9",
+      "QRId": "2",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "10",
+      "QRId": "2",
+      "Description": "",
+      "Prob": "100",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "11",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "12",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "13",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "14",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "15",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "16",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "17",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "18",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "19",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "20",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "21",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "22",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "23",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "24",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "25",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "26",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "27",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "28",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "29",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "30",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "31",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "32",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "33",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "34",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "35",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "36",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "37",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "38",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "39",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "40",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "41",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "42",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "43",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "44",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "45",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "46",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "47",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "48",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "49",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    },
+    {
+      "Id": "50",
+      "QRId": "",
+      "Description": "",
+      "Prob": "",
+      "Flag": "",
+      "Coin": "",
+      "Exp": ""
+    }
+  ]
+}

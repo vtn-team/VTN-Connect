@@ -1,5 +1,5 @@
 {
-  "Version": 271,
+  "Version": 321,
   "Data": [
     {
       "Id": "1",
@@ -8,6 +8,8 @@
       "Difficulty": "0",
       "ClearBonusCoin": "200",
       "GameOverBonusCoin": "200",
+      "ClearBonusExp": "300",
+      "GameOverBonusExp": "300",
       "PlayTime": "300",
       "IsReplayTarget": "1",
       "IsReLink": "0"
@@ -19,6 +21,8 @@
       "Difficulty": "10",
       "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "500",
+      "GameOverBonusExp": "50",
       "PlayTime": "600",
       "IsReplayTarget": "1",
       "IsReLink": "1"
@@ -30,6 +34,8 @@
       "Difficulty": "100",
       "ClearBonusCoin": "5000",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "5000",
+      "GameOverBonusExp": "500",
       "PlayTime": "600",
       "IsReplayTarget": "1",
       "IsReLink": "0"
@@ -41,6 +47,8 @@
       "Difficulty": "5",
       "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "1000",
+      "GameOverBonusExp": "500",
       "PlayTime": "800",
       "IsReplayTarget": "0",
       "IsReLink": "0"
@@ -52,6 +60,8 @@
       "Difficulty": "10",
       "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "2000",
+      "GameOverBonusExp": "500",
       "PlayTime": "600",
       "IsReplayTarget": "0",
       "IsReLink": "1"
@@ -62,7 +72,9 @@
       "GameTitle": "チェンガ",
       "Difficulty": "20",
       "ClearBonusCoin": "1000",
-      "GameOverBonusCoin": "100",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
       "PlayTime": "300",
       "IsReplayTarget": "0",
       "IsReLink": "0"
@@ -73,7 +85,9 @@
       "GameTitle": "チェンガ",
       "Difficulty": "20",
       "ClearBonusCoin": "1000",
-      "GameOverBonusCoin": "100",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
       "PlayTime": "300",
       "IsReplayTarget": "0",
       "IsReLink": "0"
@@ -84,21 +98,25 @@
       "GameTitle": "チェンガ",
       "Difficulty": "20",
       "ClearBonusCoin": "1000",
-      "GameOverBonusCoin": "100",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
       "PlayTime": "300",
       "IsReplayTarget": "0",
       "IsReLink": "0"
     },
     {
-      "Id": "9",
-      "ProjectCode": "Chenga",
-      "GameTitle": "チェンガ",
-      "Difficulty": "20",
-      "ClearBonusCoin": "1000",
-      "GameOverBonusCoin": "100",
-      "PlayTime": "300",
-      "IsReplayTarget": "0",
-      "IsReLink": "0"
+      "Id": "",
+      "ProjectCode": "",
+      "GameTitle": "",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "IsReLink": ""
     },
     {
       "Id": "99",
@@ -107,6 +125,8 @@
       "Difficulty": "0",
       "ClearBonusCoin": "0",
       "GameOverBonusCoin": "0",
+      "ClearBonusExp": "0",
+      "GameOverBonusExp": "0",
       "PlayTime": "0",
       "IsReplayTarget": "0",
       "IsReLink": "0"
@@ -118,6 +138,8 @@
       "Difficulty": "1",
       "ClearBonusCoin": "100",
       "GameOverBonusCoin": "50",
+      "ClearBonusExp": "100",
+      "GameOverBonusExp": "10",
       "PlayTime": "10",
       "IsReplayTarget": "0",
       "IsReLink": "1"
@@ -129,6 +151,8 @@
       "Difficulty": "0",
       "ClearBonusCoin": "200",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "100",
+      "GameOverBonusExp": "100",
       "PlayTime": "10",
       "IsReplayTarget": "0",
       "IsReLink": "0"
