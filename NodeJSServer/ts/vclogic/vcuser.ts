@@ -1,7 +1,8 @@
 import { chatWithSession } from "./../lib/chatgpt"
-import { getAIRule } from "./../lib/masterDataCache"
+import { getMaster, getLevel, getGameInfo, getAIRule } from "./../lib/masterDataCache"
 import { sendAPIEvent } from "../gameserver/server"
 import { query } from "./../lib/database"
+import { ResultCode } from "./vcgameInfo"
 const { v4: uuidv4 } = require('uuid')
 
 let userSession:any = {};
@@ -252,4 +253,68 @@ export async function getUserFriends(userId: number, page: number = 0) {
 		Friends: result,
 		Count: Number(count[0].Count)
 	};
+}
+
+export async function questRewards(userId: number) {
+	let ret = {
+		Exp: 0,
+		Coin: 0,
+	};
+	
+	let level = getMaster("Level");
+	if(!level) return ret;
+	
+	let userInfo = await getUserFromId(userId);
+	if(!userInfo) return ret;
+	
+	
+}
+
+export async function getRewardsByGame(gameId: number, userId: number, resultCode: ResultCode, time: number) {
+	let ret = {
+		Exp: 0,
+		Coin: 0,
+	};
+	
+	let level = getMaster("Level");
+	if(!level) return ret;
+	
+	let master = getGameInfo(gameId);
+	if(!master) return ret;
+	
+	let userInfo = await getUserFromId(userId);
+	if(!userInfo) return ret;
+	
+	switch(resultCode) {
+	default:
+	case ResultCode.INVALID:
+	case ResultCode.IN_PROGRESS:
+		break;
+		
+	case ResultCode.SUCCESS:
+		{
+			ret.Exp = master.ClearBonusExp;
+			ret.Coin = master.ClearBonusCoin;
+		}
+		break;
+		
+	case ResultCode.FAILED:
+	case ResultCode.HANDOVER:
+		{
+			let rate = 1.0;
+			if(time < master.PlayTime) {
+				rate = time / master.PlayTime;
+			}
+			
+			ret.Exp = master.GameOverBonusExp;
+			ret.Coin = master.GameOverBonusCoin;
+		}
+		break;
+	}
+	
+	//ユーザ情報更新
+	let exp = userInfo.Exp + ret.Exp;
+	for(let lv = userInfo.Level; lv < 50; ++lv) {
+		
+	}
 }

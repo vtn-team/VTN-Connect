@@ -1,5 +1,5 @@
 import { createEpisodeNormalGame, createEpisodeAIGame, saveEpisodeNormalGame, saveEpisodeAIGame, createAdvTitle, ResultCode } from "./vcgameInfo"
-import { getUniqueUsers, getUserFromId } from "./vcuser"
+import { getUniqueUsers, getUserFromId, getRewardsByGame } from "./vcuser"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { query } from "./../lib/database"
 const { v4: uuidv4 } = require('uuid')
@@ -134,6 +134,7 @@ export async function gameEndAIGame(gameResult: any) {
 		gameSessions[gameId] = {
 			Status: 0,
 		}
+		
 		if(gameHashDic[gameHash]) {
 			delete gameHashDic[gameHash];
 		}
@@ -198,6 +199,7 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 			GameHash: gameHash,
 			GameId: gameId,
 			UserId: userId,
+			StartTime: new Date()
 		}
 		if(userInfo) {
 			gameSessions[gameId]["UserInfo"] = simpleUserInfo(userInfo);
@@ -214,6 +216,7 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 	let result = {
 		Success: false,
+		Rewards: {}
 	};
 	
 	try {
@@ -236,10 +239,18 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 		//稼働中ログ
 		if(gameHashDic[gameHash]) {
 			let gameId = gameHashDic[gameHash];
+			
+			//報酬付与
+			let time = ((new Date()).getTime() - gameSessions[gameId].StartTime);
+			let userId = gameSessions[gameId].UserId;
+			
 			gameSessions[gameId] = {
 				Status: 0,
 			}
 			delete gameHashDic[gameHash];
+			
+			let rewards:any = await getRewardsByGame(gameId, userId, resultCode, time);
+			result.Rewards = rewards;
 		}
 	} catch(ex) {
 		console.log(ex);
@@ -253,7 +264,8 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 export async function gameHandOver(gameId: number, userId: number, option: number) {
 	let result = {
 		Success: false,
-		GameHash: ""
+		GameHash: "",
+		Rewards: {}
 	};
 	
 	try {
@@ -266,7 +278,8 @@ export async function gameHandOver(gameId: number, userId: number, option: numbe
 			}
 		}
 		if(gameHash != "") {
-			await gameEndVC(gameHash, 4);
+			let gameEnd = await gameEndVC(gameHash, 4);
+			result.Rewards = gameEnd.Rewards;
 		}
 		
 		let res = await gameStartVC(gameId, userId, option);
@@ -327,4 +340,8 @@ export async function getGameHistory(gameId: number, page: number = 0) {
 		History: result,
 		//Count: Number(count[0].Count)
 	};
+}
+
+export async function updateArtifact(itemId: number, ownerUserId: number) {
+	
 }
