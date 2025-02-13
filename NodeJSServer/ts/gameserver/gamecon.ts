@@ -32,8 +32,10 @@ class GameContainer {
 	protected gameInfo: any;
 	protected queue: Array<any>;
 	protected session: VCGameSession|null;
+	protected versionCode: string;
+	protected buildHash: string;
 	
-	constructor(gameInfo: any, session: VCGameSession|null) {
+	constructor(gameInfo: any, session: VCGameSession|null, joinData: any) {
 		this.gameInfo = gameInfo;
 		this.gameId = gameInfo.Id;
 		this.session = session;
@@ -43,6 +45,8 @@ class GameContainer {
 			this.player = new EventPlayer(this.gameId);
 		}
 		this.queue = [];
+		this.versionCode = joinData.Version;
+		this.buildHash = joinData.BuildHash;
 	}
 
 	public isActiveSession() {
@@ -54,14 +58,18 @@ class GameContainer {
 			return {
 				GameId: this.gameId,
 				Title: this.gameInfo.GameTitle,
-				ActiveTime: 0
+				ActiveTime: 0,
+				Version: this.versionCode,
+				Build: this.buildHash
 			};
 		}
 		
 		return {
 			GameId: this.gameId,
 			Title: this.gameInfo.GameTitle,
-			ActiveTime: this.session.getActiveTime()
+			ActiveTime: this.session.getActiveTime(),
+			Version: this.versionCode,
+			Build: this.buildHash
 		};
 	}
 
@@ -189,7 +197,7 @@ export class GameConnect {
 		let master = getMaster("GameInfo");
 		for (let m of master) {
 			if (m.IsReplayTarget && !this.games[m.Id]) {
-				this.games[m.Id] = new GameContainer(m, null);
+				this.games[m.Id] = new GameContainer(m, null, { Version: "0.1.0", BuildHash: "BOT" });
 				this.games[m.Id].startReplay((gameId: number, data: any) => { this.execReplay(gameId, data); } );
 			}
 		}
@@ -254,7 +262,7 @@ export class GameConnect {
 		return usePortal;
 	}
 
-	joinGame(gameId: number, us: UserSession, data: any) {
+	public joinGame(gameId: number, us: UserSession, data: any) {
 		if(this.games[gameId]) {
 			
 		}
@@ -271,7 +279,7 @@ export class GameConnect {
 			if (this.games[gameId]) {
 				this.games[gameId].term();
 			}
-			this.games[gameId] = new GameContainer(master, session);
+			this.games[gameId] = new GameContainer(master, session, data);
 			this.sessionDic[data.SessionId] = gameId;
 			console.log(`GAME ID:${gameId} - ${master.ProjectCode} join.`);
 			

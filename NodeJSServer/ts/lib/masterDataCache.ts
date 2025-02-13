@@ -5,7 +5,7 @@ let mCache:any = {};
 let mDicCache:any = {};
 let versionInfo:any = {};
 
-let masterFiles = ["GameInfo", "GameEvent", "AIRule", "SakuraEvent", "Level", "QREvent"];
+let masterFiles = ["GameInfo", "GameEvent", "AIRule", "SakuraEvent", "Level", "QRSheet", "QREvent"];
 const sheetUri = "https://script.google.com/macros/s/AKfycbyz1bYamLTqUP_RY6uVGyaUKs-DV_ey7awWuMzsxLN86yY79kTq3OuqhflwvXBlXoU-GQ/exec";
 //"https://script.google.com/macros/s/AKfycbwxrmXMYPwuDnCTugeCQ3XYUeNv54FeFQG7h_nPmnQBj7zDj_qRibqklzxZPu__NydlSQ/exec";
 
@@ -102,9 +102,10 @@ function constructDicMaster()
 	createDicMaster("GameInfo");
 	createDicMaster("GameEvent");
 	createDicMaster("SakuraEvent");
+	createDicMaster("QRSheet", "UUID");
 	createDicMaster("QREvent");
 	createDicMaster("Level", "Level");
-	createDicMaster("AIRule", "RuleId")
+	createDicMaster("AIRule", "RuleId");
 }
 
 export function getMaster(sheet: string)
@@ -130,6 +131,11 @@ export function getAIRule(ruleId: string)
 export function getLevel(lv: number)
 {
 	return mDicCache["Level"][lv];
+}
+
+export function getQRSheet(uuid: string)
+{
+	return mDicCache["QRSheet"][uuid];
 }
 
 export function getQREvent(id: number)

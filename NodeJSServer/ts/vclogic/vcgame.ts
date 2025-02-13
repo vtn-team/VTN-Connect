@@ -7,6 +7,8 @@ const { v4: uuidv4 } = require('uuid')
 let gameSessions:any = {};
 let gameHashDic:any = {};
 
+let artifactOwners: any = null;
+
 enum GameOption {
 	None = 0,
 	Recording = (1<<0),
@@ -40,6 +42,7 @@ export async function gameStartAIGame(option: number) {
 		GameHash: "",
 		GameTitle: "",
 		GameUsers: [],
+		Artifacts: []
 	};
 	
 	try {
@@ -61,6 +64,7 @@ export async function gameStartAIGame(option: number) {
 		result.GameHash = gameHash;
 		result.GameUsers = users;
 		result.GameTitle = title;
+		result.Artifacts = await getArtifactOwners();
 		
 		//AI記録
 		createEpisodeAIGame(gameId, gameHash, users);
@@ -225,9 +229,6 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 		
 		stopRecord(gameHash);
 		
-		//awaitはしない
-		saveEpisodeNormalGame(gameHash, resultCode);
-		
 		//DGSにイベントリレー
 		//NOTE: UserInfoは取ろうと思えばとれる
 		sendAPIEvent({
@@ -251,6 +252,9 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 			
 			let rewards:any = await getRewardsByGame(gameId, userId, resultCode, time);
 			result.Rewards = rewards;
+			
+			//awaitはしない
+			saveEpisodeNormalGame(gameHash, resultCode, rewards);
 		}
 	} catch(ex) {
 		console.log(ex);
@@ -342,6 +346,23 @@ export async function getGameHistory(gameId: number, page: number = 0) {
 	};
 }
 
-export async function updateArtifact(itemId: number, ownerUserId: number) {
+export async function getArtifactOwners() {
+	if(artifactOwners) return artifactOwners;
 	
+	artifactOwners = await query("SELECT * FROM Artifact", [0]);
+	return artifactOwners;
+}
+
+export async function updateArtifact(itemId: number, ownerUserId: number) {
+	await query("UPDATE Artifact SET OwnerId = ? WHERE Id = ?", [ownerUserId, itemId]);
+	
+	//キャッシュ更新
+	if(artifactOwners) {
+		for(let d of artifactOwners) {
+			if(d.Id != itemId) continue;
+			
+			d.OwnerId = ownerUserId;
+			break;
+		}
+	}
 }

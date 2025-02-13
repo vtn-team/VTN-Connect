@@ -1,5 +1,5 @@
 {
-  "Version": 611,
+  "Version": 615,
   "Data": [
     {
       "Id": "102",
@@ -13,7 +13,7 @@
     {
       "Id": "104",
       "Description": "ジェンガ1本抜くと材質に応じた何かが起きる",
-      "From": "5",
+      "From": "6",
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "JengaInfo",
@@ -76,7 +76,7 @@
     {
       "Id": "112",
       "Description": "ジェンガを倒すと何か起こる(ダメージ)",
-      "From": "5",
+      "From": "6",
       "Target": "1",
       "SendFlag": "GameOnly",
       "EnumCode": "BadJengaInfo",
