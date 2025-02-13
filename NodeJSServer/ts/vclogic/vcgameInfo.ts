@@ -195,7 +195,7 @@ export function createEpisodeNormalGame(gameId: number, gameHash: string, userIn
 }
 
 //
-export async function saveEpisodeNormalGame(gameHash: string, resultCode: ResultCode) {
+export async function saveEpisodeNormalGame(gameHash: string, resultCode: ResultCode, rewards: any) {
 	let userInfo = getCachedUser(gameHash);
 	if(!userInfo) return;
 	let episode = epic.getEpisodeBook(gameHash, userInfo.UserId);
@@ -228,17 +228,21 @@ export async function saveEpisodeNormalGame(gameHash: string, resultCode: Result
 	}
 	
 	messages.push({ role: "user", content: prompt });
-	console.log(messages);
 	
 	let users = [userInfo];
 	let title = await createAdvTitle(episode.getGameId(), users);
 	
 	let msg:any = await chatWithContextsText(messages);
-	console.log(msg);
 	
 	let logId = uuidv4();
+	let json = {
+		Episode: messages,
+		StoryBook: msg.content,
+		Rewards: rewards
+	};
 	await query("INSERT INTO Adventure (GameHash, UserId, Title, Result, LogId) VALUES (?, ?, ?, ?, ?)", [gameHash, userInfo.UserId, title, resultCode, logId]);
-	await uploadToS3(logId, msg.content);
+	console.log(json);
+	await uploadToS3(logId, JSON.stringify(json));
 	
 	epic.deleteEpisode(gameHash, userInfo.UserId);
 	deleteCachedUser(gameHash);
