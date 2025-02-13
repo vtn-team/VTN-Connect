@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid')
 let gameSessions:any = {};
 let gameHashDic:any = {};
 
-let artifactOwners = null;
+let artifactOwners: any = null;
 
 enum GameOption {
 	None = 0,
@@ -42,7 +42,7 @@ export async function gameStartAIGame(option: number) {
 		GameHash: "",
 		GameTitle: "",
 		GameUsers: [],
-		Artifacts: [].
+		Artifacts: []
 	};
 	
 	try {
@@ -229,9 +229,6 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 		
 		stopRecord(gameHash);
 		
-		//awaitはしない
-		saveEpisodeNormalGame(gameHash, resultCode);
-		
 		//DGSにイベントリレー
 		//NOTE: UserInfoは取ろうと思えばとれる
 		sendAPIEvent({
@@ -255,6 +252,9 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 			
 			let rewards:any = await getRewardsByGame(gameId, userId, resultCode, time);
 			result.Rewards = rewards;
+			
+			//awaitはしない
+			saveEpisodeNormalGame(gameHash, resultCode, rewards);
 		}
 	} catch(ex) {
 		console.log(ex);
@@ -346,7 +346,7 @@ export async function getGameHistory(gameId: number, page: number = 0) {
 	};
 }
 
-export async getArtifactOwners() {
+export async function getArtifactOwners() {
 	if(artifactOwners) return artifactOwners;
 	
 	artifactOwners = await query("SELECT * FROM Artifact", [0]);
