@@ -145,6 +145,8 @@ header.nav p {
 .faceicon { float: right; width: 80px; height: 100px; }
 .chatmsg { float: left; width: 200px; }
 .nameplate { top:-25px; left:-8px; }
+.log { max-height:1024px; }
+.scrollLog { max-height:812px; overflow-y: scroll; }
 
 #reader { 
   display:none;
@@ -187,37 +189,46 @@ const PAGE = {
 	USER_CREATE: 1,
 	MAIN_MENU: 2,
 	SUMMON_EFFECT: 3,
+	USER_PROFILE: 4,
+	XXX: 5,
+	YYY: 6,
+	TUTORIAL_PWA: 7,
+	TUTORIAL_HELLO: 8,
+	TUTORIAL_QR: 9,
 };
 
-const qrMagicScrollList = [
-	"810f1f50-6a2b-4a8d-8908-a37b9afe9ec2",	//魔法スクロール1
-];
-
-const qrLinkList = [
-	"a4cf1e07-cd1a-40ab-9d6f-755d344cf550",	//リンク
-];
+const TUTORIAL = {
+	NONE: 0,
+	PWA: 1,
+	HELLO: 2,
+};
 
 const movieList = [
+	"srVAI-M0i_c",
+	"5Q77hzBjtFU?",
 	"koyxhykV3bo",
 	"fjt6bEuDQU4",
 	"XFcWZaUxXVs",
 	"WVQ7l9VP1L4",
-	"MeMtJwZb7Fs",
 ];
 
 
 let userData = {};
+let saveData = null;
 let gameInfo = {};
 let elementCache = [];
 let elementStatus = [];
 let currentPageCode = -1;
 let callNo = 0;
+let eventQueue = [];
+let tutorialStep = 0;
 
 let ws = null;
 let wsSessionId = "";
 
 let qrReader = null;
 let baseURI = "https://vc.vtn-game.com";
+let resourceURI = "https://www.vtn-game.com";
 let wssURI = "wss://wss.vtn-game.com/ws/";
 
 
@@ -237,19 +248,9 @@ window.addEventListener("load", async (event) => {
 	//最終的に埋め込む
 	gameInfo = await getMaster("GameInfo");
 	
-	//PCの場合デバッグメニューだす
-	if(document.location.hostname.indexOf("www.vtn-game.com") == -1) {
-		enableUIById("debugitem");
-		setupDebugMenu();
-		
-		//localhostだけ
-		if(document.location.hostname.indexOf("localhost") != -1) {
-			wssURI = await getaddr();
-		}
-	}
-	
-	//セーブ
+	//セーブデータ取得
 	loadSaveData();
+	tutorialStep = saveData.tutorial;
 	
 	//Youtubeのリンクを生成
 	embedYoutubeLink();
@@ -273,6 +274,17 @@ window.addEventListener("load", async (event) => {
 	//ページコンテンツの分解
 	setupSPA();
 	
+	//PCの場合デバッグメニューだす
+	if(document.location.hostname.indexOf("www.vtn-game.com") == -1 && !isSmartPhone()) {
+		enableUIById("debugitem");
+		setupDebugMenu();
+		
+		//localhostだけ
+		if(document.location.hostname.indexOf("localhost") != -1) {
+			wssURI = await getaddr();
+		}
+	}
+	
 	//debug
 	if(0){
 		summonEffect();
@@ -280,21 +292,40 @@ window.addEventListener("load", async (event) => {
 		return;
 	}
 	
-	//セーブデータ取得
+	console.log(saveData);
 	
-	//クッキー取得
-	var cookie = getCookieArray();
-	console.log(cookie);
-	if(!cookie.user_hash || cookie.user_hash === "undefined") {
+	//チュートリアルメッセージ
+	if(tutorialStep == 0) {
+		if(isRunningAsPWA()) {
+			tutorialStep = 1;
+		}
+		
+		tutorialView();
+		return ;
+	}
+	
+	firstView();
+	
+	if(!isRunningAsPWA()) {
+		//TBD: 警告出す
+	}
+});
+
+async function firstView() {
+	if(!saveData.user_hash || saveData.user_hash === "undefined") {
 		//初回登録
 		loadPage(PAGE.USER_CREATE);
 	}else{
 		//ログイン
-		await loadUser(cookie.user_hash);
+		await loadUser(saveData.user_hash);
 		userSetup();
 		loadPage(PAGE.MAIN_MENU);
 	}
-});
+}
+
+function backToMain() {
+	loadPage(PAGE.MAIN_MENU);
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -352,10 +383,10 @@ async function createUser(data) {
 	
 	let result = await req.json();
 	if(result.Success) {
-		saveUserSession(result.UserData.UserHash);
+		userData = result.UserData;
+		localStorage.setItem("UserData", JSON.stringify(userData));
+		saveSessionData();
 	}
-	
-	userData = result.UserData;
 }
 
 
@@ -617,6 +648,11 @@ function setupSPA() {
 	elementCache.push(getElm("page-user-create"));
 	elementCache.push(getElm("page-main-menu"));
 	elementCache.push(getElm("page-summon-effect"));
+	elementCache.push(getElm("page-user-profile"));
+	elementCache.push({});
+	elementCache.push({});
+	elementCache.push(getElm("page-tutorial-pwa"));
+	elementCache.push(getElm("page-tutorial-hello"));
 	
 	for(let i=0; i < elementCache.length; ++i) {
 		elementStatus.push(0);
@@ -660,6 +696,79 @@ function loadPage(pageCode) {
 	currentPageCode = pageCode;
 }
 
+function showProfile(userId = 0) {
+	if(userId == 0) {
+		userId = userData.UserId;
+	}
+	openUserProfile(userId);
+}
+
+async function readHistory(title, gameHash, logId) {
+	let req = await fetch(`${resourceURI}/vc/log/${logId}`, {
+		mode: 'cors'
+	});
+	
+	
+	let result = await req.text();
+	
+	var elm = getElm("adventureLogMsg");
+	elm.innerHTML = result.replaceAll("\n", "<br />");
+	
+	var elm = getElm("adventureLogTitle");
+	elm.innerHTML = title;
+	
+	enableUIById("modal-adventure-log");
+}
+
+function closeHistory() {
+	disableUIById("modal-adventure-log");
+}
+
+function createUserAdventureHistory(history, maxCount) {
+	var elm = getElm("history");
+	let html = "";
+	
+	for(let i=0; i<history.length; ++i) {
+		html += `
+					<section class="history" style="height:120px;">
+						${history[i].Title}<br /><button type="button" class="nes-btn is-primary" onclick="readHistory('${history[i].Title}', '${history[i].GameHash}', '${history[i].LogId}')">読む</button>
+					</section>`;//
+	}
+	
+	if(history.length == 0) {
+		html += `
+					<section class="history" style="height:120px;">
+						冒険はまだない
+					</section>`;
+	}else{
+		html += `
+					<section class="history" style="height:120px;">
+						<button type="button" class="nes-btn is-primary">もっと見る</button>
+					</section>`;
+	}
+	
+	elm.innerHTML = html;
+}
+
+function createUserMessageLog(message, maxCount) {
+	
+}
+
+async function openUserProfile(userId) {
+	let req = await fetch(`${baseURI}/vc/user/${userId}?withLog=1&withMessage=1`, {
+		mode: 'cors'
+	});
+	let result = await req.json();
+	let ud = result.UserData;
+	console.log(ud);
+	
+	createUserInfoUI(ud);
+	createUserAdventureHistory(ud.History, ud.HistoryCount);
+	createUserMessageLog(ud.Message, ud.MessageCount);
+	
+	loadPage(PAGE.USER_PROFILE);
+}
+
 function summonEffect() {
 	loadPage(PAGE.SUMMON_EFFECT);
 	
@@ -684,6 +793,26 @@ console.log("no:" + no)
 		userSetup();
 		loadPage(PAGE.MAIN_MENU);
 	}
+}
+
+function tutorialView() {
+	switch(tutorialStep) {
+	case 0:
+		loadPage(PAGE.TUTORIAL_PWA);
+		tutorialStep |= 1;
+		break;
+		
+	case 1:
+		loadPage(PAGE.TUTORIAL_HELLO);
+		tutorialStep |= 2;
+		saveSessionData();
+		break;
+	}
+}
+
+function pwaSkip() {
+	tutorialStep |= 1;
+	tutorialView();
 }
 
 let youtubeIndex = 0;
@@ -875,6 +1004,34 @@ async function onScanSuccess(decodedText, decodedResult) {
 // SYSTEM 
 //////////
 
+function isRunningAsPWA() {
+	// 1. Android Chrome などが対応している `display-mode` 判定
+	if (
+		window.matchMedia &&
+		window.matchMedia('(display-mode: standalone)').matches
+	) {
+		return true;
+	}
+
+	// 2. iOS Safari (ホーム画面追加されたWebApp) が提供する `navigator.standalone`
+	if (window.navigator.standalone) {
+		return true;
+	}
+
+	return false;
+}
+
+function getOSName() {
+	const ua = navigator.userAgent.toLowerCase();
+	if(ua.indexOf('android') > -1) {
+		return "Android";
+	}
+	if(/iphone|ipad|ipod/.test(ua)) {
+		return "iOS";
+	}
+	return "PC";
+}
+
 // 連想配列に格納
 function getCookieArray() {
     var arr = {};
@@ -889,17 +1046,25 @@ function getCookieArray() {
 }
 
 //クッキーにユーザハッシュを保存
-function saveUserSession(userHash) {
+function saveUserSession() {
 	var limit = 7; //Cookieの期限
-	var now = new Date(); //現在の日付
+	var now = new Date();
 	now.setTime(now.getTime() + limit*24*60*60*1000);
-	var expireDate = now.toGMTString(); //GMT形式に変換
+	var expireDate = now.toGMTString();
 	
-	var cookievalue = "user_hash=" + userHash +";";
+	var cookievalue = "user_hash=" + userData.UserHash + "; tutorial=" + tutorialStep + "; ";
 	var expires = "expires=" + expireDate + "; ";
 	var path = "path=/";
 	
 	document.cookie = cookievalue + expires + path;
+}
+
+function isSmartPhone() {
+	if (window.matchMedia && window.matchMedia('(max-device-width: 640px)').matches) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function loadSaveData() {
@@ -910,6 +1075,23 @@ function loadSaveData() {
 		}catch(ex){
 		}
 	}
+	if(saveData) return;
+	
+	//クッキー取得
+	saveData = getCookieArray();
+	
+	if(saveData) return;
+	
+	saveData = {
+		tutorial : 0
+	};
+}
+
+function saveSessionData() {
+	saveData.user_hash = userData.UserHash;
+	saveData.tutorial = tutorialStep;
+	localStorage.setItem("SaveData", JSON.stringify(saveData));
+	saveUserSession(userData.UserHash);
 }
 
 function getElm(elmId) {
@@ -1015,19 +1197,16 @@ function updateGameStat(data) {
 	getElm("ws-state").innerHTML = "接続中"; //のユーザ:" + data.ActiveUsers.length + "人";
 }
 
-function createUserInfoUI() {
-	getElm("fullname").innerText = userData.Name;
-	getElm("level").innerText = userData.Level;
-	getElm("gender").innerText = userData.Gender;
-	getElm("age").innerText = userData.Age;
-	getElm("job").innerText = userData.Job;
-	getElm("personality").innerText = userData.Personality;
-	getElm("motivation").innerText = userData.Motivation;
-	getElm("weakness").innerText = userData.Weaknesses;
-	getElm("backstory").innerText = userData.Background;
-	
-	getElm("dbgUserId").innerText = userData.UserId;
-	getElm("dbgAvatarType").innerText = userData.AvatarType;
+function createUserInfoUI(ud = userData) {
+	getElm("fullname").innerText = ud.Name;
+	getElm("level").innerText = ud.Level;
+	getElm("gender").innerText = ud.Gender;
+	getElm("age").innerText = ud.Age;
+	getElm("job").innerText = ud.Job;
+	getElm("personality").innerText = ud.Personality;
+	getElm("motivation").innerText = ud.Motivation;
+	getElm("weakness").innerText = ud.Weaknesses;
+	getElm("backstory").innerText = ud.Background;
 }
 
 
@@ -1035,6 +1214,7 @@ function createUserInfoUI() {
 // DEBUG 
 //////////
 
+let isDebugMode = true;
 let myGameId = -1;
 let gameIngo = {};
 let gameEvent = {};
@@ -1062,6 +1242,9 @@ async function setupDebugMenu() {
 		filterAndShowDebugEvent(myGame);
 		myGameId = parseInt(myGame);
 	}
+	
+	getElm("dbgUserId").innerText = userData.UserId;
+	getElm("dbgAvatarType").innerText = userData.AvatarType;
 }
 
 async function gameShutdown() {
@@ -1086,6 +1269,11 @@ async function gameShutdown() {
 		})
 	});
 	let result = await req.json();
+}
+
+function resetTutorial() {
+	tutorialStep = 0;
+	saveSessionData();
 }
 
 function goodCheer() {
@@ -1126,6 +1314,21 @@ function reCreateUser() {
 	loadPage(PAGE.USER_CREATE);
 }
 
+async function userIdHandOver() {
+	let val = getElm("dgbUserIdHandOver").value;
+	let userId = parseInt(val);
+	
+	let req = await fetch(`${baseURI}/vc/user/${userId}`, {
+		mode: 'cors'
+	});
+	let result = await req.json();
+	userData = result.UserData;
+	localStorage.setItem("UserData", JSON.stringify(userData));
+	saveSessionData();
+	
+	firstView();
+}
+
 async function sendTestEvent(evtId) {
 	let json = {
 		SessionId: wsSessionId,
@@ -1146,64 +1349,6 @@ async function sendTestEvent(evtId) {
 	ws.send(JSON.stringify(json));
 }
 let debugData = {};
-async function reqCheck(reqKey) {
-	let host = "http://localhost:4649"; //"https://vc.vtn-game.com";
-	switch(reqKey) {
-	case "gameStart":
-	{
-		let req = await fetch(host + "/vc/gamestart", {
-			mode: 'cors'
-		});
-		let result = await req.json();
-		console.log(result);
-		debugData.gameStart = result;
-	}
-	break;
-	
-	case "gameEnd":
-	{
-		let sample = {
-			GameHash: "",
-			UserResults: [
-				{
-					UserId: 1,
-					GameResult: true,   //脱出
-					MissionClear: true, //ミッション成功
-				},
-				{
-					UserId: 35,
-					GameResult: false,  //志望
-					MissionClear: false,//ミッション失敗
-				},
-				{
-					UserId: 40,
-					GameResult: true,   //脱出
-					MissionClear: false,//ミッション失敗
-				},
-				{
-					UserId: 42,
-					GameResult: false,  //脱出
-					MissionClear: true, //ミッション成功
-				}
-			]
-		};
-		
-		let req = await fetch(host + "/vc/gamestart", {
-			mode: 'cors',
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(sample)
-		});
-		let result = await req.json();
-		console.log(result);
-		debugData.gameStart = result;
-	}
-	break;
-	}
-}
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 通知
@@ -1297,6 +1442,23 @@ function notifyMe() {
 		</div>
 	</div>
 	
+	<div id="modal-adventure-log" class="modal">
+		<div class="modal-content">
+			<div class="nes-container is-rounded with-title status log">
+				<p class="title">冒険譚</p>
+				
+				<div id="adventureLogTitle"></div>
+				<div id="adventureLogMsg" class="scrollLog"></div>
+				<div style="height:10px;"></div>
+				<div class="right">
+					<button type="button" class="nes-btn is-primary" onclick="closeHistory();">とじる</button>
+				</div>
+			</div>
+			
+			<div id="closeModal" onclick=closeHistory()>&times;</div>
+		</div>
+	</div>
+	
 	<div class="main">
 	
 		<div id="youtubeLive" class="center">
@@ -1307,6 +1469,34 @@ function notifyMe() {
 				<p class="title">ページ準備中</p>
 				
 				しばらく待ってね
+			</div>
+		</div>
+		
+		<div id="page-tutorial-pwa" style="display:none;">
+			<div class="nes-container with-title status">
+				<p class="title">こんにちは</p>
+				
+				手間だけどPWAで動かしてね<br />
+				<br /><br />
+				(仮)手順の紹介をするよ<br />
+				<br /><br />
+				<div class="right">
+					<button type="button" class="nes-btn is-primary" onclick="pwaSkip();">ＯＫ</button>
+				</div>
+			</div>
+		</div>
+		
+		<div id="page-tutorial-hello" style="display:none;">
+			<div class="nes-container with-title status">
+				<p class="title">こんにちは</p>
+				
+				バンタンコネクトへようこそ<br />
+				<br /><br />
+				(仮)どんなやつか紹介をするよ<br />
+				<br /><br />
+				<div class="right">
+					<button type="button" class="nes-btn is-primary" onclick="firstView();">ＯＫ</button>
+				</div>
 			</div>
 		</div>
 		
@@ -1343,9 +1533,9 @@ function notifyMe() {
 				<p class="title">キロク</p>
 				
 				<div class="center">
-					<button type="button" id="history" class="nes-btn is-primary" onclick="showHistory()">冒険の記録を見る</button>
+					<button type="button" class="nes-btn is-primary" onclick="showProfile()">旅の記録を見る</button>
 					<div style="height:25px;"></div>
-					<button type="button" id="friend" class="nes-btn is-primary" onclick="showHistory()">出会いの記録</button>
+					<button type="button" class="nes-btn is-primary" onclick="showHistory()">出会いの記録</button>
 					<div style="height:10px;"></div>
 				</div>
 			</div>
@@ -1368,60 +1558,11 @@ function notifyMe() {
 				
 				<div class="nes-container with-title">
 					<p class="title">名前</p>
-					<div id="fullname"></div>
+					<div id="playerName"></div>
 				</div>
-				
-				<div style="height:25px;"></div>
-				
-				<div class="nes-table-responsive">
-					<table class="nes-table is-bordered is-centered">
-					<tbody>
-						<tr>
-							<td>レベル</td>
-							<td id="level"></td>
-						</tr>
-						<tr>
-							<td>性別</td>
-							<td id="gender"></td>
-						</tr>
-						<tr>
-							<td>年齢</td>
-							<td id="age"></td>
-						</tr>
-						<tr>
-							<td>職業</td>
-							<td id="job"></td>
-						</tr>
-					</tbody>
-					</table>
-					
-					<div style="height:10px;"></div>
-					
-					<div class="nes-container with-title">
-						<p class="title">個性</p>
-						<div id="personality"></div>
-					</div>
-					
-					<div style="height:10px;"></div>
-					
-					<div class="nes-container with-title">
-						<p class="title">やる気</p>
-						<div id="motivation"></div>
-					</div>
-					
-					<div style="height:10px;"></div>
-					
-					<div class="nes-container with-title">
-						<p class="title">弱点</p>
-						<div id="weakness"></div>
-					</div>
-					
-					<div style="height:10px;"></div>
-					
-					<div class="nes-container with-title">
-						<p class="title">バックストーリー</p>
-						<div id="backstory"></div>
-					</div>
+				<div class="nes-container">
+				レベル<div id="playerLevel"></div>
+				次のレベルまで<div id="playerExp"></div>
 				</div>
 			</div>
 			
@@ -1553,6 +1694,83 @@ function notifyMe() {
 			<progress class="nes-progress is-primary" id="summongauge" value="0" max="100"></progress>
 		</div>
 		
+		<div id="page-user-profile" style="display:none;">
+			<button type="button" class="nes-btn is-primary" onclick=backToMain()>戻る</button>
+			<div style="height:25px;"></div>
+			<h1 class="nes-balloon from-left nes-pointer">冒険者プロフィール</h1>
+			<br />
+			<div id ="userprof" class="nes-container is-rounded with-title status">
+				<p class="title">冒険者ステータス</p>
+				
+				<div class="nes-container with-title">
+					<p class="title">名前</p>
+					<div id="fullname"></div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-table-responsive">
+					<table class="nes-table is-bordered is-centered">
+					<tbody>
+						<tr>
+							<td>レベル</td>
+							<td id="level"></td>
+						</tr>
+						<tr>
+							<td>性別</td>
+							<td id="gender"></td>
+						</tr>
+						<tr>
+							<td>年齢</td>
+							<td id="age"></td>
+						</tr>
+						<tr>
+							<td>職業</td>
+							<td id="job"></td>
+						</tr>
+					</tbody>
+					</table>
+					
+					<div style="height:10px;"></div>
+					
+					<div class="nes-container with-title">
+						<p class="title">個性</p>
+						<div id="personality"></div>
+					</div>
+					
+					<div style="height:10px;"></div>
+					
+					<div class="nes-container with-title">
+						<p class="title">やる気</p>
+						<div id="motivation"></div>
+					</div>
+					
+					<div style="height:10px;"></div>
+					
+					<div class="nes-container with-title">
+						<p class="title">弱点</p>
+						<div id="weakness"></div>
+					</div>
+					
+					<div style="height:10px;"></div>
+					
+					<div class="nes-container with-title">
+						<p class="title">バックストーリー</p>
+						<div id="backstory"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div style="height:50px;"></div>
+			
+			<div id ="userprof" class="nes-container is-rounded with-title status">
+				<p class="title">旅の記録</p>
+				<div style="height:10px;"></div>
+				<div id="history">
+				</div>
+			</div>
+		</div>
+		
 		<div style="height:50px;"></div>
 	</div>
 	
@@ -1594,15 +1812,22 @@ function notifyMe() {
 				GameId<input type="text" id="dbgShutdownId" class="nes-input">
 				<button type="button" class="nes-btn is-primary" onclick="gameShutdown();">ゲーム終了</button>
 				
-				<div style="height:10px;"></div>
+				<div style="height:25px;"></div>
 				<button type="button" class="nes-btn is-primary" onclick="playNextVideo();">次の動画</button>
 				
 				<div style="height:10px;"></div>
 				<button type="button" class="nes-btn is-primary" onclick="notifyMe();">通知</button>
 				
 				<div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick="reCreateUser();">ユーザ登録やり直す</button>
+				<button type="button" class="nes-btn is-primary" onclick="reCreateUser();">ユーザ登録やり直す</button><br />
 				NOTE: 作り直すまでデータは消えない<br />
+				
+				<div style="height:10px;"></div>
+				GameId<input type="text" id="dgbUserIdHandOver" class="nes-input">
+				<button type="button" class="nes-btn is-primary" onclick="userIdHandOver();">ユーザID引継ぎ</button>
+				
+				<div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick="resetTutorial();">チュートリアルリセット</button>
 				
 				<div style="height:20px;"></div>
 			</div>
@@ -1738,6 +1963,8 @@ function notifyMe() {
 	<div>
 	
 	<div class="footer">
+	<button type="button" class="nes-btn is-primary">権利表記</button>
+	<div style="height:10px;"></div>
 	</div>
 </section>
 </body>
