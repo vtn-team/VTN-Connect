@@ -437,6 +437,9 @@ function userSetup() {
 	createUserInfoUI();
 	enableUIById("userinfo");
 	
+	getElm("dbgUserId").innerText = userData.UserId;
+	getElm("dbgAvatarType").innerText = userData.AvatarType;
+	
 	connectDGS();
 }
 
@@ -1242,9 +1245,6 @@ async function setupDebugMenu() {
 		filterAndShowDebugEvent(myGame);
 		myGameId = parseInt(myGame);
 	}
-	
-	getElm("dbgUserId").innerText = userData.UserId;
-	getElm("dbgAvatarType").innerText = userData.AvatarType;
 }
 
 async function gameShutdown() {
