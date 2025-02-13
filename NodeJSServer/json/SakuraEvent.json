@@ -1,0 +1,95 @@
+{
+  "Version": 237,
+  "Data": [
+    {
+      "Id": "1",
+      "Description": "ゲーム開始時、適当な応援文がくる",
+      "GameId": "1",
+      "Trigger": "GameStart",
+      "ParamA": "0",
+      "ParamB": "200",
+      "SendFlag": "Must, PS22Users",
+      "SakuraKey": "Message_Cheer"
+    },
+    {
+      "Id": "2",
+      "Description": "適当な応援文がくる",
+      "GameId": "1",
+      "Trigger": "GameStart",
+      "ParamA": "100",
+      "ParamB": "300",
+      "SendFlag": "Random, PS23Users, PS22Users",
+      "SakuraKey": "Message_Cheer"
+    },
+    {
+      "Id": "3",
+      "Description": "適当な応援文がくる",
+      "GameId": "1",
+      "Trigger": "GameStart",
+      "ParamA": "250",
+      "ParamB": "1000",
+      "SendFlag": "Random, PS23Users, PS22Users",
+      "SakuraKey": "Message_Cheer"
+    },
+    {
+      "Id": "4",
+      "Description": "応援記録がなかったら、時間経過で適当な応援文",
+      "GameId": "1",
+      "Trigger": "GameStart",
+      "ParamA": "5000",
+      "ParamB": "5000",
+      "SendFlag": "NoMessage",
+      "SakuraKey": "Message_Cheer"
+    },
+    {
+      "Id": "5",
+      "Description": "敵を倒したときに応援文",
+      "GameId": "1",
+      "Trigger": "EventHook",
+      "ParamA": "204",
+      "ParamB": "0",
+      "SendFlag": "Random, PS22Users, PS23Users",
+      "SakuraKey": "Message_Great"
+    },
+    {
+      "Id": "6",
+      "Description": "冒険者を倒したときに罵倒文",
+      "GameId": "1",
+      "Trigger": "EventHook",
+      "ParamA": "201",
+      "ParamB": "0",
+      "SendFlag": "BuzzMessage, PS23Users, PS22Users",
+      "SakuraKey": "Message_Booing"
+    },
+    {
+      "Id": "60",
+      "Description": "死んだときに応援文",
+      "GameId": "3",
+      "Trigger": "EventHook",
+      "ParamA": "216",
+      "ParamB": "0",
+      "SendFlag": "",
+      "SakuraKey": "Message_Cheer"
+    },
+    {
+      "Id": "61",
+      "Description": "ボス倒したときに賛美のメッセージ",
+      "GameId": "3",
+      "Trigger": "EventHook",
+      "ParamA": "215",
+      "ParamB": "0",
+      "SendFlag": "",
+      "SakuraKey": "Message_Great"
+    },
+    {
+      "Id": "100",
+      "Description": "こんにちはのさくら",
+      "GameId": "99",
+      "Trigger": "Register",
+      "ParamA": "0",
+      "ParamB": "0",
+      "SendFlag": "Must, PS22Users, PS23Users",
+      "SakuraKey": "Message_Welcome"
+    }
+  ]
+}

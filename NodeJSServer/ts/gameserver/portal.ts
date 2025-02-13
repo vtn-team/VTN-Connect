@@ -4,13 +4,22 @@ import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
 import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { UserSession, VCUserSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
+import { SakuraConnect } from "./sakuracon"
 
-
+ 
 export interface VCActiveUser
 {
 	UserId: number;
 	DisplayName: string;
 	ActiveTime: number;
+}
+
+export interface UserPortalInterface {
+	joinRoom(userId: number, us: UserSession, data: any) : any; //逃げ
+	execMessage(data: any) : void;
+	removeSession(sessionId: string) : void;
+	getActiveUsers() : any;
+	sendAPIEvent(data: any) : void;
 }
 
 class UserContainer {
@@ -45,11 +54,15 @@ export class UserPortal {
 	users: any;
 	sessionDic: any;
 	broadcast: any;
+	sakura: SakuraConnect;
 
 	constructor(bc: any) {
 		this.users = {};
 		this.sessionDic = {};
 		this.broadcast = bc;
+		this.sakura = new SakuraConnect((message: any) => {
+			this.cheerMessage(message)
+		});
 	}
 	
 	parsePayload(payload: any) {
@@ -96,15 +109,12 @@ export class UserPortal {
 	}
 
 	public setupDummyUser() {
-		//TBD
-	}
-
-	public setupSakuraConnect() {
-		//TBD
+		
 	}
 
 	public execMessage(data: any) {
 		let usePortal = false;
+		if(!data["Command"]) return;
 		let payload = this.parsePayload(data["Payload"]);
 		let userId = this.sessionDic[data.SessionId];
 		
@@ -112,8 +122,21 @@ export class UserPortal {
 		{
 		case CMD.SEND_EVENT:
 		{
-			usePortal = this.execCommand(data);
-			this.broadcast(createMessage(data.UserId, CMD.EVENT, TARGET.ALL, data));
+			//イベントフック用
+			this.sakura.eventHook(data.EventId, data)
+		}
+		break;
+		
+		case CMD.SEND_CHEER:
+		{
+			this.cheerMessage(data);
+		}
+		break;
+		
+		case CMD.ERROR:
+		{
+			console.log(data)
+			this.broadcast(createMessage(data.UserId, CMD.ERROR, TARGET.SELF, data));
 		}
 		break;
 		}
@@ -123,7 +146,7 @@ export class UserPortal {
 	async joinRoom(userId: number, us: UserSession, data: any) {
 		if(userId === 0) {
 			console.log(`GAME ID:0 reject.`);
-			return ;
+			return null;
 		}
 		
 		let userInfo = await getUserFromId(userId);
@@ -137,6 +160,7 @@ export class UserPortal {
 		}else{
 			console.log(`USER ID:${userId} not found.`);
 		}
+		return null;
 	}
 	
 	public removeSession(sessionId: string) {
@@ -169,11 +193,11 @@ export class UserPortal {
 		return false;
 	}
 	
-	async messageRelay(data: any) {
+	async cheerMessage(data: any) {
 		try {
-			let json = JSON.parse(data.Data);
-			let to = json.ToUserId;
-			let from = json.FromUserId;
+			let to = data.ToUserId;
+			let from = data.FromUserId;
+			let msg = data.Data;
 			if(!to) {
 				to = -1;
 			}
@@ -184,19 +208,55 @@ export class UserPortal {
 			let message = {
 				ToUserId: to,
 				FromUserId: from,
-				Name: json.Name,
-				Message: json.Message
+				AvatarType: msg.Avatar,
+				Name: msg.Name,
+				Message: msg.Message
 			}
 			
-			let result = await checkMessageAndWrite(message);
+			//Webページにリレーする
+			let result:any = {};
+			if(msg.Emotion) {
+				result = {
+					Message: msg.Message,
+					Emotion: msg.Emotion
+				}
+			} else {
+				result = await checkMessageAndWrite(message);
+			}
 			data.Data = result.result;
-			this.broadcast(createMessage(from, CMD.EVENT, TARGET.ALL, data));
+			this.broadcast(createMessage(to, CMD.CHEER, TARGET.SELF, data));
+			
+			//応援イベントをゲームに飛ばす
+			let evtPacket = {
+				AvatarType: msg.Avatar,
+				Name: msg.Name,
+				Message: result.Message,
+				Emotion: result.Emotion
+			}
+			let evtData = {
+				EventId: 1001,
+				FromId: from,
+				Payload: this.createdPayload(evtPacket)
+			};
+			this.broadcast(createGameMessage(from, parseInt(data.GameId), CMD.EVENT, TARGET.SELF, evtData));
 		}catch(ex){
 			console.log(ex);
 		}
 	}
 	
+	async execQREvent(data: any) {
+		
+	}
+	
 	public sendAPIEvent(data: any) {
-		//TBD
+		this.sakura.apiHook(data);
+		
+		switch(data.API) {
+		case "createUser":
+		case "gameStartAIGame":
+		case "gameStartVC":
+		case "gameEndAIGame":
+		case "gameEndVC":
+		}
 	}
 };

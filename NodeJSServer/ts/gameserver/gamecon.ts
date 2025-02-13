@@ -1,6 +1,7 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
+import { getGameSessions } from "./../vclogic/vcgame"
 import { stockEpisode } from "./../vclogic/vcgameInfo"
 import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
@@ -9,6 +10,20 @@ import { EventRecorder, EventPlayer } from "./eventrec"
 export enum SP_EVENT {
 	AI_CHAT = 10000,
 };
+
+export interface GameConnectInterface {
+
+	setupGameConnect() : void;
+
+	joinGame(gameId: number, us: UserSession, data: any) : VCGameSession | null;
+	execMessage(data: any) : void;
+	removeSession(sessionId: string) : void;
+	getActiveGames() : any;
+	
+	startRecord(gameId:number, gameHash: string) : void;
+	stopRecord(gameHash: string) : void;
+	sendAPIEvent(data: any) : void;
+}
 
 class GameContainer {
 	protected gameId: number;
@@ -35,11 +50,17 @@ class GameContainer {
 	}
 	
 	public getStat() {
-		if(!this.session) return null;
+		if(!this.session) {
+			return {
+				GameId: this.gameId,
+				Title: this.gameInfo.GameTitle,
+				ActiveTime: 0
+			};
+		}
 		
 		return {
 			GameId: this.gameId,
-			Name: this.gameInfo.ProjectCode,
+			Title: this.gameInfo.GameTitle,
 			ActiveTime: this.session.getActiveTime()
 		};
 	}
@@ -58,17 +79,20 @@ class GameContainer {
 	
 	public startRecord(gameHash: string) {
 		this.recorder = new EventRecorder(this.gameId, gameHash);
+		console.log("start record");
 	}
 	
 	public recordMessage(gameId: number, data: any) {
 		if(!this.recorder) return;
 
+		console.log("record event");
 		delete data["SessionId"];
 		this.recorder.recordMessage(gameId, data);
 	}
 
 	public stopRecord(gameHash: string) {
 		this.recorder?.save(gameHash);
+		console.log("save record");
 	}
 
 	public term() {
@@ -147,8 +171,9 @@ export class GameConnect {
 			console.log("NO DATA:" + data.EventId);
 			return;
 		}
+		//console.log(event)
 
-		let msg = createGameMessage(data.SessionId, gameId, CMD.EVENT, TARGET.SELF, data);
+		let msg = createGameMessage(data.UserId, gameId, CMD.EVENT, TARGET.SELF, data);
 		for (var gId in this.games) {
 			if (!this.games[gId].isActiveSession()) continue;
 
@@ -179,6 +204,8 @@ export class GameConnect {
 
 	public execMessage(data: any) {
 		let usePortal = false;
+		if(!data["Command"]) return;
+		
 		let payload = this.parsePayload(data["Payload"]);
 		let gameId = this.sessionDic[data.SessionId];
 		
@@ -194,19 +221,17 @@ export class GameConnect {
 				let result = chatWithSession(data.ThreadId, data.Prompt);
 				return;
 			}
+			}
 			
-			case 100:
-			{
-				this.messageRelay(data);
-				return;
+			if(this.games[gameId]) {
+				this.games[gameId].recordMessage(gameId, data);
+				usePortal = this.execCommand(data);
+				this.castEvent(gameId, data);
+			}else{
+				console.log("not found game:" + gameId);
+				usePortal = this.execCommand(data);
+				this.castEvent(data.GameId, data);
 			}
-			break;
-			}
-
-			this.games[gameId].recordMessage(gameId, data);
-
-			usePortal = this.execCommand(data);
-			this.castEvent(gameId, data);
 		}
 		break;
 		
@@ -217,6 +242,13 @@ export class GameConnect {
 			stockEpisode(data["GameHash"], data["UserId"], data);
 		}
 		break;
+		/*
+		case CMD.SEND_CHEER:
+		{
+			this.cheerMessage(data);
+		}
+		break;
+		*/
 		}
 		
 		return usePortal;
@@ -229,7 +261,7 @@ export class GameConnect {
 		
 		if(gameId === 0) {
 			console.log(`GAME ID:0 reject.`);
-			return ;
+			return null;
 		}
 		
 		let find = false;
@@ -247,6 +279,7 @@ export class GameConnect {
 		}else{
 			console.log(`GAME ID:${gameId} not found.`);
 		}
+		return null;
 	}
 	
 	public removeSession(sessionId: string) {
@@ -266,12 +299,14 @@ export class GameConnect {
 	
 	public getActiveGames() {
 		let games:any = [];
-		
+		let sessions:any = getGameSessions();
 		for(var gId in this.games) {
 			let stat = this.games[gId].getStat();
-			if(stat){
-				games.push(stat);
+			if(sessions[gId]) {
+				stat.Session = sessions[gId];
+				//プレイ中のゲームの情報を送信する
 			}
+			games.push(stat);
 		}
 		
 		return games;
@@ -280,33 +315,6 @@ export class GameConnect {
 	//処理
 	execCommand(data: any) {
 		return false;
-	}
-	
-	async messageRelay(data: any) {
-		try {
-			let json = JSON.parse(data.Data);
-			let to = json.ToUserId;
-			let from = json.FromUserId;
-			if(!to) {
-				to = -1;
-			}
-			if(!from) {
-				from = -1;
-			}
-			
-			let message = {
-				ToUserId: to,
-				FromUserId: from,
-				Name: json.Name,
-				Message: json.Message
-			}
-			
-			let result = await checkMessageAndWrite(message);
-			data.Data = result.result;
-			this.broadcast(createMessage(from, CMD.EVENT, TARGET.ALL, data));
-		}catch(ex){
-			console.log(ex);
-		}
 	}
 	
 	public startRecord(gameId:number, gameHash: string) {

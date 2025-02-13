@@ -1,26 +1,26 @@
 import { chatWithSession } from "./../lib/chatgpt"
-import { getAIRule } from "./../lib/masterDataCache"
+import { getMaster, getLevel, getGameInfo, getAIRule } from "./../lib/masterDataCache"
+import { sendAPIEvent } from "../gameserver/server"
 import { query } from "./../lib/database"
+import { ResultCode } from "./vcgameInfo"
 const { v4: uuidv4 } = require('uuid')
 
 let userSession:any = {};
 let uniqueUsers:any = [];
+let userCountCache = 0;
 
-/*
-export class UserStatus {
-	public Name:string;
-	public PromptA :string;
-	public PromptB:string;
-	public PromptC:string;
-	public PromptD:string;
+interface UserStatus {
+	Name:string;
+	Questions :Array<string>;
 }
-*/
 
 //ユニークユーザをあっためておく
 export async function preloadUniqueUsers() {
 	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?",[999]);
 	uniqueUsers = result;
 	//console.log(uniqueUsers);
+	let cc:any = await query("SELECT count(Id) as Count FROM User", [0]);
+	userCountCache = Number(cc[0].Count);
 }
 
 //ユニークユーザを特定数分取得
@@ -65,8 +65,45 @@ export function getAllUniqueUsers() {
 	return uniqueUsers;
 }
 
-async function createUserFromChatGPT(sessionId:string|null) {
+async function createUserFromChatGPT(sessionId:string|null, userInput: UserStatus) {
 	let prompt = getAIRule("CreateUser").RuleText;
+	
+	const questions = [
+	[
+		"貴族の屋敷",
+		"馬小屋",
+		"一般家庭",
+		"山中(野生児化)",
+	],
+	[
+		"お宝見つけて一攫千金を狙う",
+		"最強のプレイヤーになる",
+		"安全に細々と暮らす",
+		"ワンワン！！ ワオーン！！",
+	],
+	[
+		"無謀である",
+		"承認欲求が強い",
+		"飽きっぽい",
+		"ワンワン！！ ワオーン！！",
+	],
+	[
+		"安全に頑張りましょう",
+		"命懸けの冒険をしよう",
+		"友達たくさん作ってね",
+		"ワンワン！！ ワオーン！！",
+	]];
+	prompt = prompt.replace("<UserName>", userInput.Name);
+	for(let i=0; i<4; ++i) {
+		let q = parseInt(userInput.Questions[i])-1;
+		if(q < 0 || q >= 4) {
+			prompt = prompt.replace(`<Q${(i+1)}>`, "無回答");
+			continue;
+		}
+		console.log(q);
+		prompt = prompt.replace(`<Q${(i+1)}>`, questions[i][q]);
+	}
+	
 	prompt += `
 # 出力例(JSON)\n
 {
@@ -102,7 +139,7 @@ async function checkCreateUserFromChatGPT(sessionId:string) {
 
 
 //ユーザを作成する
-export async function createUserWithAI() { //status: UserStatus
+export async function createUserWithAI(userInput: UserStatus) {
 	let userHash = uuidv4();
 	let success = false;
 	let result: any = {};
@@ -111,7 +148,7 @@ export async function createUserWithAI() { //status: UserStatus
 		let json:any = {};
 		let session:string|null = null;
 		for(let i=0; i<5; ++i) {
-			let data:any = await createUserFromChatGPT(session);
+			let data:any = await createUserFromChatGPT(session, userInput);
 			json = JSON.parse(data.content);
 			session = data.sessionId;
 			if(session == null) throw new Error("session無効");
@@ -136,6 +173,10 @@ export async function createUserWithAI() { //status: UserStatus
 		let status: Array<any> = [userId, json.DisplayName, json.AvatarType, json.Gender, json.Age, json.Job, json.Personality, json.Motivation,json.Weaknesses, json.Background];
 		query("INSERT INTO UserGameStatus (UserId, DisplayName, AvatarType, Gender, Age, Job, Personality, Motivation, Weaknesses, Background) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", status);
 		
+		userCountCache++;
+		
+		result.Name = json.FullName;
+		delete json["FullName"];
 		result.UserId = userId;
 		result.UserHash = userHash;
 		result.Type = 1;	//NOTE: ハードコード
@@ -144,6 +185,12 @@ export async function createUserWithAI() { //status: UserStatus
 		for(var k in json) {
 			result[k] = json[k];
 		}
+		
+		//DGSにイベントリレー
+		sendAPIEvent({
+			API: "createUser",
+			UserData: result
+		});
 		
 		success = true;
 	} catch(ex) {
@@ -156,6 +203,16 @@ export async function createUserWithAI() { //status: UserStatus
 	}
 }
 
+export async function getUsers(page: number = 0) {
+	let limit = 25;
+	let result = await query("SELECT * FROM User LIMIT 0,?", [limit]);
+	
+	return {
+		History: result,
+		Count: userCountCache
+	};
+}
+
 export async function getUserFromId(id: number) {
 	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id = ?", [id]);
 	if(result.length == 0) return null;
@@ -166,4 +223,98 @@ export async function getUserFromHash(hash: string) {
 	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE UserHash = ?", [hash]);
 	if(result.length == 0) return null;
 	return result[0];
+}
+
+export async function getUserHistory(userId: number, page: number = 0) {
+	let result = await query("SELECT * FROM Adventure WHERE UserId = ? ORDER BY CreatedAt DESC LIMIT 0, 10", [userId]);
+	let count = await query("SELECT count(GameHash) as Count FROM Adventure WHERE UserId = ?", [userId]);
+	
+	return {
+		History: result,
+		Count: Number(count[0].Count)
+	};
+}
+
+export async function getUserMessages(userId: number, page: number = 0) {
+	let result = await query("SELECT * FROM Message WHERE ToUserId = ? ORDER BY CreatedAt DESC LIMIT 0, 10", [userId]);
+	let count = await query("SELECT count(Id) as Count FROM Message WHERE ToUserId = ?", [userId]);
+	
+	return {
+		Messages: result,
+		Count: Number(count[0].Count)
+	};
+}
+
+export async function getUserFriends(userId: number, page: number = 0) {
+	let result = await query("SELECT * FROM Friend WHERE UserId = ? ORDER BY CreatedAt DESC LIMIT 0, 10", [userId]);
+	let count = await query("SELECT count(UserId) as Count FROM Message WHERE UserId = ?", [userId]);
+	
+	return {
+		Friends: result,
+		Count: Number(count[0].Count)
+	};
+}
+
+export async function questRewards(userId: number) {
+	let ret = {
+		Exp: 0,
+		Coin: 0,
+	};
+	
+	let level = getMaster("Level");
+	if(!level) return ret;
+	
+	let userInfo = await getUserFromId(userId);
+	if(!userInfo) return ret;
+	
+	
+}
+
+export async function getRewardsByGame(gameId: number, userId: number, resultCode: ResultCode, time: number) {
+	let ret = {
+		Exp: 0,
+		Coin: 0,
+	};
+	
+	let level = getMaster("Level");
+	if(!level) return ret;
+	
+	let master = getGameInfo(gameId);
+	if(!master) return ret;
+	
+	let userInfo = await getUserFromId(userId);
+	if(!userInfo) return ret;
+	
+	switch(resultCode) {
+	default:
+	case ResultCode.INVALID:
+	case ResultCode.IN_PROGRESS:
+		break;
+		
+	case ResultCode.SUCCESS:
+		{
+			ret.Exp = master.ClearBonusExp;
+			ret.Coin = master.ClearBonusCoin;
+		}
+		break;
+		
+	case ResultCode.FAILED:
+	case ResultCode.HANDOVER:
+		{
+			let rate = 1.0;
+			if(time < master.PlayTime) {
+				rate = time / master.PlayTime;
+			}
+			
+			ret.Exp = master.GameOverBonusExp;
+			ret.Coin = master.GameOverBonusCoin;
+		}
+		break;
+	}
+	
+	//ユーザ情報更新
+	let exp = userInfo.Exp + ret.Exp;
+	for(let lv = userInfo.Level; lv < 50; ++lv) {
+		
+	}
 }

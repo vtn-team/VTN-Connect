@@ -1,0 +1,1 @@
+RENAME TABLE `vtn-connect`.`Event` TO `vtn-connect`.`Friend`;

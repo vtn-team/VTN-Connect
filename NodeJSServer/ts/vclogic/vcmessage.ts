@@ -5,6 +5,7 @@ import { query } from "./../lib/database"
 export interface MessagePacket {
 	ToUserId: number;
 	FromUserId: number;
+	AvatarType: number,
 	Name: string;
 	Message: string;
 }
@@ -30,15 +31,16 @@ async function checkMessageByChatGPT(message: MessagePacket) {
 
 //メッセージを検閲し、感情値を分析、格納する
 export async function checkMessageAndWrite(message: MessagePacket) {
-	let success = false;
-	let result: any = {};
+	let result: any = {
+		Success: false
+	};
 	
 	try {
 		let data:any = await checkMessageByChatGPT(message);
 		let json = JSON.parse(data.content);
 		
 		//DBに保存
-		let ins = await query("INSERT INTO Message (ToUserId, FromUserId, Message, Emotion) VALUES (?, ?, ?, ?)", [message.ToUserId, message.FromUserId, json.Message, json.Emotion]);
+		let ins = await query("INSERT INTO Message (ToUserId, FromUserId, AvatarType, Message, Emotion) VALUES (?, ?, ?, ?, ?)", [message.ToUserId, message.FromUserId, message.AvatarType, json.Message, json.Emotion]);
 		
 		result.ToUserId = message.ToUserId;
 		result.FromUserId = message.FromUserId;
@@ -46,13 +48,11 @@ export async function checkMessageAndWrite(message: MessagePacket) {
 		result.Message = json.Message;
 		result.Emotion = json.Emotion;
 		
-		success = true;
+		result.Success = true;
 	} catch(ex) {
 		console.log(ex);
 	}
 	
-	return {
-		success: success,
-		result: result
-	}
+	return result;
 }
+

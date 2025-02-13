@@ -54,11 +54,11 @@ namespace VTNConnect
 
         async public void Setup()
         {
-            _gameId = ProjectSettings.GameID;
+            _gameId = VantanConnect.GameID;
             string address = await _getAddress.Request();
             _isReconnect = false;
             if (address == "") return;
-            Connect(address);
+            await _client.Connect(address, Message);
         }
 
         public void Setup(EventDataCallback callback)
@@ -102,12 +102,6 @@ namespace VTNConnect
 #endif
         }
 
-
-        void Connect(string address)
-        {
-            _client.Connect(address, Message);
-        }
-
         public void Send(EventData data)
         {
             WSPS_SendEvent pack = new WSPS_SendEvent(_sessionId, data);
@@ -145,6 +139,8 @@ namespace VTNConnect
                             var welcome = JsonUtility.FromJson<WSPR_Welcome>(data.Data);
                             var join = new WSPS_Join();
                             join.SessionId = welcome.SessionId;
+                            join.BuildHash = BuildState.BuildHash;
+                            join.Version = BuildState.Version;
                             join.GameId = _gameId;
                             _client.Send(JsonUtility.ToJson(join));
                             _sessionId = welcome.SessionId;

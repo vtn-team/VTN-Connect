@@ -1,12 +1,21 @@
 import { getMaster, getGameInfo, getGameEvent, getAIRule } from "../lib/masterDataCache"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
-import { chatWithContextsText } from "./../lib/chatgpt"
+import { chat, chatWithContextsText } from "./../lib/chatgpt"
+//import { chat } from "./../lib/gemini"
 import { query } from "./../lib/database"
 import { uploadToS3 } from "./../lib/s3"
 const { v4: uuidv4 } = require('uuid')
 
 interface Episode {
 	getEpisodePrompt(userInfo: any) : any;
+}
+
+export enum ResultCode {
+	INVALID = 0,
+	IN_PROGRESS = 1,
+	SUCCESS = 2,
+	FAILED = 3,
+	HANDOVER = 4,
 }
 
 //ゲーム情報構造体
@@ -186,7 +195,7 @@ export function createEpisodeNormalGame(gameId: number, gameHash: string, userIn
 }
 
 //
-export async function saveEpisodeNormalGame(gameHash: string, gameResult: boolean) {
+export async function saveEpisodeNormalGame(gameHash: string, resultCode: ResultCode) {
 	let userInfo = getCachedUser(gameHash);
 	if(!userInfo) return;
 	let episode = epic.getEpisodeBook(gameHash, userInfo.UserId);
@@ -200,17 +209,35 @@ export async function saveEpisodeNormalGame(gameHash: string, gameResult: boolea
 	let rule = getAIRule("CreateEpic_" + master.ProjectCode);
 	if(!rule) rule = getAIRule("CreateEpic");
 	let prompt = rule.RuleText;
-	if(gameResult) {
+	switch(resultCode) {
+	case ResultCode.INVALID:
+	case ResultCode.IN_PROGRESS:
+		break;
+		
+	case ResultCode.SUCCESS:
 		prompt += "\n\n# 冒険の結末\n- 成功";
-	}else{
-		prompt += "\n\n# 冒険の結末\n- 失敗";
+		break;
+		
+	case ResultCode.FAILED:
+	prompt += "\n\n# 冒険の結末\n- 失敗";
+		break;
+		
+	case ResultCode.HANDOVER:
+		prompt += "\n\n# 冒険の結末\n- 別の人に託した";
+		break;
 	}
+	
 	messages.push({ role: "user", content: prompt });
+	console.log(messages);
+	
+	let users = [userInfo];
+	let title = await createAdvTitle(episode.getGameId(), users);
 	
 	let msg:any = await chatWithContextsText(messages);
+	console.log(msg);
 	
 	let logId = uuidv4();
-	await query("INSERT INTO Adventure (GameHash, UserId, Result, LogId) VALUES (?, ?, ?, ?)", [gameHash, userInfo.UserId, gameResult ? 1 : 0, logId]);
+	await query("INSERT INTO Adventure (GameHash, UserId, Title, Result, LogId) VALUES (?, ?, ?, ?, ?)", [gameHash, userInfo.UserId, title, resultCode, logId]);
 	await uploadToS3(logId, msg.content);
 	
 	epic.deleteEpisode(gameHash, userInfo.UserId);
@@ -232,7 +259,7 @@ export function createEpisodeAIGame(gameId: number, gameHash: string, users: any
 }
 
 //物語生成(AIゲーム)
-export async function saveEpisodeAIGame(gameHash: string, gameResult: any) {
+export async function saveEpisodeAIGame(gameHash: string, title: string, gameResult: any) {
 	//ユーザのリストが入っている
 	let users = getCachedUser(gameHash);
 	
@@ -269,13 +296,13 @@ export async function saveEpisodeAIGame(gameHash: string, gameResult: any) {
 		
 		let messages = episode.getEpisodePrompt();
 		messages.push({ role: "user", content: prompt });
-		console.log(messages);
+		//console.log(messages);
 		
 		let msg:any = await chatWithContextsText(messages);
-		console.log(msg);
+		//console.log(msg);
 		
 		let logId = uuidv4();
-		await query("INSERT INTO Adventure (GameHash, UserId, Result, LogId) VALUES (?, ?, ?, ?)", [gameHash, result.UserId, resNumber, logId]);
+		await query("INSERT INTO Adventure (GameHash, UserId, Title, Result, LogId) VALUES (?, ?, ?, ?, ?)", [gameHash, result.UserId, title, resNumber, logId]);
 		await uploadToS3(logId, msg.content);
 		
 		epic.deleteEpisode(gameHash, result.UserId);
@@ -286,6 +313,39 @@ export async function saveEpisodeAIGame(gameHash: string, gameResult: any) {
 	deleteCachedUser(gameHash);
 	
 	console.log("complete message");
+}
+
+export async function createAdvTitle(gameId:number, users:any) {
+	let gameInfo:any = getGameInfo(gameId)
+	let rule:any = getAIRule("AdventureTitle_" + gameInfo.ProjectCode);
+	if(!rule) {
+		rule = getAIRule("AdventureTitle");
+	}
+	
+	let prompt = rule.RuleText;
+	prompt += `
+# ゲームタイトル
+${gameInfo.GameTitle}
+
+# 難易度(10がふつう)
+${gameInfo.Difficulty}
+
+# 参加する冒険者
+	`;
+	
+	if(users.length > 0) {
+		for(let u of users) {
+			prompt += `- ${u.Name} (${u.Job}) が参加。\nバックストーリー: {$u.Background}`;
+		}
+	}else{
+		prompt += "冒険者はいない";
+	}
+	
+	prompt += "#返送値(JSON)\n{ Title: [考えたタイトル] }";
+	
+	let json:any = await chat(prompt);
+	json = JSON.parse(json.content);
+	return json.Title;
 }
 
 //物語を記録

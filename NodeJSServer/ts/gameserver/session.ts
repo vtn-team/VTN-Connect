@@ -11,10 +11,14 @@ export enum CMD {
 	JOIN = 2,
 	EVENT = 3,
 	GAMESTAT = 4,
+	CHEER = 5,
 	SEND_JOIN = 100,
 	SEND_EVENT = 101,
 	SEND_EPISODE = 102,
+	SEND_CHEER = 103,
+	SEND_QR = 104,
 	SEND_USER_JOIN = 110,
+	ERROR = 500,
 };
 
 export enum SESSION_TYPE {
@@ -112,11 +116,11 @@ export class VCUserSession extends UserSession {
 	
 	public chkTarget(data: any) {
 		let tgt: TARGET = data.Target;
-		let senderId: string = data.UserId;
+		let senderId: number = data.UserId;
 		switch(tgt) {
 		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.sessionId == senderId);
-		case TARGET.OTHER: return (this.sessionId != senderId);
+		case TARGET.SELF: return (this.userId == senderId);
+		case TARGET.OTHER: return (this.userId != senderId);
 		}
 	}
 };
@@ -137,17 +141,19 @@ export class VCGameSession extends UserSession {
 	}
 	
 	public chkTarget(data: any) {
+		if(data.GameId === undefined) return false;
+		
 		let tgt: TARGET = data.Target;
-		let senderId: string = data.UserId;
+		let senderId: number = data.GameId;
 		switch(tgt) {
 		case TARGET.ALL:return true;
-		case TARGET.SELF: return (this.sessionId == senderId);
-		case TARGET.OTHER: return (this.sessionId != senderId);
+		case TARGET.SELF: return (this.gameId == senderId);
+		case TARGET.OTHER: return (this.gameId != senderId);
 		}
 	}
 };
 
-export function createMessage(senderId: string, command: CMD, target:TARGET, data: any) {
+export function createMessage(senderId: number, command: CMD, target:TARGET, data: any) {
 	//let msg = msgpack.pack(data);
 	delete data["Command"]
 	let msg = JSON.stringify(data);
@@ -160,7 +166,7 @@ export function createMessage(senderId: string, command: CMD, target:TARGET, dat
 	return ret;
 }
 
-export function createGameMessage(senderId: string, senderGameId: number, command: CMD, target:TARGET, data: any) {
+export function createGameMessage(senderId: number, senderGameId: number, command: CMD, target:TARGET, data: any) {
 	//let msg = msgpack.pack(data);
 	delete data["Command"]
 	let msg = JSON.stringify(data);
@@ -172,4 +178,47 @@ export function createGameMessage(senderId: string, senderGameId: number, comman
 		"Data" :msg
 	};
 	return ret;
+}
+
+export function parsePayload(payload: any) {
+	let data:any = {};
+	let types:any = {};
+	if(payload) {
+		for(var d of payload) {
+			types[d.Key] = d.TypeName;
+			
+			switch(d.TypeName)
+			{
+			case "Integer":
+				data[d.Key] = Number(d.Data);
+				break;
+				
+			case "String":
+				data[d.Key] = d.Data;
+				break;
+				
+			default:
+				data[d.Key] = d.Data;
+				break;
+			}
+		}
+	}
+	return {
+		data: data,
+		types: types
+	};
+}
+
+export function createdPayload(data: any) {
+	let payload:any = [];
+	if(data) {
+		for(var k in data) {
+			payload.push({
+				Key: k,
+				TypeName: typeof data[k],
+				Data: data[k]
+			});
+		}
+	}
+	return payload;
 }

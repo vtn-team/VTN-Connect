@@ -3,22 +3,14 @@ const { v4: uuidv4 } = require('uuid')
 
 //集積した情報
 let currentInfo:any = {};
+let isUnderMaintenance = false;
 
-
-//ゲーム情報の更新
-export async function updateMainGameInfo(gameInfo: any) {
-	try {
-		currentInfo.gameInfo = gameInfo;
-		
-		//DBに保存
-		//let ins = await query("INSERT INTO User (UserHash, Type, Name) VALUES (?, 1, ?)", [userHash, json.FullName]);
-	}catch(ex){
-		console.log(ex);
-	}
+//メンテナンス情報の更新
+export function updateMaintenance(isMaintenance: boolean) {
+	isUnderMaintenance = isMaintenance;
 }
 
-
-//情報の更新
-export async function getInfo() {
-	return currentInfo;
+//メンテナンス情報の更新
+export function getMaintenance() {
+	return isUnderMaintenance;
 }

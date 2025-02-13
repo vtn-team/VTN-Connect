@@ -1,4 +1,4 @@
-import { loadMaster } from "./../lib/masterDataCache"
+import { loadMaster, getMaster } from "./../lib/masterDataCache"
 
 
 export async function index(req: any,res: any,route: any)
@@ -13,5 +13,15 @@ export async function masterupdate(req: any,res: any,route: any)
 	
 	return {
 		status: 200
+	};
+}
+
+export async function getmaster(req: any,res: any,route: any)
+{
+	let master:any = getMaster(route.query.name);
+	
+	return {
+		status: 200,
+		Master: master
 	};
 }

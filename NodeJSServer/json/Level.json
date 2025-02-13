@@ -1,0 +1,355 @@
+{
+  "Version": 93,
+  "Data": [
+    {
+      "Level": "1",
+      "NeedExp": "0",
+      "QuestInterval": "10000",
+      "RewardExp": "10",
+      "RewardCoin": "10"
+    },
+    {
+      "Level": "2",
+      "NeedExp": "50",
+      "QuestInterval": "10000",
+      "RewardExp": "20",
+      "RewardCoin": "20"
+    },
+    {
+      "Level": "3",
+      "NeedExp": "80",
+      "QuestInterval": "20000",
+      "RewardExp": "30",
+      "RewardCoin": "30"
+    },
+    {
+      "Level": "4",
+      "NeedExp": "80",
+      "QuestInterval": "30000",
+      "RewardExp": "30",
+      "RewardCoin": "30"
+    },
+    {
+      "Level": "5",
+      "NeedExp": "80",
+      "QuestInterval": "50000",
+      "RewardExp": "30",
+      "RewardCoin": "30"
+    },
+    {
+      "Level": "6",
+      "NeedExp": "100",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "7",
+      "NeedExp": "100",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "8",
+      "NeedExp": "100",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "9",
+      "NeedExp": "150",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "10",
+      "NeedExp": "150",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "11",
+      "NeedExp": "180",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "12",
+      "NeedExp": "200",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "13",
+      "NeedExp": "220",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "14",
+      "NeedExp": "250",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "15",
+      "NeedExp": "300",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "16",
+      "NeedExp": "400",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "17",
+      "NeedExp": "500",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "18",
+      "NeedExp": "500",
+      "QuestInterval": "200000",
+      "RewardExp": "150",
+      "RewardCoin": "150"
+    },
+    {
+      "Level": "19",
+      "NeedExp": "500",
+      "QuestInterval": "200000",
+      "RewardExp": "150",
+      "RewardCoin": "150"
+    },
+    {
+      "Level": "20",
+      "NeedExp": "800",
+      "QuestInterval": "200000",
+      "RewardExp": "150",
+      "RewardCoin": "150"
+    },
+    {
+      "Level": "21",
+      "NeedExp": "1000",
+      "QuestInterval": "300000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "22",
+      "NeedExp": "1000",
+      "QuestInterval": "300000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "23",
+      "NeedExp": "1500",
+      "QuestInterval": "500000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "24",
+      "NeedExp": "1500",
+      "QuestInterval": "500000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "25",
+      "NeedExp": "1500",
+      "QuestInterval": "500000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "26",
+      "NeedExp": "2000",
+      "QuestInterval": "500000",
+      "RewardExp": "250",
+      "RewardCoin": "250"
+    },
+    {
+      "Level": "27",
+      "NeedExp": "2000",
+      "QuestInterval": "500000",
+      "RewardExp": "250",
+      "RewardCoin": "250"
+    },
+    {
+      "Level": "28",
+      "NeedExp": "2500",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "29",
+      "NeedExp": "2500",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "30",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "31",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "32",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "33",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "34",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "35",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "36",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "37",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "38",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "39",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "40",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "41",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "42",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "43",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "44",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "45",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "46",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "47",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "48",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "49",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "50",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    }
+  ]
+}

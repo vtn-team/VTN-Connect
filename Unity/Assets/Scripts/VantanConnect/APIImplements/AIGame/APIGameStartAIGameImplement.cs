@@ -16,6 +16,7 @@ namespace VTNConnect
     public class GameStartAIGameResult : APIResponce
     {
         public string GameHash;
+        public string GameTitle;
         public UserData[] GameUsers;
         public GameInfo[] GameInfo;
     }

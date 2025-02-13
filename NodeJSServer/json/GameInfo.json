@@ -1,115 +1,161 @@
 {
-  "Version": 154,
+  "Version": 321,
   "Data": [
     {
       "Id": "1",
       "ProjectCode": "VCMain",
       "GameTitle": "いぬのだいぼうけん",
-      "Difficulty ": "0",
+      "Difficulty": "0",
       "ClearBonusCoin": "200",
       "GameOverBonusCoin": "200",
+      "ClearBonusExp": "300",
+      "GameOverBonusExp": "300",
       "PlayTime": "300",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "1",
+      "IsReLink": "0"
     },
     {
       "Id": "2",
       "ProjectCode": "Confront",
       "GameTitle": "Confront",
-      "Difficulty ": "10",
+      "Difficulty": "10",
       "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "500",
+      "GameOverBonusExp": "50",
       "PlayTime": "600",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "1",
+      "IsReLink": "1"
     },
     {
       "Id": "3",
       "ProjectCode": "BossBattle2D",
-      "GameTitle": "ブルスラアクション",
-      "Difficulty ": "100",
+      "GameTitle": "ブルスラアクション！",
+      "Difficulty": "100",
       "ClearBonusCoin": "5000",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "5000",
+      "GameOverBonusExp": "500",
       "PlayTime": "600",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "1",
+      "IsReLink": "0"
     },
     {
       "Id": "4",
       "ProjectCode": "ToyBox",
       "GameTitle": "玩具箱",
-      "Difficulty ": "5",
+      "Difficulty": "5",
       "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "1000",
+      "GameOverBonusExp": "500",
       "PlayTime": "800",
-      "IsReplayTarget": "0"
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
       "Id": "5",
-      "ProjectCode": "Jenga",
-      "GameTitle": "チェンガ",
-      "Difficulty ": "20",
-      "ClearBonusCoin": "1000",
+      "ProjectCode": "Nexus",
+      "GameTitle": "NEXUS",
+      "Difficulty": "10",
+      "ClearBonusCoin": "500",
       "GameOverBonusCoin": "100",
-      "PlayTime": "300",
-      "IsReplayTarget": "0"
+      "ClearBonusExp": "2000",
+      "GameOverBonusExp": "500",
+      "PlayTime": "600",
+      "IsReplayTarget": "0",
+      "IsReLink": "1"
     },
     {
       "Id": "6",
-      "ProjectCode": "Nexus",
-      "GameTitle": "Nexus",
-      "Difficulty ": "10",
-      "ClearBonusCoin": "500",
-      "GameOverBonusCoin": "100",
-      "PlayTime": "600",
-      "IsReplayTarget": "0"
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
       "Id": "7",
-      "ProjectCode": "SkyBanshee",
-      "GameTitle": "スカイバンシィ",
-      "Difficulty ": "10",
-      "ClearBonusCoin": "500",
-      "GameOverBonusCoin": "100",
-      "PlayTime": "600",
-      "IsReplayTarget": "0"
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
       "Id": "8",
-      "ProjectCode": "RoboPro",
-      "GameTitle": "ロボティクスプロトコル",
-      "Difficulty ": "5",
-      "ClearBonusCoin": "500",
-      "GameOverBonusCoin": "100",
-      "PlayTime": "600",
-      "IsReplayTarget": "0"
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
+    },
+    {
+      "Id": "",
+      "ProjectCode": "",
+      "GameTitle": "",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "IsReLink": ""
     },
     {
       "Id": "99",
       "ProjectCode": "UserPortal",
       "GameTitle": "ユーザ接続用アプリ",
-      "Difficulty ": "0",
+      "Difficulty": "0",
       "ClearBonusCoin": "0",
       "GameOverBonusCoin": "0",
+      "ClearBonusExp": "0",
+      "GameOverBonusExp": "0",
       "PlayTime": "0",
-      "IsReplayTarget": "0"
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     },
     {
       "Id": "100",
       "ProjectCode": "SampleGame",
       "GameTitle": "サンプル",
-      "Difficulty ": "1",
+      "Difficulty": "1",
       "ClearBonusCoin": "100",
       "GameOverBonusCoin": "50",
+      "ClearBonusExp": "100",
+      "GameOverBonusExp": "10",
       "PlayTime": "10",
-      "IsReplayTarget": "1"
+      "IsReplayTarget": "0",
+      "IsReLink": "1"
     },
     {
       "Id": "101",
       "ProjectCode": "SampleGameAITest",
       "GameTitle": "AIテスト用",
-      "Difficulty ": "0",
+      "Difficulty": "0",
       "ClearBonusCoin": "200",
       "GameOverBonusCoin": "100",
+      "ClearBonusExp": "100",
+      "GameOverBonusExp": "100",
       "PlayTime": "10",
-      "IsReplayTarget": "0"
+      "IsReplayTarget": "0",
+      "IsReLink": "0"
     }
   ]
 }

@@ -1,16 +1,36 @@
-import { updateMainGameInfo } from "./vcinfo"
-import { createEpisodeNormalGame, createEpisodeAIGame, saveEpisodeNormalGame, saveEpisodeAIGame } from "./vcgameInfo"
-import { getUniqueUsers, getUserFromId } from "./vcuser"
+import { createEpisodeNormalGame, createEpisodeAIGame, saveEpisodeNormalGame, saveEpisodeAIGame, createAdvTitle, ResultCode } from "./vcgameInfo"
+import { getUniqueUsers, getUserFromId, getRewardsByGame } from "./vcuser"
 import { sendAPIEvent, startRecord, stopRecord } from "../gameserver/server"
 import { query } from "./../lib/database"
 const { v4: uuidv4 } = require('uuid')
+
+let gameSessions:any = {};
+let gameHashDic:any = {};
 
 enum GameOption {
 	None = 0,
 	Recording = (1<<0),
 }
 
-//ゲーム情報構造体
+function simpleUserInfo(userInfo: any) : any
+{
+	if(userInfo.length && userInfo.length > 1) {
+		let ret = [];
+		for(let u of userInfo) {
+			ret.push(simpleUserInfo(u));
+		}
+		return ret;
+	}else{
+		//シンプルにする
+		return {
+			UserId: userInfo.UserId,
+			Name: userInfo.DisplayName,
+			AvatarType: userInfo.AvatarType,
+		};
+	}
+	
+	return null;
+}
 
 //AIゲーム開始
 //NOTE: 誰を使うかはサーバが決定する
@@ -18,8 +38,8 @@ export async function gameStartAIGame(option: number) {
 	let result = {
 		Success: false,
 		GameHash: "",
+		GameTitle: "",
 		GameUsers: [],
-		GameInfo: []
 	};
 	
 	try {
@@ -32,19 +52,47 @@ export async function gameStartAIGame(option: number) {
 		//Gameにプレイ開始したゲームの情報を記録
 		await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
 		
+		//AIゲームは開始時にタイトルを決める
+		let title:any = await createAdvTitle(gameId, users);
+		
+		startRecord(gameId, gameHash);
+		
 		result.Success = true;
 		result.GameHash = gameHash;
 		result.GameUsers = users;
+		result.GameTitle = title;
 		
 		//AI記録
 		createEpisodeAIGame(gameId, gameHash, users);
 		
 		//DGSにイベントリレー
 		sendAPIEvent({
-			API: gameStartAIGame,
+			API: "gameStartAIGame",
 			GameHash: gameHash,
+			GameId: gameId,
+			GameTitle: title,
 			GameUsers: users,
 		});
+		
+		//稼働中ログ
+		let delList= [];
+		for(let k in gameHashDic) {
+			if(gameHashDic[k] == gameId){
+				delList.push(k);
+			}
+		}
+		for(let k of delList) {
+			delete gameHashDic[k];
+		}
+		
+		gameHashDic[gameHash] = gameId;
+		gameSessions[gameId] = {
+			Status: 1,
+			GameHash: gameHash,
+			GameId: gameId,
+			GameUsers: simpleUserInfo(users),
+			GameTitle: title,
+		}
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -61,17 +109,35 @@ export async function gameEndAIGame(gameResult: any) {
 	try {
 		result.Success = true;
 		
-		let hash = gameResult.GameHash;
+		let gameHash = gameResult.GameHash;
+		
+		let title = "";
+		if(gameHashDic[gameHash]) {
+			let gameId = gameHashDic[gameHash];
+			title = gameSessions[gameId].GameTitle;
+		}
+		
+		stopRecord(gameHash);
 		
 		//awaitはしない
-		saveEpisodeAIGame(hash, gameResult.UserResults);
+		saveEpisodeAIGame(gameHash, title, gameResult.UserResults);
 		
 		//DGSにイベントリレー
 		sendAPIEvent({
-			API: gameStartAIGame,
-			GameHash: hash,
+			API: "gameEndAIGame",
+			GameHash: gameHash,
 			GameResult: gameResult,
 		});
+		
+		//稼働中ログ
+		let gameId = 1; //NOTE: ハードコードで良くないが良い手段がない
+		gameSessions[gameId] = {
+			Status: 0,
+		}
+		
+		if(gameHashDic[gameHash]) {
+			delete gameHashDic[gameHash];
+		}
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -94,7 +160,7 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		//Gameにプレイ開始したゲームの情報を記録
 		if(userId > 0) {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 1)", [gameHash, gameId]);
-			let userInfo = await getUserFromId(userId);
+			userInfo = await getUserFromId(userId);
 			createEpisodeNormalGame(gameId, gameHash, userInfo);
 		} else {
 			await query("INSERT INTO Game (GameHash, GameId, State) VALUES (?, ?, 3)", [gameHash, gameId]);
@@ -109,11 +175,35 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		
 		//DGSにイベントリレー
 		sendAPIEvent({
-			API: gameStartVC,
+			API: "gameStartVC",
 			GameHash: gameHash,
+			GameId: gameId,
 			UserId: userId,
-			UserInfo: userInfo,
+			UserData: userInfo,
 		});
+		
+		//稼働中ログ
+		let delList= [];
+		for(let k in gameHashDic) {
+			if(gameHashDic[k] == gameId){
+				delList.push(k);
+			}
+		}
+		for(let k of delList) {
+			delete gameHashDic[k];
+		}
+		
+		gameHashDic[gameHash] = gameId;
+		gameSessions[gameId] = {
+			Status: 1,
+			GameHash: gameHash,
+			GameId: gameId,
+			UserId: userId,
+			StartTime: new Date()
+		}
+		if(userInfo) {
+			gameSessions[gameId]["UserInfo"] = simpleUserInfo(userInfo);
+		}
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -123,33 +213,87 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 
 
 //ゲーム終了
-export async function gameEndVC(gameHash: string, gameResult: boolean) {
+export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 	let result = {
 		Success: false,
+		Rewards: {}
 	};
 	
 	try {
-		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [gameResult ? 2 : 3, gameHash]);
+		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [resultCode, gameHash]);
 		result.Success = true;
 		
 		stopRecord(gameHash);
 		
 		//awaitはしない
-		saveEpisodeNormalGame(gameHash, gameResult);
+		saveEpisodeNormalGame(gameHash, resultCode);
 		
 		//DGSにイベントリレー
 		//NOTE: UserInfoは取ろうと思えばとれる
 		sendAPIEvent({
-			API: gameStartVC,
+			API: "gameEndVC",
 			GameHash: gameHash,
-			GameResult: gameResult
+			GameResult: resultCode
 		});
+		
+		//稼働中ログ
+		if(gameHashDic[gameHash]) {
+			let gameId = gameHashDic[gameHash];
+			
+			//報酬付与
+			let time = ((new Date()).getTime() - gameSessions[gameId].StartTime);
+			let userId = gameSessions[gameId].UserId;
+			
+			gameSessions[gameId] = {
+				Status: 0,
+			}
+			delete gameHashDic[gameHash];
+			
+			let rewards:any = await getRewardsByGame(gameId, userId, resultCode, time);
+			result.Rewards = rewards;
+		}
 	} catch(ex) {
 		console.log(ex);
 	}
 	
 	return result;
 }
+
+
+//ゲーム交代
+export async function gameHandOver(gameId: number, userId: number, option: number) {
+	let result = {
+		Success: false,
+		GameHash: "",
+		Rewards: {}
+	};
+	
+	try {
+		//稼働中であればGameEndする
+		let gameHash = "";
+		for(let k in gameHashDic) {
+			if(gameHashDic[k] == gameId){
+				gameHash = k;
+				break;
+			}
+		}
+		if(gameHash != "") {
+			let gameEnd = await gameEndVC(gameHash, 4);
+			result.Rewards = gameEnd.Rewards;
+		}
+		
+		let res = await gameStartVC(gameId, userId, option);
+		
+		result.GameHash = res.GameHash;
+		
+	} catch(ex) {
+		console.log(ex);
+	}
+	
+	return result;
+}
+
+
 
 async function choiceAIGameUsers() {
 	//DBから更新日時が最も古い3人を抜き出す
@@ -173,4 +317,31 @@ async function choiceAIGameUsers() {
 	
 	users = users.concat(getUniqueUsers(4-ids.length));
 	return users;
+}
+
+export function getGameSessions() {
+	return gameSessions;
+}
+
+export async function getGameHistory(gameId: number, page: number = 0) {
+	let result = null;
+	let count = 0;
+	let limit = 25;
+	
+	if(gameId == 0) {
+		result = await query("SELECT * FROM Adventure LIMIT 0,?", [limit]);
+		//await query("SELECT count(GameHash) as Count FROM Adventure WHERE GameId = ?", [gameId]);
+	} else {
+		result = await query("SELECT * FROM Adventure WHERE GameId = ? LIMIT 0, ?", [gameId,limit]);
+		//await query("SELECT count(GameHash) as Count FROM Adventure WHERE GameId = ?", [gameId]);
+	}
+	
+	return {
+		History: result,
+		//Count: Number(count[0].Count)
+	};
+}
+
+export async function updateArtifact(itemId: number, ownerUserId: number) {
+	
 }
