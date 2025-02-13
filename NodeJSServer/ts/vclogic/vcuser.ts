@@ -189,6 +189,7 @@ export async function createUserWithAI(userInput: UserStatus) {
 		//DGSにイベントリレー
 		sendAPIEvent({
 			API: "createUser",
+			UserId: userId,
 			UserData: result
 		});
 		
@@ -270,6 +271,19 @@ export async function questRewards(userId: number) {
 	
 }
 
+function getUserLevel(exp: number) {
+	let ret = 1;
+	for(let lv = 1; lv < 50; ++lv) {
+		let level = getLevel(lv);
+		exp -= level.NeedExp;
+		if(exp < 0) {
+			ret = lv-1;
+			break;
+		}
+	}
+	return ret;
+}
+
 export async function getRewardsByGame(gameId: number, userId: number, resultCode: ResultCode, time: number) {
 	let ret = {
 		Exp: 0,
@@ -313,8 +327,11 @@ export async function getRewardsByGame(gameId: number, userId: number, resultCod
 	}
 	
 	//ユーザ情報更新
+	let gold = userInfo.Gold + ret.Coin;
 	let exp = userInfo.Exp + ret.Exp;
-	for(let lv = userInfo.Level; lv < 50; ++lv) {
-		
-	}
+	let lv = getUserLevel(exp);
+	
+	await query("UPDATE User SET Level = ?, Exp = ?, Gold = ? WHERE Id = ?", [lv, exp, gold, userId]);
+	
+	return ret;
 }
