@@ -500,7 +500,7 @@ export async function execArtifactAppearEvent(atrifactEventStackId: ArtifaceEven
 	//一定時間経過でイベントフラグを落とす
 	flagDownTimer = setTimeout(() => {
 		artifactEvent = 0;
-	}, 6000);
+	}, 600000);
 }
 
 //
