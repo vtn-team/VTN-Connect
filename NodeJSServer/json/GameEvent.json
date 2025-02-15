@@ -1,5 +1,5 @@
 {
-  "Version": 615,
+  "Version": 687,
   "Data": [
     {
       "Id": "102",
@@ -236,6 +236,24 @@
       "System": ""
     },
     {
+      "Id": "501",
+      "Description": "ダルドリーシッディ",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "VCMainEvent1",
+      "System": ""
+    },
+    {
+      "Id": "502",
+      "Description": "思考盗聴",
+      "From": "0",
+      "Target": "1",
+      "SendFlag": "ALL",
+      "EnumCode": "VCMainEvent2",
+      "System": ""
+    },
+    {
       "Id": "1000",
       "Description": "コインいっこ入れる",
       "From": "0",
@@ -273,11 +291,11 @@
     },
     {
       "Id": "1004",
-      "Description": "アーティファクトを獲得",
+      "Description": "アーティファクト警報",
       "From": "0",
       "Target": "-1",
       "SendFlag": "ALL",
-      "EnumCode": "GetArtifact",
+      "EnumCode": "ArtifactNotice",
       "System": ""
     },
     {
@@ -377,6 +395,15 @@
       "Target": "1",
       "SendFlag": "ALL",
       "EnumCode": "Artifact03",
+      "System": ""
+    },
+    {
+      "Id": "1200",
+      "Description": "アーティファクト取得",
+      "From": "1",
+      "Target": "0",
+      "SendFlag": "ALL",
+      "EnumCode": "GetArtifact",
       "System": ""
     }
   ]
