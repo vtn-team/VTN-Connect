@@ -307,7 +307,7 @@ export class GameConnect {
 		delete this.sessionDic[sessionId];
 
 		//イベントプレイヤーにする
-		this.setupGameConnect();
+		//this.setupGameConnect();
 		
 		console.log(`GAME ID:${gameId} leave.`);
 	}
@@ -329,7 +329,29 @@ export class GameConnect {
 	
 	//処理
 	execCommand(data: any) {
-		return false;
+		let evtId = parseInt(data.EventId);
+		let event = getGameEvent(evtId);
+		let payload:any = [];
+		
+		//200以下のゲームは送信者の情報を記録する
+		if(evtId < 200) {
+			payload = parsePayload(data.Payload);
+			let game = getGameInfo(data.FromId);
+			let session = this.gameSessions[data.FromId];
+			let dd:any = {
+				"GameName" : game.GameTitle,
+				"UserId" : session?.UserId,
+				"Name" : session?.UserInfo?.Name
+			};
+			if(!dd.Name) dd.Name = "Unknown";
+			
+			let addPayload = createdPayload(dd);
+			
+			for(let d of addPayload) {
+				data.Payload.push(d);
+			}
+		}
+		
 		//イベント別に情報を整理
 		switch(evtId)
 		{
@@ -341,6 +363,8 @@ export class GameConnect {
 			break;
 		}
 		
+		//console.log(data);
+		return data;
 	}
 	
 	public startRecord(gameId:number, gameHash: string) {
