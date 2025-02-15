@@ -192,6 +192,11 @@ export class SakuraConnect {
 		case "GameStart":
 			//GameStartはParamsの範囲内で遅延する
 			delay = evt.Params[0] + crypto.randomInt(0, evt.Params[1]);
+			
+			//AIゲームの場合登場順を考慮
+			if(data.API == "gameStartAIGame") {
+				delay += (data.Index * 3000) + 1500;
+			}
 			break;
 		}
 		

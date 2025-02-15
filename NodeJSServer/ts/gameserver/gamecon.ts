@@ -1,9 +1,9 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
-import { getGameSessions } from "./../vclogic/vcgame"
+import { getGameSessions, updateArtifact, getArtifactEvent, ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 import { stockEpisode } from "./../vclogic/vcgameInfo"
-import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
+import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage, createdPayload, parsePayload } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
 
 
@@ -119,6 +119,7 @@ class GameContainer {
 export class GameConnect {
 	games: any;
 	sessionDic: any;
+	gameSessions: any;
 	broadcast: any;
 	recordingHash: any;
 
@@ -179,12 +180,13 @@ export class GameConnect {
 			console.log("NO DATA:" + data.EventId);
 			return;
 		}
+		
 		//console.log(event)
 
 		let msg = createGameMessage(data.UserId, gameId, CMD.EVENT, TARGET.SELF, data);
 		for (var gId in this.games) {
 			if (!this.games[gId].isActiveSession()) continue;
-
+			
 			if (event.Target == -1) {
 				this.games[gId].sendEventMessage(msg);
 			} else if (gId == event.Target) {
@@ -233,11 +235,11 @@ export class GameConnect {
 			
 			if(this.games[gameId]) {
 				this.games[gameId].recordMessage(gameId, data);
-				usePortal = this.execCommand(data);
+				data = this.execCommand(data);
 				this.castEvent(gameId, data);
 			}else{
 				console.log("not found game:" + gameId);
-				usePortal = this.execCommand(data);
+				data = this.execCommand(data);
 				this.castEvent(data.GameId, data);
 			}
 		}
@@ -248,6 +250,11 @@ export class GameConnect {
 			if(!data["GameHash"]) break;
 			
 			stockEpisode(data["GameHash"], data["UserId"], data);
+			
+			if(data.EpisodeCode == 200) {
+				//冒険者が会話をしたらアーティファクトカウントを追加
+				execArtifactAppearEvent(ArtifaceEventStack.TALK);
+			}
 		}
 		break;
 		/*
@@ -307,11 +314,11 @@ export class GameConnect {
 	
 	public getActiveGames() {
 		let games:any = [];
-		let sessions:any = getGameSessions();
+		this.gameSessions = getGameSessions();
 		for(var gId in this.games) {
 			let stat = this.games[gId].getStat();
-			if(sessions[gId]) {
-				stat.Session = sessions[gId];
+			if(this.gameSessions[gId]) {
+				stat.Session = this.gameSessions[gId];
 				//プレイ中のゲームの情報を送信する
 			}
 			games.push(stat);
@@ -323,6 +330,17 @@ export class GameConnect {
 	//処理
 	execCommand(data: any) {
 		return false;
+		//イベント別に情報を整理
+		switch(evtId)
+		{
+		
+		//アーティファクト取得
+		case 1200:
+			payload = parsePayload(data.Payload);
+			updateArtifact(payload.UserId);
+			break;
+		}
+		
 	}
 	
 	public startRecord(gameId:number, gameHash: string) {
@@ -340,6 +358,37 @@ export class GameConnect {
 	}
 	
 	public sendAPIEvent(data: any) {
-		//TBD
+		
+		switch(data.API) {
+		case "createUser":
+		case "gameStartAIGame":
+			{
+				//アーティファクトが出ていたらアーティファクト送信
+				let atEvent = getArtifactEvent();
+				if(atEvent > 0) {
+					setTimeout(() => {
+						this.execMessage({
+							UserId: 0,
+							GameId: 0,
+							Command: CMD.SEND_EVENT,
+							EventId: 1100 + atEvent - 1,
+							FromId: 0,
+							Payload: []
+						});
+					}, 1000);
+				}
+			}
+			break;
+			
+		case "gameStartVC":
+			{
+				//ゲームを遊んだらアーティファクトカウントを追加
+				execArtifactAppearEvent(ArtifaceEventStack.PLAYGAME);
+			}
+			break;
+			
+		case "gameEndAIGame":
+		case "gameEndVC":
+		}
 	}
 };

@@ -2,6 +2,7 @@ import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
 import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
+import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 import { UserSession, VCUserSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
 import { SakuraConnect } from "./sakuracon"
@@ -130,6 +131,9 @@ export class UserPortal {
 		case CMD.SEND_CHEER:
 		{
 			this.cheerMessage(data);
+			
+			//応援メッセージが来たらアーティファクトカウントを追加
+			execArtifactAppearEvent(ArtifaceEventStack.CHEER);
 		}
 		break;
 		
@@ -228,6 +232,7 @@ export class UserPortal {
 			
 			//応援イベントをゲームに飛ばす
 			let evtPacket = {
+				Target: to,
 				AvatarType: msg.Avatar,
 				Name: msg.Name,
 				Message: result.Message,

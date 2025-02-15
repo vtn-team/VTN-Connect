@@ -182,14 +182,13 @@ export function createGameMessage(senderId: number, senderGameId: number, comman
 
 export function parsePayload(payload: any) {
 	let data:any = {};
-	let types:any = {};
 	if(payload) {
 		for(var d of payload) {
-			types[d.Key] = d.TypeName;
-			
 			switch(d.TypeName)
 			{
 			case "Integer":
+			case "number":
+			case "Int32":
 				data[d.Key] = Number(d.Data);
 				break;
 				
@@ -203,10 +202,7 @@ export function parsePayload(payload: any) {
 			}
 		}
 	}
-	return {
-		data: data,
-		types: types
-	};
+	return data;
 }
 
 export function createdPayload(data: any) {
