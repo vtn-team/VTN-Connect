@@ -128,6 +128,14 @@ export class UserPortal {
 		}
 		break;
 		
+		case CMD.USERSTAT:
+		{
+			//ユーザステータスの更新
+			console.log(data)
+			this.broadcast(createMessage(data.UserId, CMD.USERSTAT, TARGET.SELF, data));
+		}
+		break;
+		
 		case CMD.SEND_CHEER:
 		{
 			this.cheerMessage(data);

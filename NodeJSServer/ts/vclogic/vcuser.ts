@@ -284,6 +284,32 @@ function getUserLevel(exp: number) {
 	return ret;
 }
 
+export async function getRewardsByEventCode(userId: number, gold: number, exp:number) {
+	let ret = {
+		Exp: exp,
+		Coin: gold,
+	};
+	
+	let level = getMaster("Level");
+	if(!level) return ret;
+	
+	let userInfo = await getUserFromId(userId);
+	if(!userInfo) return ret;
+	
+	//ユーザ情報更新
+	let totalGold = userInfo.Gold + ret.Coin;
+	let totalExp = userInfo.Exp + ret.Exp;
+	let lv = getUserLevel(totalExp);
+	
+	await query("UPDATE User SET Level = ?, Exp = ?, Gold = ? WHERE Id = ?", [lv, totalExp, totalGold, userId]);
+	
+	return {
+		Lv: lv,
+		Exp: totalExp,
+		Gold: totalGold
+	};
+}
+
 export async function getRewardsByGame(gameId: number, userId: number, resultCode: ResultCode, time: number) {
 	let ret = {
 		Exp: 0,

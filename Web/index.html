@@ -175,6 +175,8 @@ const CMD = {
 	JOIN: 2,
 	EVENT: 3,
 	GAMESTAT: 4,
+	CHEER: 5,
+	USERSTAT: 6,
 	SEND_JOIN: 100,
 	SEND_EVENT: 101,
 	SEND_EPISODE: 102,
@@ -504,6 +506,10 @@ function execMessage(data) {
 	}
 	break;
 	
+	case CMD.USERSTAT:
+		console.log(data);
+		break;
+	
 	case CMD.GAMESTAT:
 		activeGameInfo = data.Data.ActiveGames;
 		console.log(activeGameInfo);
@@ -628,14 +634,15 @@ function cheerMessage(toUserId, tgtGameId, msg, emo) {
 	ws.send(JSON.stringify(json));
 }
 
-function sendQREvent(code) {
+function sendQREvent(code, isDebug) {
 	try{
 		//SessionIdをキーにしてJoinを返す
 		let json = {
 			SessionId: wsSessionId,
 			Command: CMD.SEND_QR,
 			SerialCode: code,
-			UserId: userData.UserId
+			UserId: userData.UserId,
+			IsDebug: isDebug
 		};
 		ws.send(JSON.stringify(json));
 	}catch(ex){
@@ -1223,6 +1230,8 @@ let isDebugMode = true;
 let myGameId = -1;
 let gameIngo = {};
 let gameEvent = {};
+let sendQRIndex = 0;
+
 async function setupDebugMenu() {
 	gameEvent = await getMaster("GameEvent");
 	
@@ -1247,6 +1256,22 @@ async function setupDebugMenu() {
 		filterAndShowDebugEvent(myGame);
 		myGameId = parseInt(myGame);
 	}
+}
+
+function sendDebugQR() {
+	const qrMagicScrollList = [
+		"810f1f50-6a2b-4a8d-8908-a37b9afe9ec2",		//魔法スクロール1
+		"8f47353a-a230-4a50-8e58-1ad1d46b2200",		//魔法スクロール2
+		"404c7c46-0436-4c8e-80b9-e86029ef5eb6",		//魔法スクロール3
+		"fa0e5db3-12d7-4f3e-b785-1aa1ef10ec4f",		//魔法スクロール4
+		"3900742f-0c88-4d6e-9dff-13035d52ab64",		//魔法スクロール5
+	];
+	
+	let qrStr = qrMagicScrollList[sendQRIndex];
+	sendQREvent(qrStr, true);
+	
+	sendQRIndex++;
+	if(sendQRIndex > 4) sendQRIndex=0;
 }
 
 async function gameShutdown() {
@@ -1304,6 +1329,7 @@ function filterAndShowDebugEvent(gameId) {
 	let html = "";
 	for(let evt of gameEvent) {
 		if(evt.Release == "") continue;
+		if(evt.Id >= 1000) continue;
 		if(evt.Target == -1 || evt.Target == gameId) {
 			html += `<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(${evt.Id})>${evt.Description}</button><div style="height:10px;"></div>`;
 		}
@@ -1906,7 +1932,7 @@ function notifyMe() {
 				<p class="title">テストQR</p>
 				<br />
 				<button type="button" class="nes-btn is-primary" onclick=sendQREvent("810f1f50-6a2b-4a8d-8908-a37b9afe9ec2")>リンク1</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendQREvent("a4cf1e07-cd1a-40ab-9d6f-755d344cf550")>スクロール1</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendDebugQR()>スクロール</button><div style="height:10px;"></div>
 			</div>
 		</div>
 		

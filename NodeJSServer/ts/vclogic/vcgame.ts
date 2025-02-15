@@ -431,8 +431,8 @@ export async function execArtifactAppearEvent(atrifactEventStackId: ArtifaceEven
 	
 	if(artifactEvent != 0) return;
 	
-	let flag: Array<number> = [0,0,0,0,0];
-	let ids: Array<number> = [];
+	let flag: Array<number> = [0,0,0,0,0,0];
+	let ids: Array<any> = [];
 	let owners: any = await getArtifactOwners();
 	for(let d of owners) {
 		if(d.OwnerId != 0) {
@@ -451,7 +451,7 @@ export async function execArtifactAppearEvent(atrifactEventStackId: ArtifaceEven
 	case 1:
 		{
 			let appear = true;
-			for(let i=0; i<5; ++i){
+			for(let i=1; i<=5; ++i){
 				if(artifactQR[i] == 0) {
 					appear = false;
 					break;
@@ -460,7 +460,7 @@ export async function execArtifactAppearEvent(atrifactEventStackId: ArtifaceEven
 			
 			if(appear) {
 				let rnd = crypto.randomInt(0, ids.length);
-				artifactEvent = ids[rnd];
+				artifactEvent = ids[rnd].Id;
 				for(let i=0; i<5; ++i){
 					artifactQR[i]--;
 				}

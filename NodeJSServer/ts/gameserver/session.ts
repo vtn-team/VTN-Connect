@@ -12,6 +12,7 @@ export enum CMD {
 	EVENT = 3,
 	GAMESTAT = 4,
 	CHEER = 5,
+	USERSTAT = 6,
 	SEND_JOIN = 100,
 	SEND_EVENT = 101,
 	SEND_EPISODE = 102,

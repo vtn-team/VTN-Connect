@@ -96,7 +96,7 @@ class Server {
 				this.pong(uuid);
 			});
 
-			ws.on('message', (message: string) => {
+			ws.on('message', async (message: string) => {
 				console.log(' Received: %s', message);
 				try
 				{
@@ -125,7 +125,7 @@ class Server {
 							
 						case CMD.SEND_QR:
 							{
-								let result:any = this.qrEventer.execEvent(data);
+								let result:any = await this.qrEventer.execEvent(data);
 								if(result.Status == 1) {
 									this.contents.execMessage(result.Data);
 								}

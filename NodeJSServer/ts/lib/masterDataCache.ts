@@ -89,6 +89,7 @@ function constructDicMaster()
 		{
 			for(let k in d)
 			{
+				if(k == "UUID") continue;
 				if(k.endsWith("At")) continue;
 				
 				if(!isNaN(parseInt(d[k])))
@@ -103,7 +104,7 @@ function constructDicMaster()
 	createDicMaster("GameEvent");
 	createDicMaster("SakuraEvent");
 	createDicMaster("QRSheet", "UUID");
-	createDicMaster("QREvent");
+	createDicGroupListMaster("QREvent", "QRId");
 	createDicMaster("Level", "Level");
 	createDicMaster("AIRule", "RuleId");
 }
