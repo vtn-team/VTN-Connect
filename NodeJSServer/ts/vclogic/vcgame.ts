@@ -347,8 +347,6 @@ async function choiceAIGameUsers(afEvent:number, owners: any) {
 	//残りはユニークユーザで埋める
 	let users = [];
 	if(ids.length > 0) {
-		console.log(ids);
-		console.log(join.join(','));
 		users = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id IN ("+join.join(',')+");", ids);
 		await query("UPDATE User SET LastPlayedAt = CURRENT_TIMESTAMP() WHERE Id IN ("+join.join(',')+");", ids);
 	}
