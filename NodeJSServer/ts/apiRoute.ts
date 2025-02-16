@@ -5,7 +5,7 @@ exports.Routes = {
 		"/favicon.ico"	: "resource#favicon#favicon",
 		"/manifest.json" : "debug#manifest#Webテスト",
 		"/serviceworker.js" : "debug#serviceworker#Webテスト",
-		"/bg.gif" : "debug#bg#Webテスト",
+		"/bg.jpg" : "debug#bg#Webテスト",
 		"/anime.min.js" : "debug#animejs#Webテスト",
 		"/uuid" : "debug#uuid# uuid生成",
 		"/stat" : {
