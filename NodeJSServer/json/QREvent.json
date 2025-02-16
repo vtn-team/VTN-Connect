@@ -1,5 +1,5 @@
 {
-  "Version": 196,
+  "Version": 199,
   "Data": [
     {
       "Id": "1",
@@ -42,7 +42,7 @@
       "QRId": "1",
       "Description": "ランダムでアーティファクトを取得",
       "Probability": "5",
-      "Flag": "Artifact",
+      "Flag": "Exp",
       "Value": "0",
       "Level": "99"
     },
@@ -222,7 +222,7 @@
       "QRId": "5",
       "Description": "ランダムでアーティファクトを取得",
       "Probability": "5",
-      "Flag": "Artifact",
+      "Flag": "Both",
       "Value": "0",
       "Level": "99"
     },
