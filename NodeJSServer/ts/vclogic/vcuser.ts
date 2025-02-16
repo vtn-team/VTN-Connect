@@ -400,7 +400,7 @@ export async function gameAskAndReward(askVal: any) {
 		userAskLog[askVal.UserId][askVal.GameId] = 1;
 		
 		reward = {
-			Exp: exp
+			Exp: exp,
 			Level: lv,
 			Gold: gold
 		};
