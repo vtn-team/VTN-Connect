@@ -240,7 +240,7 @@ export async function saveEpisodeNormalGame(gameHash: string, resultCode: Result
 		StoryBook: msg.content,
 		Rewards: rewards
 	};
-	await query("INSERT INTO Adventure (GameHash, UserId, Title, Result, LogId) VALUES (?, ?, ?, ?, ?)", [gameHash, userInfo.UserId, title, resultCode, logId]);
+	await query("INSERT INTO Adventure (GameHash, UserId, GameId, Title, PlayerName, Result, LogId) VALUES (?, ?, ?, ?, ?, ?, ?)", [gameHash, userInfo.UserId, episode.getGameId(), title, userInfo.DisplayName, resultCode, logId]);
 	console.log(json);
 	await uploadToS3(logId, JSON.stringify(json));
 	
@@ -306,7 +306,7 @@ export async function saveEpisodeAIGame(gameHash: string, title: string, gameRes
 		//console.log(msg);
 		
 		let logId = uuidv4();
-		await query("INSERT INTO Adventure (GameHash, UserId, Title, Result, LogId) VALUES (?, ?, ?, ?, ?)", [gameHash, result.UserId, title, resNumber, logId]);
+		await query("INSERT INTO Adventure (GameHash, UserId, GameId, Title, PlayerName, Result, LogId) VALUES (?, ?, ?, ?, ?, ?, ?)", [gameHash, result.UserId, 1, title, target.DisplayName, resNumber, logId]);
 		await uploadToS3(logId, msg.content);
 		
 		epic.deleteEpisode(gameHash, result.UserId);

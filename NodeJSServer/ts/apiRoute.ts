@@ -22,6 +22,9 @@ exports.Routes = {
 				"@id%d" : "vc#getUser#             ユーザ取得",
 				"@hash%s" : "vc#getUser#           ユーザ取得",
 			},
+			"/games" : {
+				"@id%d" : "vc#gameHistory#         冒険の記録を取得",
+			},
 			"/history" : {
 				"@id%d" : "vc#userHistory#         冒険の記録を取得",
 			},
