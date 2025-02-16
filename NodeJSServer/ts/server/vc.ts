@@ -1,6 +1,6 @@
 import { getConnectionAddress, getActiveSessionNum, updateMaintenance } from "./../gameserver/server"
 import { query } from "./../lib/database"
-import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash, getUserHistory, getUserMessages, getUserFriends } from "./../vclogic/vcuser"
+import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash, getUserHistory, getUserMessages, getUserFriends, gameAskAndReward } from "./../vclogic/vcuser"
 import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC, getGameHistory, gameHandOver, setArtifactDebug } from "./../vclogic/vcgame"
 import { uploadToS3 } from "./../lib/s3"
 const { v4: uuidv4 } = require('uuid')
@@ -218,6 +218,14 @@ export async function handOver(req: any,res: any,route: any)
 	
 	result.Status = 200;
 	result.UserData = user;
+	
+	return result;
+}
+
+//ゲームアンケート
+export async function gameAsk(req: any,res: any,route: any)
+{
+	let result:any = await gameAskAndReward(route.query);
 	
 	return result;
 }

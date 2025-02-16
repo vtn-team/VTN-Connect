@@ -59,6 +59,7 @@ exports.Routes = {
 				"/gameend" : "vc#gameEndAI#        ゲーム終了",
 			},
 			"/cheer" : "vc#cheer#                  おうえん(API経由)",
+			"/gameask" : "vc#gameAsk#              アンケート",
 		},
 		"/tools" : {
 			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"
