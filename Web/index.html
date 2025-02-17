@@ -1627,7 +1627,6 @@ function subscribeUserToPush(registration) {
     registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: applicationServerKey
-		// applicationServerKey: "BLheYK_ZKUqWjTUX4OEnG6eytFDJ79H3EQczFEqRYgF2Plp5W-D8Eki3E2--EWqKfxN_-FSTyXF0MJRqQJrYvZA"
     })
     .then(function(subscription) {
         console.log('ユーザーがプッシュ通知に登録されました:', subscription);
@@ -1642,16 +1641,14 @@ function subscribeUserToPush(registration) {
 
 function saveSubscription() {
 	// サーバーにPushSubscriptionを送信する
-	fetch('http://localhost:4649/vc/subscribe', {
+	fetch(`${baseURI}/vc/subscribe`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
 			subscription: sub,
-			// TODO: ユーザーIDの取得をやる
-			// UserId: userData.UserId
-			UserId: "1"
+			UserId: userData.UserData.Id
 		})
 	})
 	.then(function(response) {
@@ -1668,16 +1665,14 @@ function saveSubscription() {
 
 function sendSubscriptionToServer() {
     // サーバーにPushSubscriptionを送信する
-    fetch('http://localhost:4649/vc/send', {
+    fetch(`${baseURI}/vc/send`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
 			subscription: sub,
-			// TODO: ユーザーIDの取得をやる
-			// UserId: userData.UserId
-			UserId: "1"
+			UserId: userData.UserData.Id
 		})
     })
     .then(function(response) {
