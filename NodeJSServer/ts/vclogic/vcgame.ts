@@ -130,13 +130,21 @@ export async function gameEndAIGame(gameResult: any) {
 		let gameHash = gameResult.GameHash;
 		
 		let title = "";
+		let users:any = [];
+		let rewards:any = [];
 		if(gameHashDic[gameHash]) {
 			let gameId = gameHashDic[gameHash];
 			title = gameSessions[gameId].GameTitle;
+			users = gameSessions[gameId].GameUsers;
 		}
 		
 		stopRecord(gameHash);
 		
+		for(let res of gameResult) {
+			let r:any = await getRewardsByGame(1, res.UserId, res.GameResult ? ResultCode.SUCCESS : ResultCode.FAILED, 99999);
+			rewards.push(r);
+			res.rewards = r;
+		}
 		//awaitはしない
 		saveEpisodeAIGame(gameHash, title, gameResult.UserResults);
 		
@@ -145,6 +153,7 @@ export async function gameEndAIGame(gameResult: any) {
 			API: "gameEndAIGame",
 			GameHash: gameHash,
 			GameResult: gameResult,
+			GameRewards: rewards
 		});
 		
 		//稼働中ログ
