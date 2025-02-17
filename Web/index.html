@@ -149,8 +149,8 @@ header.nav p {
 .faceicon { float: right; width: 80px; height: 100px; }
 .chatmsg { float: left; width: 200px; }
 .nameplate { top:-25px; left:-8px; }
-.log { max-height:1024px; }
-.scrollLog { max-height:812px; overflow-y: scroll; }
+.log { max-height:640px; }
+.scrollLog { max-height:512px; overflow-y: scroll; }
 
 #reader { 
   display:none;
@@ -616,7 +616,16 @@ function cheerSetup(tgtGameId, toUserId) {
 	for(let game of activeGameInfo) {
 		if(game.GameId == tgtGameId) {
 			console.log(game)
-			playingUserName = game.Session.UserInfo.Name;
+			if(game.GameId == 1) { 
+				for(let u of game.Session.GameUsers) {
+					if(u.UserId == toUserId) {
+						playingUserName = u.Name;
+						break;
+					}
+				}
+			}else{
+				playingUserName = game.Session.UserInfo.Name;
+			}
 		}
 	}
 	cheerTarget = {
@@ -814,10 +823,10 @@ async function readHistory(title, gameHash, logId) {
 	});
 	
 	
-	let result = await req.text();
+	let result = await req.json();
 	
 	var elm = getElm("adventureLogMsg");
-	elm.innerHTML = result.replaceAll("\n", "<br />");
+	elm.innerHTML = result.StoryBook.replaceAll("\n", "<br />");
 	
 	var elm = getElm("adventureLogTitle");
 	elm.innerHTML = title;
@@ -876,7 +885,7 @@ function createGameHistory(history, maxCount) {
 			html += `<<${group_by[gameHash][0].Title}>><br />`;
 			html += `<section class="history" style="height:240px;">`;
 			for(let i=0; i<group_by[gameHash].length; ++i) {
-				html += `　　${group_by[gameHash][0].PlayerName}の冒険　<button type="button" class="nes-btn is-primary" onclick="readHistory('${group_by[gameHash][i].Title}', '${group_by[gameHash][i].GameHash}', '${group_by[gameHash][i].LogId}')">読む</button><br />`;
+				html += `　　${group_by[gameHash][i].PlayerName}の冒険　<button type="button" class="nes-btn is-primary" onclick="readHistory('${group_by[gameHash][i].Title}', '${group_by[gameHash][i].GameHash}', '${group_by[gameHash][i].LogId}')">読む</button><br />`;
 			}
 		}
 		html += "</section>";
@@ -1361,7 +1370,9 @@ function updateGameStat(data) {
 				html += `<div>冒険中！： ${game.Session.GameTitle}</div>`;
 				
 				for(let u of game.Session.GameUsers) {
-					
+					html += `<div>${u.Name}が冒険中！`;
+					html += `<button type="button" id="cheer${game.GameId}" class="nes-btn is-primary" onclick="cheerSetup(${game.GameId}, ${u.UserId})">応援する！</button>`;
+					html += "</div>";
 				}
 			}else{
 				html +="<div>冒険の準備中…</div>";
@@ -1550,6 +1561,7 @@ async function sendTestEvent(evtId) {
 		SessionId: wsSessionId,
 		Command: CMD.SEND_EVENT,
 		GameId: myGameId,
+		FromId: 99,
 		EventId: evtId,
 		Payload: []
 	};
@@ -1664,9 +1676,10 @@ function notifyMe() {
 				<p class="title">冒険譚</p>
 				
 				<div id="adventureLogTitle"></div>
+				<br />
 				<div id="adventureLogMsg" class="scrollLog"></div>
 				<div style="height:10px;"></div>
-				<div class="right">
+				<div class="center">
 					<button type="button" class="nes-btn is-primary" onclick="closeHistory();">とじる</button>
 				</div>
 			</div>
@@ -1742,6 +1755,22 @@ function notifyMe() {
 			<div id="main-api-effect" class="nes-container status" style="display:none;">
 				<p>通信中！！</p>
 				<progress class="nes-progress is-primary" id="mainworkgauge" value="0" max="100"></progress>
+			</div>
+			
+		
+			<div id="page-tutorial-qr">
+				<div class="nes-balloon from-left with-title">
+					<p class="title">ＱＲ検索をやってみよう</p>
+					
+					会場内に「マジックスクロール」や「冒険の扉」と呼ばれるものがおかれています。<br />
+					「QR読み込み」からQRコードを読み込んでみましょう<br />
+					<br />
+					<br />
+					冒険の扉とマジックスクロールはそれぞれ別の効果があります。<br />
+					<div class="right">
+						<button type="button" class="nes-btn is-primary" onclick="firstView();">ＯＫ</button>
+					</div>
+				</div>
 			</div>
 			
 			<div id="aaa" class="nes-container is-rounded with-title status">
