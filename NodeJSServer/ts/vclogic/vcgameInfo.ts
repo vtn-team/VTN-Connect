@@ -333,10 +333,14 @@ export async function createAdvTitle(gameId:number, users:any) {
 	}
 	
 	let prompt = rule.RuleText;
-	prompt += `
+	if(gameId != 1) {
+		prompt += `
 # ゲームタイトル
 ${gameInfo.GameTitle}
-
+		`;
+	}
+	
+	prompt += `
 # 難易度(10がふつう)
 ${gameInfo.Difficulty}
 

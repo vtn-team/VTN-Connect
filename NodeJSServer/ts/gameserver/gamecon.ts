@@ -401,6 +401,18 @@ export class GameConnect {
 						});
 					}, 1000);
 				}
+				
+				this.execMessage({
+					UserId: 0,
+					GameId: 0,
+					Command: CMD.SEND_EVENT,
+					EventId: 1006,
+					FromId: 0,
+					Payload: createdPayload({
+						"GameId": data.GameId,
+						"API" : data.API
+					})
+				});
 			}
 			break;
 			

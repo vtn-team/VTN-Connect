@@ -7,7 +7,7 @@ const crypto = require("crypto")
 
 let gameSessions:any = {};
 let gameHashDic:any = {};
-
+let gameUserCache:any = {};
 let artifactEventStack:Array<number> = [0,0,0,0,0,0];
 let artifactQR:Array<number> = [0,0,0,0,0];
 let artifactEvent:number = 0;
@@ -110,7 +110,8 @@ export async function gameStartAIGame(option: number) {
 			GameUsers: simpleUserInfo(users),
 			GameTitle: title,
 			AppearArtifact: appearArtifact
-		}
+		};
+		gameUserCache[gameId] = users;
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -165,6 +166,7 @@ export async function gameEndAIGame(gameResult: any) {
 		if(gameHashDic[gameHash]) {
 			delete gameHashDic[gameHash];
 		}
+		gameUserCache[gameId] = {};
 	} catch(ex) {
 		console.log(ex);
 	}
@@ -230,6 +232,7 @@ export async function gameStartVC(gameId: number, userId: number, option: number
 		}
 		if(userInfo) {
 			gameSessions[gameId]["UserInfo"] = simpleUserInfo(userInfo);
+			gameUserCache[gameId] = userInfo;
 		}
 	} catch(ex) {
 		console.log(ex);
@@ -278,6 +281,7 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 			
 			//awaitはしない
 			saveEpisodeNormalGame(gameHash, resultCode, rewards);
+			gameUserCache[gameId] = {};
 		}
 	} catch(ex) {
 		console.log(ex);
@@ -366,6 +370,10 @@ async function choiceAIGameUsers(afEvent:number, owners: any) {
 
 export function getGameSessions() {
 	return gameSessions;
+}
+
+export function getGameUserCache(gameId: number) {
+	return gameUserCache[gameId];
 }
 
 export async function getGameHistory(gameId: number, page: number = 0) {
