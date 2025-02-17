@@ -14,11 +14,16 @@ export type PushNotificationMessage = {
  * @summary 指定されたユーザーIDにプッシュ通知を送信します。
  *
  * @param {string} userId - プッシュ通知を送信する対象のユーザーID。
- * @param {PushNotificationMessage} message - 送信するプッシュ通知のメッセージ内容。
  * @returns {Promise<void>} - プッシュ通知の送信が完了したら解決されるPromise。
  * @throws {Error} - プッシュ通知の送信中にエラーが発生した場合。
  */
-export const sendPushNotification = async (userId: string, message: PushNotificationMessage): Promise<void> => {
+export const sendPushNotification = async (userId: string): Promise<void> => {
+    const message = {
+        title: "新しい通知",
+        body: "新しい通知が届きました。",
+        url: "https://example.com/",
+    };
+
     try {
         // Web Push の設定
         // TODO: mailto のメールアドレスを実際のメールアドレスに変更する
@@ -40,10 +45,19 @@ export const sendPushNotification = async (userId: string, message: PushNotifica
             };
         });
 
+        // プッシュ通知を登録されたUserへ一斉送信
         await Promise.all(pushSubscriptions.map((sub) => webPush.sendNotification(sub, JSON.stringify(message))));
 
         console.log(`successfully sent web push to ${userId}.`, message);
     } catch (error) {
-        console.warn("Error sending web push to ${userId}.", error);
+        console.warn(`Error sending web push to ${userId}.`, error);
     }
 };
+
+// VAPIDキーをUint8Arrayに変換する関数
+function urlB64ToUint8Array(base64String: string): Uint8Array {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = Buffer.from(base64, 'base64');
+    return new Uint8Array(rawData);
+}
