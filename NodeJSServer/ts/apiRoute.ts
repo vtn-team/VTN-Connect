@@ -64,6 +64,7 @@ exports.Routes = {
 			"/cheer" : "vc#cheer#                  おうえん(API経由)",
 			"/gameask" : "vc#gameAsk#              アンケート",
 			"/subscribe" : "vc#subscribe#          プッシュ通知登録",
+			"/send" : "vc#send#                  プッシュ通知送信",
 		},
 		"/tools" : {
 			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"
