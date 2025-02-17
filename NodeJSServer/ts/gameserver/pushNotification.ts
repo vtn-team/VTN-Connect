@@ -27,6 +27,7 @@ export type PushNotificationMessage = {
  * @throws {Error} - プッシュ通知の送信中にエラーが発生した場合。
  */
 export const sendPushNotification = async (userId: string): Promise<void> => {
+  // push通知のメッセージ
   const message = {
     title: "新しい通知",
     body: "新しい通知が届きました。",
@@ -62,11 +63,3 @@ export const sendPushNotification = async (userId: string): Promise<void> => {
     console.warn(`Error sending web push to ${userId}.`, error);
   }
 };
-
-// VAPIDキーをUint8Arrayに変換する関数
-function urlB64ToUint8Array(base64String: string): Uint8Array {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = Buffer.from(base64, "base64");
-  return new Uint8Array(rawData);
-}
