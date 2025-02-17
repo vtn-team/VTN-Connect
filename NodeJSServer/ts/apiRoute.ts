@@ -5,7 +5,7 @@ exports.Routes = {
 		"/favicon.ico"	: "resource#favicon#favicon",
 		"/manifest.json" : "debug#manifest#Webテスト",
 		"/serviceworker.js" : "debug#serviceworker#Webテスト",
-		"/bg.gif" : "debug#bg#Webテスト",
+		"/bg.jpg" : "debug#bg#Webテスト",
 		"/anime.min.js" : "debug#animejs#Webテスト",
 		"/uuid" : "debug#uuid# uuid生成",
 		"/stat" : {
@@ -21,6 +21,9 @@ exports.Routes = {
 			"/user" : {
 				"@id%d" : "vc#getUser#             ユーザ取得",
 				"@hash%s" : "vc#getUser#           ユーザ取得",
+			},
+			"/games" : {
+				"@id%d" : "vc#gameHistory#         冒険の記録を取得",
 			},
 			"/history" : {
 				"@id%d" : "vc#userHistory#         冒険の記録を取得",
@@ -59,6 +62,7 @@ exports.Routes = {
 				"/gameend" : "vc#gameEndAI#        ゲーム終了",
 			},
 			"/cheer" : "vc#cheer#                  おうえん(API経由)",
+			"/gameask" : "vc#gameAsk#              アンケート",
 		},
 		"/tools" : {
 			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"

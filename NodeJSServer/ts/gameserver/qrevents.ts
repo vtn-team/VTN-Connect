@@ -1,6 +1,7 @@
-import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
-import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
+import { getMaster, getGameInfo, getGameEvent, getQRSheet, getQREvent } from "./../lib/masterDataCache"
+import { getUserFromId, getUserFromHash, getRewardsByEventCode } from "./../vclogic/vcuser"
 import { UserSession, VCUserSession, CMD, TARGET, createdPayload } from "./session"
+import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 
 const QRCodes: any = {
 	"a4cf1e07-cd1a-40ab-9d6f-755d344cf550" : { Pattern: "Rewards" },
@@ -25,7 +26,7 @@ export class QREventer {
 		data.SerialCode
 	}
 	
-	public execEvent(data: any) {
+	public async execEvent(data: any) {
 		/*
 		SessionId: wsSessionId,
 		Command: CMD.SEND_QR,
@@ -41,8 +42,9 @@ export class QREventer {
 		};
 		
 		let serialCode = data.SerialCode;
+		let qrMaster = getQRSheet(serialCode);
 		
-		if(!QRCodes[serialCode]) {
+		if(!qrMaster) {
 			msgData.Message = "存在しないシリアルコードです";
 			return {
 				Status: 0,
@@ -50,7 +52,7 @@ export class QREventer {
 			};
 		}
 		
-		if(this.serialDic[data.UserId]) {
+		if(this.serialDic[data.UserId] && !data.IsDebug) {
 			let note = this.serialDic[data.UserId];
 			if(note[serialCode]) {
 				let date = note[serialCode];
@@ -72,22 +74,89 @@ export class QREventer {
 		//TODO: リワード計算
 		let retData:any = {};
 		msgData = {}
-		if( QRCodes[serialCode].Pattern == "Link" ) {
+		if( qrMaster.Type == 1 ) {
 			retData.Command = CMD.SEND_EVENT;
 			retData.EventId = 1000;
 			retData.Payload = createdPayload({
-				GameId : QRCodes[serialCode].GameId,
+				GameId : qrMaster.TargetId,
 				UserId : data.UserId
 			});
 		}
 		
-		if( QRCodes[serialCode].Pattern == "Rewards" ) {
-			retData.Command = CMD.SEND_EVENT;
-			retData.EventId = 1002;
-			retData.Payload = createdPayload({
-				GameId : QRCodes[serialCode].GameId,
-				UserId : data.UserId
-			});
+		//NOTE: リリンク
+		
+		if( qrMaster.Type == 2 ) {
+			//効果
+			let qrEvents = getQREvent(qrMaster.TargetId);
+			
+			//重みづけ確率
+			let total = 0;
+			for(var qr of qrEvents)
+			{
+				if(qr.Probability == "") continue;
+				total += qr.Probability;
+			}
+	
+			let get:any = null;
+			let random:number = Math.floor(Math.random() * total);
+			for(var qr of qrEvents)
+			{
+				if(qr.Probability == "") continue;
+				random -= qr.Probability;
+				if(random < 0)
+				{
+					get = qr;
+					break;
+				}
+			}
+			
+			console.log(get);
+			
+			if(get.Flag == "Coin" || get.Flag == "Both") {
+				retData.Command = CMD.SEND_EVENT;
+				retData.EventId = 1002;
+				retData.Payload = createdPayload({
+					UserId : data.UserId,
+					GetGold: get.Value
+				});
+			}
+			
+			if(get.Flag == "Event") {
+				retData.Command = CMD.SEND_EVENT;
+				retData.EventId = get.Value;
+				retData.Payload = createdPayload({
+					UserId : data.UserId
+				});
+			}
+			
+			
+			let updateResult = null;
+			switch(get.Flag)
+			{
+			case "Coin":
+				updateResult = await getRewardsByEventCode(data.UserId, get.Value, 0);
+				break;
+				
+			case "Exp":
+				updateResult = await getRewardsByEventCode(data.UserId, 0, get.Value);
+				break;
+				
+			case "Both":
+				updateResult = await getRewardsByEventCode(data.UserId, get.Value, get.Value);
+				break;
+			}
+			
+			//QR読み込みでアーティファクトカウントを追加
+			execArtifactAppearEvent(ArtifaceEventStack.QRCODE, qrMaster.TargetId);
+			
+			if(updateResult) {
+				msgData = {
+					Command:CMD.USERSTAT,
+					UpdateStat: updateResult,
+					GameId: 99,
+					UserId: data.UserId
+				};
+			}
 		}
 		
 		//
@@ -96,6 +165,7 @@ export class QREventer {
 			Data: retData,
 			Message: msgData,
 		};
+		
 		console.log(ret);
 		return ret;
 	}

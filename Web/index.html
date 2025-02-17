@@ -26,7 +26,7 @@ html, body, pre, code, kbd, samp {
 }
 
 body {
-  background-image: url('bg.gif');
+  background-image: url('bg.jpg');
   background-size: auto 100vh;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -133,6 +133,10 @@ header.nav p {
   font-size: 0.6rem;
 }
 
+.playerName { font-size: 1.5rem; }
+.playerLevel { font-size: 1.2rem; }
+.playerLevelGauge { height: 20px; border-width: 1px; }
+.ask-text { width: 240px; height: 120px; }
 .important { grid-area: important; }
 .main { grid-area: main; margin: 0 auto; }
 .debugitem { grid-area: debugitem; }
@@ -175,6 +179,8 @@ const CMD = {
 	JOIN: 2,
 	EVENT: 3,
 	GAMESTAT: 4,
+	CHEER: 5,
+	USERSTAT: 6,
 	SEND_JOIN: 100,
 	SEND_EVENT: 101,
 	SEND_EPISODE: 102,
@@ -190,11 +196,12 @@ const PAGE = {
 	MAIN_MENU: 2,
 	SUMMON_EFFECT: 3,
 	USER_PROFILE: 4,
-	XXX: 5,
-	YYY: 6,
-	TUTORIAL_PWA: 7,
-	TUTORIAL_HELLO: 8,
-	TUTORIAL_QR: 9,
+	GAME_HISTORY: 5,
+	GAME_ASK: 6,
+	ASK_EFFECT: 7,
+	TUTORIAL_PWA: 10,
+	TUTORIAL_HELLO: 11,
+	TUTORIAL_QR: 12,
 };
 
 const TUTORIAL = {
@@ -204,8 +211,10 @@ const TUTORIAL = {
 };
 
 const movieList = [
+	"fiwx5iWPG5I",
+	"Fk2YpPMcSfA",
 	"srVAI-M0i_c",
-	"5Q77hzBjtFU?",
+	"5Q77hzBjtFU",
 	"koyxhykV3bo",
 	"fjt6bEuDQU4",
 	"XFcWZaUxXVs",
@@ -216,6 +225,7 @@ const movieList = [
 let userData = {};
 let saveData = null;
 let gameInfo = {};
+let levelMaster = {};
 let elementCache = [];
 let elementStatus = [];
 let currentPageCode = -1;
@@ -247,6 +257,10 @@ window.addEventListener("load", async (event) => {
 	
 	//最終的に埋め込む
 	gameInfo = await getMaster("GameInfo");
+	let lm = await getMaster("Level");
+	for(let m of lm) {
+		levelMaster[m.Level] = m;
+	}
 	
 	//セーブデータ取得
 	loadSaveData();
@@ -352,13 +366,15 @@ async function getMaster(name) {
 
 //ユーザ読み込み
 async function loadUser(userHash) {
-	let user = localStorage.getItem("UserData");
+	let user = null; //localStorage.getItem("UserData");
+	/*
 	if(user) {
 		try{
 			user = JSON.parse(user);
 		}catch(ex){
 		}
 	}
+	*/
 	
 	if(user && user.UserHash) {
 		userData = user;
@@ -389,6 +405,17 @@ async function createUser(data) {
 	}
 }
 
+//ユーザアンケート
+async function userGameAsk(data) {
+	let req = await fetch(`${baseURI}/vc/gameask`, {
+		method: 'POST',
+		mode: 'cors',
+		body: JSON.stringify(data)
+	});
+	
+	let result = await req.json();
+	return result;
+}
 
 //ウラコマンド、AIゲーム開始
 let aiGameState = {};
@@ -439,6 +466,13 @@ function userSetup() {
 	
 	getElm("dbgUserId").innerText = userData.UserId;
 	getElm("dbgAvatarType").innerText = userData.AvatarType;
+	
+	let userLevel = getUserLevel(userData.Exp);
+	getElm("playerName").innerText = userData.Name;
+	getElm("playerLevel").innerText = "レベル:" + userLevel.Level;
+	getElm("playerNextExp").innerText = userLevel.Next;
+	getElm("nextlv").value = userLevel.ExpGauge;
+	getElm("playerGold").innerText = userData.Gold;
 	
 	connectDGS();
 }
@@ -502,6 +536,18 @@ function execMessage(data) {
 	}
 	break;
 	
+	case CMD.USERSTAT:
+		console.log(data);
+		{
+			let update = data.Data.UpdateStat;
+			let userLevel = getUserLevel(update.Exp);
+			getElm("playerLevel").innerText = "レベル:" + userLevel.Level;
+			getElm("playerNextExp").innerText = userLevel.Next;
+			getElm("nextlv").value = userLevel.ExpGauge;
+			getElm("playerGold").innerText = update.Gold;
+		}
+		break;
+	
 	case CMD.GAMESTAT:
 		activeGameInfo = data.Data.ActiveGames;
 		console.log(activeGameInfo);
@@ -511,6 +557,9 @@ function execMessage(data) {
 	case CMD.EVENT:
 	{
 		console.log(payload);
+		
+		getElm("errorMessage").innerHTML = JSON.stringify(payload);
+		
 		//addSysLog("冒険者が魔法を使った", data.Data.Data);
 		switch(data.Data.EventId)
 		{
@@ -553,7 +602,7 @@ function execMessage(data) {
 
 function setupErrorDialog(data) {
 	enableUIById("modal-error");
-	getElm("errorMessage").innerHTML = "エラー";
+	getElm("errorMessage").innerHTML = JSON.stringify(data);
 }
 
 function closeError() {
@@ -626,14 +675,15 @@ function cheerMessage(toUserId, tgtGameId, msg, emo) {
 	ws.send(JSON.stringify(json));
 }
 
-function sendQREvent(code) {
+function sendQREvent(code, isDebug) {
 	try{
 		//SessionIdをキーにしてJoinを返す
 		let json = {
 			SessionId: wsSessionId,
 			Command: CMD.SEND_QR,
 			SerialCode: code,
-			UserId: userData.UserId
+			UserId: userData.UserId,
+			IsDebug: isDebug
 		};
 		ws.send(JSON.stringify(json));
 	}catch(ex){
@@ -652,6 +702,9 @@ function setupSPA() {
 	elementCache.push(getElm("page-main-menu"));
 	elementCache.push(getElm("page-summon-effect"));
 	elementCache.push(getElm("page-user-profile"));
+	elementCache.push(getElm("page-game-history"));
+	elementCache.push(getElm("page-game-ask"));
+	elementCache.push(getElm("page-ask-effect"));
 	elementCache.push({});
 	elementCache.push({});
 	elementCache.push(getElm("page-tutorial-pwa"));
@@ -679,6 +732,47 @@ function setupSPA() {
 		await createUser(data);
 		userCreateNextPageCheck(1);
 	});
+	
+	let elm = getElm("game-ask-0");
+	for(let game of gameInfo) {
+		if(game.Id >= 6 && game.Id <= 8) continue; //チェンガ対策
+		if(game.Id >= 99) continue;
+		var option = document.createElement("option");
+		option.text = game.GameTitle;
+		option.value = game.Id;
+		elm.appendChild(option);
+	}
+	
+	getElm("game-ask-send").addEventListener('click', async () => {
+		let askOk = true;
+		for(let i=0; i<8; ++i){
+			if(getElm("game-ask-"+i).value == "0"){
+				setupErrorDialog({ Message: "項目を入力してください" });
+				askOk = false;
+				break;
+			}
+		}
+		if(!askOk) return;
+		
+		let data = {
+			UserId: userData.UserId,
+			GameId: getElm("game-ask-0").value,
+			GameTitle: getElm("game-ask-0").selectedOptions[0].text,
+			Gender: getElm("game-ask-1").selectedOptions[0].text,
+			Age: getElm("game-ask-2").selectedOptions[0].text,
+			Originality: getElm("game-ask-3").selectedOptions[0].text,
+			Funny: getElm("game-ask-4").selectedOptions[0].text,
+			Quality: getElm("game-ask-5").selectedOptions[0].text,
+			Rule: getElm("game-ask-6").selectedOptions[0].text,
+			Replay: getElm("game-ask-7").selectedOptions[0].text,
+			Speciality: getElm("game-ask-8").value,
+			Improvement: getElm("game-ask-9").value,
+		};
+		console.log(data);
+		sendAskEffect();
+		let result = await userGameAsk(data);
+		console.log(result);
+	});
 }
 
 function loadPage(pageCode) {
@@ -704,6 +798,14 @@ function showProfile(userId = 0) {
 		userId = userData.UserId;
 	}
 	openUserProfile(userId);
+}
+
+function showGameHistory(gameId = 0) {
+	openGameHistory(gameId);
+}
+
+function showGameAsk() {
+	openGameAsk();
 }
 
 async function readHistory(title, gameHash, logId) {
@@ -753,8 +855,82 @@ function createUserAdventureHistory(history, maxCount) {
 	elm.innerHTML = html;
 }
 
+function createGameHistory(history, maxCount) {
+	var elm = getElm("gameHistory");
+	let html = "";
+	
+	let group_by = {};
+	for(let i=0; i<history.length; ++i) {
+		if(!group_by[history[i].GameHash]) {
+			group_by[history[i].GameHash] = [];
+		}
+		group_by[history[i].GameHash].push(history[i])
+	}
+	
+	for(let gameHash in group_by) {
+		if(group_by[gameHash].length == 1) {
+			html += `<<${group_by[gameHash][0].Title}>><br />`;
+			html += `<section class="history" style="height:80px;">`;
+			html += `${group_by[gameHash][0].PlayerName}の冒険　<button type="button" class="nes-btn is-primary readbutton" onclick="readHistory('${group_by[gameHash][0].Title}', '${group_by[gameHash][0].GameHash}', '${group_by[gameHash][0].LogId}')">読む</button>`;
+		}else{
+			html += `<<${group_by[gameHash][0].Title}>><br />`;
+			html += `<section class="history" style="height:240px;">`;
+			for(let i=0; i<group_by[gameHash].length; ++i) {
+				html += `　　${group_by[gameHash][0].PlayerName}の冒険　<button type="button" class="nes-btn is-primary" onclick="readHistory('${group_by[gameHash][i].Title}', '${group_by[gameHash][i].GameHash}', '${group_by[gameHash][i].LogId}')">読む</button><br />`;
+			}
+		}
+		html += "</section>";
+	}
+	
+	if(history.length == 0) {
+		html += `
+					<section class="history" style="height:120px;">
+						冒険はまだない
+					</section>`;
+	}else{
+		html += `
+					<section class="history" style="height:120px;">
+						<button type="button" class="nes-btn is-primary">もっと見る</button>
+					</section>`;
+	}
+	
+	elm.innerHTML = html;
+}
+
 function createUserMessageLog(message, maxCount) {
 	
+}
+
+function getUserLevel(exp) {
+	let ret = 1;
+	let next = 0;
+	let rate = 0;
+	for(let lv = 1; lv < 50; ++lv) {
+		let level = levelMaster[lv];
+		exp -= level.NeedExp;
+		if(exp < 0) {
+			ret = lv-1;
+			next = (-exp);
+			rate = Math.floor(next / level.NeedExp * 100);
+			break;
+		}
+	}
+	return {
+		Level: ret,
+		Next: next,
+		ExpGauge: rate
+	}
+}
+
+async function openGameHistory(gameId) {
+	let req = await fetch(`${baseURI}/vc/games/${gameId}`, {
+		mode: 'cors'
+	});
+	let result = await req.json();
+	console.log(result);
+	
+	createGameHistory(result.History, result.Count);
+	loadPage(PAGE.GAME_HISTORY);
 }
 
 async function openUserProfile(userId) {
@@ -772,6 +948,10 @@ async function openUserProfile(userId) {
 	loadPage(PAGE.USER_PROFILE);
 }
 
+async function openGameAsk(gameId=0) {
+	loadPage(PAGE.GAME_ASK);
+}
+
 function summonEffect() {
 	loadPage(PAGE.SUMMON_EFFECT);
 	
@@ -787,6 +967,23 @@ function summonEffect() {
 	setTimeout(() => {
 		userCreateNextPageCheck(2);
 	}, 7500);
+}
+
+function sendAskEffect() {
+	loadPage(PAGE.ASK_EFFECT);
+	
+	anime({
+		targets: getElm("askgauge"),
+		value: [0, 100],
+		easing: 'easeInOutQuart',
+			round: 1,
+			duration: 3000,
+			easing: 'easeInOutExpo'
+	});
+	
+	setTimeout(() => {
+		firstView();
+	}, 3500);
 }
 
 function userCreateNextPageCheck(no) {
@@ -992,13 +1189,13 @@ async function onScanSuccess(decodedText, decodedResult) {
 		return;
 	}
 	
-	if(decodedText.indexOf("VantanConnectQR:") == -1) {
+	if(decodedText.indexOf("VCQR:") == -1) {
 		getElm("qrresult").innerText = "無効なQRです";
 		return;
 	}
 	
 	//URLをパースしてシリアルコードだけ引き出す
-	let qrSerialCode = decodedText.replace("http://www.vtn-game.com/vc/index.html?qrcode=","");
+	let qrSerialCode = decodedText.replace("VCQR:","");
 	
 	sendQREvent(qrSerialCode);
 }
@@ -1221,6 +1418,8 @@ let isDebugMode = true;
 let myGameId = -1;
 let gameIngo = {};
 let gameEvent = {};
+let sendQRIndex = 0;
+
 async function setupDebugMenu() {
 	gameEvent = await getMaster("GameEvent");
 	
@@ -1245,6 +1444,22 @@ async function setupDebugMenu() {
 		filterAndShowDebugEvent(myGame);
 		myGameId = parseInt(myGame);
 	}
+}
+
+function sendDebugQR() {
+	const qrMagicScrollList = [
+		"810f1f50-6a2b-4a8d-8908-a37b9afe9ec2",		//魔法スクロール1
+		"8f47353a-a230-4a50-8e58-1ad1d46b2200",		//魔法スクロール2
+		"404c7c46-0436-4c8e-80b9-e86029ef5eb6",		//魔法スクロール3
+		"fa0e5db3-12d7-4f3e-b785-1aa1ef10ec4f",		//魔法スクロール4
+		"3900742f-0c88-4d6e-9dff-13035d52ab64",		//魔法スクロール5
+	];
+	
+	let qrStr = qrMagicScrollList[sendQRIndex];
+	sendQREvent(qrStr, true);
+	
+	sendQRIndex++;
+	if(sendQRIndex > 4) sendQRIndex=0;
 }
 
 async function gameShutdown() {
@@ -1302,6 +1517,7 @@ function filterAndShowDebugEvent(gameId) {
 	let html = "";
 	for(let evt of gameEvent) {
 		if(evt.Release == "") continue;
+		if(evt.Id >= 1000) continue;
 		if(evt.Target == -1 || evt.Target == gameId) {
 			html += `<button type="button" class="nes-btn is-primary" onclick=sendTestEvent(${evt.Id})>${evt.Description}</button><div style="height:10px;"></div>`;
 		}
@@ -1460,7 +1676,18 @@ function notifyMe() {
 	</div>
 	
 	<div class="main">
-	
+		<div id ="userinfo" class="nes-container is-rounded with-title status" style="display:none;">
+			<p class="title">ステータス</p>
+			<div class="playerName" id="playerName"></div><br />
+			<div class="playerLevel" id="playerLevel"></div>
+			次のレベルまで: <span class="playerNextExp" id="playerNextExp"></span><br />
+			<progress class="nes-progress is-primary playerLevelGauge" id="nextlv" value="0" max="100"></progress><br />
+			<br />
+			<div class="playerGold">所持ゴールド: <span id="playerGold"></span></div>
+		</div>
+		
+		<div style="height:50px;"></div>
+		
 		<div id="youtubeLive" class="center">
 		</div>
 		
@@ -1503,6 +1730,7 @@ function notifyMe() {
 		<div style="height:50px;"></div>
 		
 		<div id="page-main-menu" style="display:none;">
+			
 			<div id ="gameinfo" class="nes-container is-rounded with-title status">
 				<p class="title">ゲーム稼働状況</p>
 				
@@ -1517,7 +1745,7 @@ function notifyMe() {
 			</div>
 			
 			<div id="aaa" class="nes-container is-rounded with-title status">
-				<p class="title">探索 <QR></p>
+				<p class="title">ＱＲ探索</p>
 				<div class="center">
 					会場のQRコードを読み込んで、冒険を有利にしよう！<br /><br />
 					<button type="button" id="qrscan" class="nes-btn is-primary" onclick="readQR();">QR読み込み</button><br /><br />
@@ -1533,9 +1761,11 @@ function notifyMe() {
 				<p class="title">キロク</p>
 				
 				<div class="center">
-					<button type="button" class="nes-btn is-primary" onclick="showProfile()">旅の記録を見る</button>
+					<button type="button" class="nes-btn is-primary" onclick="showProfile()">自分のプロフィールを見る</button>
 					<div style="height:25px;"></div>
-					<button type="button" class="nes-btn is-primary" onclick="showHistory()">出会いの記録</button>
+					<button type="button" class="nes-btn is-primary" onclick="showGameHistory()">みんなの冒険の記録を見る</button>
+					<div style="height:25px;"></div>
+					<button type="button" class="nes-btn is-primary" onclick="showGameAsk()">アンケートに答える</button>
 					<div style="height:10px;"></div>
 				</div>
 			</div>
@@ -1548,21 +1778,6 @@ function notifyMe() {
 					<section id="msglog" class="message-list">
 					</section>
 					<div style="height:50px;"></div>
-				</div>
-			</div>
-			
-			<div style="height:50px;"></div>
-			
-			<div id ="userinfo" class="nes-container is-rounded with-title status">
-				<p class="title">あなたのステータス</p>
-				
-				<div class="nes-container with-title">
-					<p class="title">名前</p>
-					<div id="playerName"></div>
-				</div>
-				<div class="nes-container">
-				レベル<div id="playerLevel"></div>
-				次のレベルまで<div id="playerExp"></div>
 				</div>
 			</div>
 			
@@ -1580,6 +1795,17 @@ function notifyMe() {
 				<div class="right">
 					<button type="button" id="test" class="nes-btn is-primary" onclick="testEvent();">ソウシン</button>
 				</div>
+			</div>
+		</div>
+		
+		<div id ="page-game-history" style="display:none;">
+			<button type="button" class="nes-btn is-primary" onclick=backToMain()>戻る</button>
+			<div style="height:25px;"></div>
+			
+			<div class="nes-container is-rounded with-title status">
+				<p class="title">みんなの冒険の記録</p>
+				<div style="height:10px;"></div>
+				<div id="gameHistory"></div>
 			</div>
 		</div>
 		
@@ -1694,6 +1920,11 @@ function notifyMe() {
 			<progress class="nes-progress is-primary" id="summongauge" value="0" max="100"></progress>
 		</div>
 		
+		<div id="page-ask-effect" class="nes-container status" style="display:none;">
+			<p>アンケート送信…</p>
+			<progress class="nes-progress is-primary" id="askgauge" value="0" max="100"></progress>
+		</div>
+		
 		<div id="page-user-profile" style="display:none;">
 			<button type="button" class="nes-btn is-primary" onclick=backToMain()>戻る</button>
 			<div style="height:25px;"></div>
@@ -1772,6 +2003,220 @@ function notifyMe() {
 		</div>
 		
 		<div style="height:50px;"></div>
+		
+		<div id="page-game-ask" style="display:none;">
+			<button type="button" class="nes-btn is-primary" onclick=backToMain()>戻る</button>
+			<div style="height:25px;"></div>
+			<h1 class="nes-balloon from-left nes-pointer">ゲームアンケート</h1>
+			<div id ="userprof" class="nes-container is-rounded status">
+				<div class="nes-container with-title">
+					<p class="title">遊んだゲーム</p>
+					
+					<div class="nes-select is-normal">
+						<select required id="game-ask-0">
+						</select>
+					</div>
+				</div>
+				
+				<div id="askGameNote"><br />
+				<p>※このゲームはバンタンコネクト非対応です</p>
+				</div>
+				
+				<div class="nes-container with-title">
+					<p class="title">性別</p>
+					
+					<div class="nes-select is-normal">
+						<select required id="game-ask-1">
+						<option value="0" disabled selected hidden>必須項目(タップして選択)</option>
+						<option value="1">男性</option>
+						<option value="2">女性</option>
+						<option value="3">その他</option>
+						<option value="4">無回答</option>
+						</select>
+					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">ご年齢層</p>
+					
+					<div class="nes-select is-normal">
+						<select required id="game-ask-2">
+						<option value="0" disabled selected hidden>必須項目(タップして選択)</option>
+						<option value="1">0～9歳</option>
+						<option value="2">10～19歳</option>
+						<option value="3">20～29歳</option>
+						<option value="4">30～39歳</option>
+						<option value="5">40～49歳</option>
+						<option value="6">50～59歳</option>
+						<option value="7">60歳～</option>
+						<option value="8">その他</option>
+						</select>
+					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">オリジナリティ</p>
+					
+					<label for="error_select">ゲームのオリジナリティはありましたか？ <br /><br />
+					既存で販売されているゲームなどとは違う新しさがあったかなどの視点で問題ございません</label>
+					<div class="nes-select is-normal">
+						<select required id="game-ask-3">
+						<option value="0" disabled selected hidden>必須項目(タップして選択)</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						</select>
+					</div>
+					<div>
+						<label for="error_select">なかった…1<br />あった…10<br />でお願いします</label>
+					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">面白さ</p>
+					
+					<label for="error_select">ゲームは面白かったですか？</label>
+					<div class="nes-select is-normal">
+						<select required id="game-ask-4">
+						<option value="0" disabled selected hidden>必須項目(タップして選択)</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						</select>
+					</div>
+					<div>
+						<label for="error_select">つまらない…1<br />どちらでもない…5<br />おもしろかった…10<br />でお願いします</label>
+					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">クォリティ</p>
+					
+					<label for="error_select">ゲームのクォリティはいかがでしたか？</label>
+					<div class="nes-select is-normal">
+						<select required id="game-ask-5">
+						<option value="0" disabled selected hidden>必須項目(タップして選択)</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						</select>
+					</div>
+					<div>
+						<label for="error_select">低い…1<br />どちらでもない…5<br />高い…10<br />でお願いします</label>
+					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">ゲームルール</p>
+					
+					<label for="error_select">
+					ルールを理解して遊ぶことができましたか？ <br />
+					</label>
+					<div class="nes-select is-normal">
+						<select required id="game-ask-6">
+						<option value="0" disabled selected hidden>必須項目(タップして選択)</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						</select>
+					</div>
+					<div>
+						<label for="error_select">できなかった…1<br />できた…10<br />でお願いします</label>
+					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">リプレイ性</p>
+					
+					<label for="error_select">また遊びたいと思いますか？</label>
+					<div class="nes-select is-normal">
+						<select required id="game-ask-7">
+						<option value="0" disabled selected hidden>必須項目(タップして選択)</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						</select>
+					</div>
+					<div>
+						<label for="error_select">思わない…1<br />思う…10<br />でお願いします</label>
+					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">特筆する点</p>
+					(回答は任意です)<br />
+					特に面白かった点があればぜひご記載ください
+					<textarea id="game-ask-8" name="game-ask-8" class="nes-textarea ask-text"></textarea>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">改善点など</p>
+					(回答は任意です)<br />
+					物足りなかった点など、改善点があればご記載ください
+					<textarea id="game-ask-9" name="game-ask-9" class="nes-textarea ask-text"></textarea>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="center">
+					<button type="button" id="game-ask-send" class="nes-btn is-primary" onclick=sendGameAsk()>送信</button>
+				</div>
+			</div>
+		</div>
+		
+		<div style="height:50px;"></div>
+		
 	</div>
 	
 	<div id="debugitem" style="display:none;">
@@ -1904,7 +2349,7 @@ function notifyMe() {
 				<p class="title">テストQR</p>
 				<br />
 				<button type="button" class="nes-btn is-primary" onclick=sendQREvent("810f1f50-6a2b-4a8d-8908-a37b9afe9ec2")>リンク1</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendQREvent("a4cf1e07-cd1a-40ab-9d6f-755d344cf550")>スクロール1</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendDebugQR()>スクロール</button><div style="height:10px;"></div>
 			</div>
 		</div>
 		

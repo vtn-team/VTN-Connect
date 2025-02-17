@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require('uuid')
 let userSession:any = {};
 let uniqueUsers:any = [];
 let userCountCache = 0;
+let userAskLog: any = {};
 
 interface UserStatus {
 	Name:string;
@@ -284,6 +285,32 @@ function getUserLevel(exp: number) {
 	return ret;
 }
 
+export async function getRewardsByEventCode(userId: number, gold: number, exp:number) {
+	let ret = {
+		Exp: exp,
+		Coin: gold,
+	};
+	
+	let level = getMaster("Level");
+	if(!level) return ret;
+	
+	let userInfo = await getUserFromId(userId);
+	if(!userInfo) return ret;
+	
+	//ユーザ情報更新
+	let totalGold = userInfo.Gold + ret.Coin;
+	let totalExp = userInfo.Exp + ret.Exp;
+	let lv = getUserLevel(totalExp);
+	
+	await query("UPDATE User SET Level = ?, Exp = ?, Gold = ? WHERE Id = ?", [lv, totalExp, totalGold, userId]);
+	
+	return {
+		Lv: lv,
+		Exp: totalExp,
+		Gold: totalGold
+	};
+}
+
 export async function getRewardsByGame(gameId: number, userId: number, resultCode: ResultCode, time: number) {
 	let ret = {
 		Exp: 0,
@@ -334,4 +361,54 @@ export async function getRewardsByGame(gameId: number, userId: number, resultCod
 	await query("UPDATE User SET Level = ?, Exp = ?, Gold = ? WHERE Id = ?", [lv, exp, gold, userId]);
 	
 	return ret;
+}
+
+export async function gameAskAndReward(askVal: any) {
+	let userInfo = await getUserFromId(askVal.UserId);
+	if(!userInfo) return {
+		Status: 500,
+		Message: "ユーザが見つからない"
+	};
+	
+	if(!userAskLog[askVal.UserId]) {
+		userAskLog[askVal.UserId] = {}
+	}
+	
+	let error = false;
+	try {
+		await query("INSERT INTO GameReview (UserId, GameId, GameTitle, Gender, Age, Originality, Funny, Quality, Rule, Replay, Speciality, Improvement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+			askVal.UserId, askVal.GameId, askVal.GameTitle, askVal.Gender, askVal.Age,askVal.Originality, askVal.Funny, askVal.Quality, askVal.Rule, askVal.Replay, askVal.Speciality, askVal.Improvement
+		]);
+	}catch(ex){
+		error = true;
+		console.log(ex);
+	}
+	
+	if(error) return {
+		Status: 500,
+		Message: "アンケートでエラーが発生しました"
+	};
+	
+	let reward = {};
+	if(!userAskLog[askVal.UserId][askVal.GameId]) {
+		//ユーザ情報更新
+		let gold = userInfo.Gold + 500;
+		let exp = userInfo.Exp + 500;
+		let lv = getUserLevel(exp);
+		
+		await query("UPDATE User SET Level = ?, Exp = ?, Gold = ? WHERE Id = ?", [lv, exp, gold, askVal.UserId]);
+		userAskLog[askVal.UserId][askVal.GameId] = 1;
+		
+		reward = {
+			Exp: exp,
+			Level: lv,
+			Gold: gold
+		};
+	}
+	
+	return {
+		Status: 200,
+		Message: "OK",
+		Reward: reward
+	};
 }

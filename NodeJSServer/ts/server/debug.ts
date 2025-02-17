@@ -59,10 +59,10 @@ export async function animejs(req: any,res: any,route: any)
 
 export async function bg(req: any,res: any,route: any)
 {
-	const image = await fs.readFile(__dirname+"/../../../Web/bg.gif");
+	const image = await fs.readFile(__dirname+"/../../../Web/bg.jpg");
 	return {
 		statusCode: 200,
-		type: 'image/gif',
+		type: 'image/jpeg',
 		html: image
 	}
 }

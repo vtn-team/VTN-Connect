@@ -1,5 +1,5 @@
 {
-  "Version": 327,
+  "Version": 424,
   "Data": [
     {
       "Id": "1",
@@ -12,7 +12,7 @@
       "GameOverBonusExp": "300",
       "PlayTime": "300",
       "IsReplayTarget": "1",
-      "IsReLink": "0"
+      "isVCTarget": "1"
     },
     {
       "Id": "2",
@@ -25,7 +25,7 @@
       "GameOverBonusExp": "50",
       "PlayTime": "600",
       "IsReplayTarget": "1",
-      "IsReLink": "1"
+      "isVCTarget": "1"
     },
     {
       "Id": "3",
@@ -38,7 +38,7 @@
       "GameOverBonusExp": "500",
       "PlayTime": "600",
       "IsReplayTarget": "1",
-      "IsReLink": "0"
+      "isVCTarget": "1"
     },
     {
       "Id": "4",
@@ -51,7 +51,7 @@
       "GameOverBonusExp": "500",
       "PlayTime": "800",
       "IsReplayTarget": "0",
-      "IsReLink": "0"
+      "isVCTarget": "1"
     },
     {
       "Id": "5",
@@ -64,7 +64,7 @@
       "GameOverBonusExp": "500",
       "PlayTime": "600",
       "IsReplayTarget": "0",
-      "IsReLink": "1"
+      "isVCTarget": "1"
     },
     {
       "Id": "6",
@@ -77,7 +77,7 @@
       "GameOverBonusExp": "3000",
       "PlayTime": "300",
       "IsReplayTarget": "0",
-      "IsReLink": "0"
+      "isVCTarget": "1"
     },
     {
       "Id": "7",
@@ -90,7 +90,7 @@
       "GameOverBonusExp": "3000",
       "PlayTime": "300",
       "IsReplayTarget": "0",
-      "IsReLink": "0"
+      "isVCTarget": "1"
     },
     {
       "Id": "8",
@@ -103,12 +103,12 @@
       "GameOverBonusExp": "3000",
       "PlayTime": "300",
       "IsReplayTarget": "0",
-      "IsReLink": "0"
+      "isVCTarget": "1"
     },
     {
-      "Id": "",
-      "ProjectCode": "",
-      "GameTitle": "",
+      "Id": "9",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
       "Difficulty": "",
       "ClearBonusCoin": "",
       "GameOverBonusCoin": "",
@@ -116,7 +116,241 @@
       "GameOverBonusExp": "",
       "PlayTime": "",
       "IsReplayTarget": "",
-      "IsReLink": ""
+      "isVCTarget": ""
+    },
+    {
+      "Id": "10",
+      "ProjectCode": "GDTeamWork01",
+      "GameTitle": "マグネティックロボ",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "11",
+      "ProjectCode": "GDTeamWork02",
+      "GameTitle": "Figment the Cosmos",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "12",
+      "ProjectCode": "GDTeamWork03",
+      "GameTitle": "Robotics Protocol",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "13",
+      "ProjectCode": "GDTeamWork04",
+      "GameTitle": "クリエイターライフのきおく",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "14",
+      "ProjectCode": "GDTeamWork05",
+      "GameTitle": "Space Exploration",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "15",
+      "ProjectCode": "GDTeamWork06",
+      "GameTitle": "ヒューマニティ オブ ザ デッド",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "16",
+      "ProjectCode": "Team2024_A",
+      "GameTitle": "ルテアとおかしなスプーン",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "17",
+      "ProjectCode": "Team2024_B",
+      "GameTitle": "アストラルアカデミア",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "18",
+      "ProjectCode": "Team2024_C",
+      "GameTitle": "Stuffed  Fairy",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "19",
+      "ProjectCode": "Team2024_D",
+      "GameTitle": "Eclipses -イクリプシーズ-",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "20",
+      "ProjectCode": "Team2024_E",
+      "GameTitle": "NIRVANA",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "21",
+      "ProjectCode": "GDTeamWork07",
+      "GameTitle": "カミゴロシ",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "22",
+      "ProjectCode": "GDWork01",
+      "GameTitle": "Spectral Red Dragon",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "23",
+      "ProjectCode": "GDWork02",
+      "GameTitle": "Guid",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "24",
+      "ProjectCode": "GDWork03",
+      "GameTitle": "Magnet Planet",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "25",
+      "ProjectCode": "GDWork04",
+      "GameTitle": "３つのスマホ",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "26",
+      "ProjectCode": "GDWork05",
+      "GameTitle": "フェイクシェル",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "27",
+      "ProjectCode": "GDWork06",
+      "GameTitle": "Storm Penetrator",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
     },
     {
       "Id": "99",
@@ -129,7 +363,7 @@
       "GameOverBonusExp": "0",
       "PlayTime": "0",
       "IsReplayTarget": "0",
-      "IsReLink": "0"
+      "isVCTarget": "0"
     },
     {
       "Id": "100",
@@ -142,7 +376,7 @@
       "GameOverBonusExp": "10",
       "PlayTime": "10",
       "IsReplayTarget": "0",
-      "IsReLink": "1"
+      "isVCTarget": "1"
     },
     {
       "Id": "101",
@@ -155,7 +389,7 @@
       "GameOverBonusExp": "100",
       "PlayTime": "10",
       "IsReplayTarget": "0",
-      "IsReLink": "0"
+      "isVCTarget": "0"
     }
   ]
 }

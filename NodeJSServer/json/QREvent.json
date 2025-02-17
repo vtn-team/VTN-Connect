@@ -1,455 +1,275 @@
 {
-  "Version": 20,
+  "Version": 199,
   "Data": [
     {
       "Id": "1",
       "QRId": "1",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "経験値を入手",
+      "Probability": "200",
+      "Flag": "Exp",
+      "Value": "50",
+      "Level": "1"
     },
     {
       "Id": "2",
       "QRId": "1",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "経験値を入手",
+      "Probability": "100",
+      "Flag": "Exp",
+      "Value": "100",
+      "Level": "2"
     },
     {
       "Id": "3",
       "QRId": "1",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "経験値を入手",
+      "Probability": "70",
+      "Flag": "Exp",
+      "Value": "200",
+      "Level": "3"
     },
     {
       "Id": "4",
       "QRId": "1",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "経験値を入手",
+      "Probability": "10",
+      "Flag": "Exp",
+      "Value": "1000",
+      "Level": "4"
     },
     {
       "Id": "5",
       "QRId": "1",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "ランダムでアーティファクトを取得",
+      "Probability": "5",
+      "Flag": "Exp",
+      "Value": "0",
+      "Level": "99"
     },
     {
       "Id": "6",
       "QRId": "2",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "コイン入手",
+      "Probability": "200",
+      "Flag": "Coin",
+      "Value": "500",
+      "Level": "1"
     },
     {
       "Id": "7",
       "QRId": "2",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "コイン入手",
+      "Probability": "100",
+      "Flag": "Coin",
+      "Value": "1000",
+      "Level": "2"
     },
     {
       "Id": "8",
       "QRId": "2",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "コイン入手",
+      "Probability": "50",
+      "Flag": "Coin",
+      "Value": "2000",
+      "Level": "3"
     },
     {
       "Id": "9",
       "QRId": "2",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "コイン入手",
+      "Probability": "5",
+      "Flag": "Coin",
+      "Value": "10000",
+      "Level": "4"
     },
     {
       "Id": "10",
       "QRId": "2",
-      "Description": "",
-      "Prob": "100",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "Description": "コイン入手",
+      "Probability": "1",
+      "Flag": "Coin",
+      "Value": "30000",
+      "Level": "5"
     },
     {
       "Id": "11",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "3",
+      "Description": "経験値を入手",
+      "Probability": "200",
+      "Flag": "Exp",
+      "Value": "80",
+      "Level": "1"
     },
     {
       "Id": "12",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "3",
+      "Description": "経験値を入手",
+      "Probability": "100",
+      "Flag": "Exp",
+      "Value": "150",
+      "Level": "2"
     },
     {
       "Id": "13",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "3",
+      "Description": "経験値を入手",
+      "Probability": "70",
+      "Flag": "Exp",
+      "Value": "500",
+      "Level": "3"
     },
     {
       "Id": "14",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "3",
+      "Description": "経験値を入手",
+      "Probability": "10",
+      "Flag": "Exp",
+      "Value": "1500",
+      "Level": "4"
     },
     {
       "Id": "15",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "3",
+      "Description": "経験値を入手",
+      "Probability": "5",
+      "Flag": "Exp",
+      "Value": "0",
+      "Level": "5"
     },
     {
       "Id": "16",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "4",
+      "Description": "コイン入手",
+      "Probability": "500",
+      "Flag": "Coin",
+      "Value": "250",
+      "Level": "1"
     },
     {
       "Id": "17",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "4",
+      "Description": "コイン入手",
+      "Probability": "100",
+      "Flag": "Coin",
+      "Value": "1500",
+      "Level": "2"
     },
     {
       "Id": "18",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "4",
+      "Description": "コイン入手",
+      "Probability": "70",
+      "Flag": "Coin",
+      "Value": "5000",
+      "Level": "3"
     },
     {
       "Id": "19",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "4",
+      "Description": "コイン入手",
+      "Probability": "10",
+      "Flag": "Coin",
+      "Value": "10000",
+      "Level": "4"
     },
     {
       "Id": "20",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "4",
+      "Description": "コイン入手",
+      "Probability": "5",
+      "Flag": "Coin",
+      "Value": "30000",
+      "Level": "5"
     },
     {
       "Id": "21",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "5",
+      "Description": "コインと経験値を入手",
+      "Probability": "200",
+      "Flag": "Both",
+      "Value": "30",
+      "Level": "1"
     },
     {
       "Id": "22",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "5",
+      "Description": "コインと経験値を入手",
+      "Probability": "100",
+      "Flag": "Both",
+      "Value": "50",
+      "Level": "2"
     },
     {
       "Id": "23",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "5",
+      "Description": "コインと経験値を入手",
+      "Probability": "70",
+      "Flag": "Both",
+      "Value": "100",
+      "Level": "3"
     },
     {
       "Id": "24",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "5",
+      "Description": "コインと経験値を入手",
+      "Probability": "10",
+      "Flag": "Both",
+      "Value": "500",
+      "Level": "4"
     },
     {
       "Id": "25",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "5",
+      "Description": "ランダムでアーティファクトを取得",
+      "Probability": "5",
+      "Flag": "Both",
+      "Value": "0",
+      "Level": "99"
     },
     {
       "Id": "26",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "1",
+      "Description": "ハズレイベント",
+      "Probability": "150",
+      "Flag": "Event",
+      "Value": "501",
+      "Level": "1"
     },
     {
       "Id": "27",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "2",
+      "Description": "ハズレイベント",
+      "Probability": "150",
+      "Flag": "Event",
+      "Value": "502",
+      "Level": "1"
     },
     {
       "Id": "28",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "3",
+      "Description": "ハズレイベント",
+      "Probability": "150",
+      "Flag": "Event",
+      "Value": "503",
+      "Level": "1"
     },
     {
       "Id": "29",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "4",
+      "Description": "ハズレイベント",
+      "Probability": "150",
+      "Flag": "Event",
+      "Value": "504",
+      "Level": "1"
     },
     {
       "Id": "30",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "31",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "32",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "33",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "34",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "35",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "36",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "37",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "38",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "39",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "40",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "41",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "42",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "43",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "44",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "45",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "46",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "47",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "48",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "49",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
-    },
-    {
-      "Id": "50",
-      "QRId": "",
-      "Description": "",
-      "Prob": "",
-      "Flag": "",
-      "Coin": "",
-      "Exp": ""
+      "QRId": "5",
+      "Description": "ハズレイベント",
+      "Probability": "150",
+      "Flag": "Event",
+      "Value": "505",
+      "Level": "1"
     }
   ]
 }
