@@ -1620,6 +1620,7 @@ function initializePush() {
 // 	ws.send(JSON.stringify(json));
 // }
 
+let sub;
 function subscribeUserToPush(registration) {
 	// TODO: 公開鍵の取得をどうにかする
     const applicationServerKey = urlB64ToUint8Array('BLheYK_ZKUqWjTUX4OEnG6eytFDJ79H3EQczFEqRYgF2Plp5W-D8Eki3E2--EWqKfxN_-FSTyXF0MJRqQJrYvZA');
@@ -1630,35 +1631,50 @@ function subscribeUserToPush(registration) {
     })
     .then(function(subscription) {
         console.log('ユーザーがプッシュ通知に登録されました:', subscription);
+		sub = subscription;
         // サーバーにPushSubscriptionを送信する
-        sendSubscriptionToServer(subscription);
+        saveSubscription();
     })
     .catch(function(error) {
         console.log('プッシュ通知の登録に失敗しました:', error);
     });
 }
 
-// VAPIDキーをUint8Arrayに変換する関数
-function urlB64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
+function saveSubscription() {
+	// サーバーにPushSubscriptionを送信する
+	fetch('http://localhost:4649/vc/subscribe', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			subscription: sub,
+			// TODO: ユーザーIDの取得をやる
+			// UserId: userData.UserId
+			UserId: "1"
+		})
+	})
+	.then(function(response) {
+		if (response.ok) {
+			console.log('PushSubscriptionがサーバーに送信されました');
+		} else {
+			console.log('PushSubscriptionの送信に失敗しました');
+		}
+	})
+	.catch(function(error) {
+		console.log('PushSubscriptionの送信中にエラーが発生しました:', error);
+	});
 }
 
-function sendSubscriptionToServer(subscription) {
+function sendSubscriptionToServer() {
     // サーバーにPushSubscriptionを送信する
-    fetch('http://localhost:4649/vc/subscribe', {
+    fetch('http://localhost:4649/vc/send', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-			subscription: subscription,
+			subscription: sub,
 			// TODO: ユーザーIDの取得をやる
 			// UserId: userData.UserId
 			UserId: "1"
@@ -1674,6 +1690,18 @@ function sendSubscriptionToServer(subscription) {
     .catch(function(error) {
         console.log('PushSubscriptionの送信中にエラーが発生しました:', error);
     });
+}
+
+// VAPIDキーをUint8Arrayに変換する関数
+function urlB64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }
 
 </script>
@@ -2343,9 +2371,8 @@ function sendSubscriptionToServer(subscription) {
 				<button type="button" id="" class="nes-btn is-primary" onclick="initializePush();">通知登録</button>
 				<div style="height:10px;"></div>
 
-				<!-- TODO: 通知の登録と送信を分離する -->
-				<!-- <button type="button" id="" class="nes-btn is-primary" onclick="subscribeUserToPush();">通知送信</button>
-				<div style="height:10px;"></div> -->
+				<button type="button" id="" class="nes-btn is-primary" onclick="sendSubscriptionToServer();">通知送信</button>
+				<div style="height:10px;"></div>
 
 				<button type="button" class="nes-btn is-primary" onclick="reCreateUser();">ユーザ登録やり直す</button><br />
 				NOTE: 作り直すまでデータは消えない<br />
