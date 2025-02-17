@@ -244,7 +244,22 @@ export async function epictest(req: any, res: any, route: any) {
   }, 1000);
 }
 
+// プッシュ通知登録
 export async function subscribe(req: any, res: any, route: any) {
+  let PushNotification = require("./../gameserver/pushNotification");
+  let pushSubscription = {
+    endpoint: route.query.subscription.endpoint,
+    keys: {
+      auth: route.query.subscription.keys.auth,
+      p256dh: route.query.subscription.keys.p256dh,
+    },
+  };
+
+  let result = await PushNotification.savePushSubscription(route.query.UserId, pushSubscription);
+}
+
+// プッシュ通知送信
+export async function send(req: any, res: any, route: any) {
   let PushNotification = require("./../gameserver/pushNotification");
   let result = await PushNotification.sendPushNotification(route.query.UserId);
 }
