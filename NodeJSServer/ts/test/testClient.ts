@@ -1,6 +1,7 @@
 import { client } from 'websocket'
-import { getConnectionAddress } from "./gameserver/server"
-import { CMD, TARGET } from "./gameserver/session"
+import { getConnectionAddress } from "../gameserver/server"
+import { CMD, TARGET } from "../gameserver/session"
+import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC, getGameHistory, getGameSessions, getGameUserCache, gameHandOver, setArtifactDebug } from "./../vclogic/vcgame"
 
 
 export class TestGameClient {
@@ -114,7 +115,8 @@ export class TestAIGameClient extends TestGameClient {
 	}
 	
 	public async gameStart() {
-		this.result = await gameStartAIGame({});
+		this.result = await gameStartAIGame(0);
+		return this.result;
 	}
 	
 	public async gameEnd() {
@@ -125,8 +127,10 @@ export class TestAIGameClient extends TestGameClient {
 				GameResult: true,
 				MissionClear: true,
 				rewards: { Exp: 300, Coin: 200 }
-			};
+			});
 		}
-		await gameEndAIGame(result);
+		result.GameHash = this.result.GameHash;
+		result.UserResults = result;
+		return await gameEndAIGame(result);
 	}
 }
