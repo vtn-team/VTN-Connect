@@ -1,5 +1,5 @@
 {
-  "Version": 424,
+  "Version": 438,
   "Data": [
     {
       "Id": "1",
@@ -69,7 +69,7 @@
     {
       "Id": "6",
       "ProjectCode": "Chenga",
-      "GameTitle": "チェンガ",
+      "GameTitle": "チェンガ 1P",
       "Difficulty": "20",
       "ClearBonusCoin": "1000",
       "GameOverBonusCoin": "500",
@@ -82,7 +82,7 @@
     {
       "Id": "7",
       "ProjectCode": "Chenga",
-      "GameTitle": "チェンガ",
+      "GameTitle": "チェンガ 2P",
       "Difficulty": "20",
       "ClearBonusCoin": "1000",
       "GameOverBonusCoin": "500",
@@ -95,7 +95,7 @@
     {
       "Id": "8",
       "ProjectCode": "Chenga",
-      "GameTitle": "チェンガ",
+      "GameTitle": "チェンガ 3P",
       "Difficulty": "20",
       "ClearBonusCoin": "1000",
       "GameOverBonusCoin": "500",
@@ -353,6 +353,58 @@
       "isVCTarget": ""
     },
     {
+      "Id": "28",
+      "ProjectCode": "GDWork07",
+      "GameTitle": "Commander of the Dungeon",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "29",
+      "ProjectCode": "GDWork08",
+      "GameTitle": "ワイズマンの修練塔",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "30",
+      "ProjectCode": "GDWork09",
+      "GameTitle": "Abandoned Priso Break",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "31",
+      "ProjectCode": "GDWork10",
+      "GameTitle": "スマートモーニングシュミレーション",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
       "Id": "99",
       "ProjectCode": "UserPortal",
       "GameTitle": "ユーザ接続用アプリ",
@@ -380,8 +432,8 @@
     },
     {
       "Id": "101",
-      "ProjectCode": "SampleGameAITest",
-      "GameTitle": "AIテスト用",
+      "ProjectCode": "VCMainUI",
+      "GameTitle": "いぬ大",
       "Difficulty": "0",
       "ClearBonusCoin": "200",
       "GameOverBonusCoin": "100",
