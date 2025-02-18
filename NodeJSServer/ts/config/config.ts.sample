@@ -30,3 +30,9 @@ export const DATABASE_PASSWORD = "db pass";
 
 //db select
 export const DATABASE_SELECT = "db use";
+
+//push
+export const PUSH_PRIVATE_KEY = "";
+
+//push
+export const PUSH_PUBLIC_KEY = "";

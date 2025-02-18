@@ -152,6 +152,7 @@ export async function getGameUsers(req: any,res: any,route: any)
 		result: results
 	};
 */
+}
 
 //ユーザーを作成する
 export async function createUser(req: any, res: any, route: any) {
