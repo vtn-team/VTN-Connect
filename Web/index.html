@@ -6,27 +6,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
 <title>VANTAN - CONNECT (DEV LOCATION)</title>
-<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
 <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript" ></script>
 <script src="anime.min.js"></script>
 <style>
 /* ドット調のフォントに変更 */
 @font-face {
-  font-family: "PixelMplus12-Bold";
+  font-family: "PixelMplus12-Regular";
   src: 
-    local("PixelMplus12-Bold"),
-    url("PixelMplus12-Bold.woff2") format("woff2"),
-    url("PixelMplus12-Bold.woff") format("woff"),
-    url("PixelMplus12-Bold.ttf");
+    local("PixelMplus12-Regular"),
+    url("https://www.vtn-game.com/vc/PixelMplus12-Regular.woff2") format("woff2"),
+    url("https://www.vtn-game.com/vc/PixelMplus12-Regular.woff") format("woff"),
+    url("https://www.vtn-game.com/vc/PixelMplus12-Regular.ttf");
 }
 
 html, body, pre, code, kbd, samp {
-  font-family: "PixelMplus12-Bold", serif;
+  font-family: "PixelMplus12-Regular", serif;
 }
 
 body {
-  background-image: url('bg.jpg');
+  background-image: url('https://www.vtn-game.com/vc/bg.jpg');
   background-size: auto 100vh;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -202,7 +201,17 @@ const PAGE = {
 	TUTORIAL_PWA: 10,
 	TUTORIAL_HELLO: 11,
 	TUTORIAL_QR: 12,
+	TUTORIAL_GAMELINK: 12,
 };
+
+/*
+・そもそもバンコネとはなんぞや(自分を作る)
+・QR読んでね
+・ゲームリンクと冒険
+・他の人応援しようね、良いことあるよ
+・連動イベントがあるよ
+・冒険(AIゲーム)について
+*/
 
 const TUTORIAL = {
 	NONE: 0,
@@ -809,6 +818,10 @@ function showProfile(userId = 0) {
 	openUserProfile(userId);
 }
 
+function showFriends() {
+	openFriendList();
+}
+
 function showGameHistory(gameId = 0) {
 	openGameHistory(gameId);
 }
@@ -834,8 +847,23 @@ async function readHistory(title, gameHash, logId) {
 	enableUIById("modal-adventure-log");
 }
 
+async function openReward(title, rewards) {
+	var elm = getElm("rewardLogMsg");
+	elm.innerHTML = "";
+	//result.StoryBook.replaceAll("\n", "<br />");
+	
+	var elm = getElm("rewardLogTitle");
+	elm.innerHTML = title;
+	
+	enableUIById("modal-reward-log");
+}
+
 function closeHistory() {
 	disableUIById("modal-adventure-log");
+}
+
+function closeRewardLog() {
+	disableUIById("modal-reward-log");
 }
 
 function createUserAdventureHistory(history, maxCount) {
@@ -940,6 +968,14 @@ async function openGameHistory(gameId) {
 	
 	createGameHistory(result.History, result.Count);
 	loadPage(PAGE.GAME_HISTORY);
+}
+
+async function openFriendList() {
+	let req = await fetch(`${baseURI}/vc/friend/${userData.UserId}`, {
+		mode: 'cors'
+	});
+	let result = await req.json();
+	console.log(result);
 }
 
 async function openUserProfile(userId) {
@@ -1688,6 +1724,24 @@ function notifyMe() {
 		</div>
 	</div>
 	
+	<div id="modal-reawrd-log" class="modal">
+		<div class="modal-content">
+			<div class="nes-container is-rounded with-title status log">
+				<p class="title">報酬をゲット！</p>
+				
+				<div id="reawrdLogTitle"></div>
+				<br />
+				<div id="reawrdLogMsg"></div>
+				<div style="height:10px;"></div>
+				<div class="center">
+					<button type="button" class="nes-btn is-primary" onclick="closeRewardLog();">とじる</button>
+				</div>
+			</div>
+			
+			<div id="closeModal" onclick=closeRewardLog()>&times;</div>
+		</div>
+	</div>
+	
 	<div class="main">
 		<div id ="userinfo" class="nes-container is-rounded with-title status" style="display:none;">
 			<p class="title">ステータス</p>
@@ -1791,6 +1845,8 @@ function notifyMe() {
 				
 				<div class="center">
 					<button type="button" class="nes-btn is-primary" onclick="showProfile()">自分のプロフィールを見る</button>
+					<div style="height:25px;"></div>
+					<button type="button" class="nes-btn is-primary" onclick="showFriends()">トモダチになった冒険者</button>
 					<div style="height:25px;"></div>
 					<button type="button" class="nes-btn is-primary" onclick="showGameHistory()">みんなの冒険の記録を見る</button>
 					<div style="height:25px;"></div>
