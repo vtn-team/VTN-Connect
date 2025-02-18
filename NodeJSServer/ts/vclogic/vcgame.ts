@@ -55,7 +55,9 @@ export async function gameStartAIGame(option: number) {
 		let gameHash = uuidv4();
 		
 		//アーティファクト出現条件チェック
-		appearArtifact = getArtifactEvent();
+		appearArtifact = artifactEvent;
+		artifactEvent = 0;
+		
 		let owners = await getArtifactOwners();
 		
 		let users = await choiceAIGameUsers(appearArtifact, owners);
@@ -141,11 +143,12 @@ export async function gameEndAIGame(gameResult: any) {
 		
 		stopRecord(gameHash);
 		
-		for(let res of gameResult) {
+		for(let res of gameResult.UserResults) {
 			let r:any = await getRewardsByGame(1, res.UserId, res.GameResult ? ResultCode.SUCCESS : ResultCode.FAILED, 99999);
 			rewards.push(r);
 			res.rewards = r;
 		}
+		
 		//awaitはしない
 		saveEpisodeAIGame(gameHash, title, gameResult.UserResults);
 		
@@ -409,12 +412,9 @@ export async function updateArtifact(ownerUserId: number) {
 	let itemId = appearArtifact;
 	await query("UPDATE Artifact SET OwnerId = ? WHERE Id = ?", [ownerUserId, itemId]);
 	
-	if(artifactEvent == itemId) {
-		artifactEvent = 0;
-	}
-	if(flagDownTimer) {
-		clearTimeout(flagDownTimer);
-	}
+	//if(artifactEvent == itemId) {
+	//	artifactEvent = 0;
+	//}
 	
 	//キャッシュ更新
 	if(artifactOwners) {
@@ -515,9 +515,9 @@ export async function execArtifactAppearEvent(atrifactEventStackId: ArtifaceEven
 	console.log(artifactEvent);
 	
 	//一定時間経過でイベントフラグを落とす
-	flagDownTimer = setTimeout(() => {
-		artifactEvent = 0;
-	}, 600000);
+	//flagDownTimer = setTimeout(() => {
+	//	artifactEvent = 0;
+	//}, 600000);
 }
 
 //
