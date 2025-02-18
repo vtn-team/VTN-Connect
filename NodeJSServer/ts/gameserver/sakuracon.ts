@@ -266,7 +266,7 @@ export class SakuraConnect {
         // ユニークユーザが取得できない場合は、再度取得する
         while (!botUserData) {
             uniqueId = crypto.randomInt(1, 999);
-            botUserData = uniqueUsers[uniqueId];
+            botUserData = this.uniqueUsers[uniqueId];
         }
 
         // 送信タイミングを判定し、送信するデータを選択する
@@ -331,12 +331,17 @@ export class SakuraConnect {
     public sendSupportMessage(toUserId: number, fromUserId: number = -1, event?: any): any {
         // TODO: 難易度とゲームの内容を見てから、どのタイミングで応援が必要そうかを決める
         // TODO: 今後{event}を送ってもらう場合があるので、一応引数を設定しておく
+
+        console.log("start SendSupportMessage");
+
         let sendData;
         try {
             sendData = this.createSakuraMessage(toUserId, fromUserId, CMD.SEND_JOIN);
         } catch (ex) {
             console.warn(`SendMessageError: ${ex}`);
         }
+
+        console.log("end SendSupportMessage");
         return sendData;
     }
 
