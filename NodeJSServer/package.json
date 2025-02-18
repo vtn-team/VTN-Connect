@@ -1,6 +1,6 @@
 {
-  "name": "live server",
-  "version": "0.1.0",
+  "name": "VantanConnect",
+  "version": "0.8.0",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "aws-sdk": "^2.789.0",
     "cron": "^1.8.2",
     "dotenv": "^16.0.3",
+    "jest": "28.0.0",
     "mariadb": "^3.1.2",
     "node-fetch": "^2.6.1",
     "openai": "^4.77.0",
@@ -27,9 +28,11 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^18.7.18",
     "@types/websocket": "^1.0.10",
     "@types/ws": "^8.5.13",
+    "ts-jest": "28.0.0",
     "ts-node-dev": "^1.1.6"
   }
 }
