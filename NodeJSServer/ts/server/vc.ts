@@ -1,9 +1,9 @@
 import { getConnectionAddress, getActiveSessionNum, updateMaintenance } from "./../gameserver/server";
 import { query } from "./../lib/database";
 import { getUniqueUsers, createUserWithAI, getUserFromId, getUserFromHash, getUserHistory, getUserMessages, getUserFriends, gameAskAndReward } from "./../vclogic/vcuser";
-import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC, getGameHistory, gameHandOver, setArtifactDebug } from "./../vclogic/vcgame";
-import { uploadToS3 } from "./../lib/s3";
-const { v4: uuidv4 } = require("uuid");
+import { gameStartAIGame, gameEndAIGame, gameStartVC, gameEndVC, getGameHistory, getGameSessions, getGameUserCache, gameHandOver, setArtifactDebug } from "./../vclogic/vcgame"
+import { uploadToS3 } from "./../lib/s3"
+const { v4: uuidv4 } = require('uuid')
 
 //デフォルト関数
 export async function index(req: any, res: any, route: any) {
@@ -120,31 +120,38 @@ export async function friendList(req: any, res: any, route: any) {
 }
 
 //4人ランダム取得
-export async function getGameUsers(req: any, res: any, route: any) {
-  let player = await query("SELECT Id FROM User ORDER BY LastPlayedAt ASC LIMIT 0,?", [3]);
-  let ids: Array<number> = [];
-  let join: Array<string> = [];
-  for (let d of player) {
-    if (d.Id < 999) continue;
-    ids.push(d.Id);
-    join.push("?");
-  }
-
-  let results = [];
-  if (ids.length > 0) {
-    console.log(ids);
-    console.log(join.join(","));
-    results = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id IN (" + join.join(",") + ");", ids);
-    await query("UPDATE User SET LastPlayedAt = CURRENT_TIMESTAMP() WHERE Id IN (" + join.join(",") + ");", ids);
-  }
-
-  results = results.concat(getUniqueUsers(4 - ids.length));
-
-  return {
-    Status: 200,
-    result: results,
-  };
-}
+export async function getGameUsers(req: any,res: any,route: any)
+{
+	let player = getGameUserCache(1);
+	console.log(player);
+	return {
+		Status: 200,
+		UserData: player
+	};
+/*
+	let player = await query("SELECT Id FROM User ORDER BY LastPlayedAt ASC LIMIT 0,?",[3]);
+	let ids:Array<number> = [];
+	let join:Array<string> = [];
+	for(let d of player) {
+		if(d.Id < 999) continue;
+		ids.push(d.Id);
+		join.push("?");
+	}
+	
+	let results = [];
+	if(ids.length > 0) {
+		console.log(ids);
+		console.log(join.join(','));
+		results = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id IN ("+join.join(',')+");", ids);
+		await query("UPDATE User SET LastPlayedAt = CURRENT_TIMESTAMP() WHERE Id IN ("+join.join(',')+");", ids);
+	}
+	
+	results = results.concat(getUniqueUsers(4-ids.length));
+	return {
+		Status: 200,
+		result: results
+	};
+*/
 
 //ユーザーを作成する
 export async function createUser(req: any, res: any, route: any) {

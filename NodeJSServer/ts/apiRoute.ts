@@ -34,7 +34,10 @@ exports.Routes = {
 			"/friend" : {
 				"@id%d" : "vc#friendList#          トモダチを取得",
 			},
-			"/gameusers" : "vc#getGameUsers#       ゲーム参加ユーザの取得",
+			"/gameusers" : {
+				"/" : "vc#getGameUsers#       ゲーム参加ユーザの取得",
+				"/active" : "vc#getGameUsers#       ゲーム参加ユーザの取得",
+			},
 			
 			"/epictest" : "vc#epictest#             冒険の書を作る",
 		},

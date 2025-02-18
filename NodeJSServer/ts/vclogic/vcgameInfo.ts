@@ -306,8 +306,14 @@ export async function saveEpisodeAIGame(gameHash: string, title: string, gameRes
 		//console.log(msg);
 		
 		let logId = uuidv4();
+		let json = {
+			Episode: messages,
+			StoryBook: msg.content,
+			Rewards: result.rewards
+		};
+		
 		await query("INSERT INTO Adventure (GameHash, UserId, GameId, Title, PlayerName, Result, LogId) VALUES (?, ?, ?, ?, ?, ?, ?)", [gameHash, result.UserId, 1, title, target.DisplayName, resNumber, logId]);
-		await uploadToS3(logId, msg.content);
+		await uploadToS3(logId, JSON.stringify(json));
 		
 		epic.deleteEpisode(gameHash, result.UserId);
 		
@@ -327,10 +333,14 @@ export async function createAdvTitle(gameId:number, users:any) {
 	}
 	
 	let prompt = rule.RuleText;
-	prompt += `
+	if(gameId != 1) {
+		prompt += `
 # ゲームタイトル
 ${gameInfo.GameTitle}
-
+		`;
+	}
+	
+	prompt += `
 # 難易度(10がふつう)
 ${gameInfo.Difficulty}
 
