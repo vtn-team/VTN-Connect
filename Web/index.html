@@ -298,7 +298,7 @@ window.addEventListener("load", async (event) => {
 		
 		//localhostだけ
 		if(document.location.hostname.indexOf("localhost") != -1) {
-			wssURI = await getaddr();
+			wssURI = "ws://localhost:3788"; //await getaddrUserPortal();
 		}
 	}
 	
@@ -784,6 +784,13 @@ function setupSPA() {
 		sendAskEffect();
 		let result = await userGameAsk(data);
 		console.log(result);
+		if( result.Status == 200) {
+			result.Reward.Exp
+			result.Reward.Gold
+			result.Reward.Level
+			rewardViewFlag++;
+			openReward();
+		}
 	});
 }
 
@@ -849,7 +856,10 @@ async function openReward(title, rewards) {
 	var elm = getElm("rewardLogTitle");
 	elm.innerHTML = title;
 	
-	enableUIById("modal-reward-log");
+	if(rewardViewFlag >= 2) {
+		enableUIById("modal-reward-log");
+		rewardViewFlag = 0;
+	}
 }
 
 function closeHistory() {
@@ -2393,7 +2403,7 @@ function urlB64ToUint8Array(base64String) {
 				<div style="height:25px;"></div>
 				
 				<div class="center">
-					<button type="button" id="game-ask-send" class="nes-btn is-primary" onclick=sendGameAsk()>送信</button>
+					<button type="button" id="game-ask-send" class="nes-btn is-primary")>送信</button>
 				</div>
 			</div>
 		</div>
