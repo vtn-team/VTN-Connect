@@ -58,7 +58,7 @@ export async function checkMessageAndWrite(message: MessagePacket) {
 
 export async function recordFriendShip(evtId: number, userId: number, friendId: number, friendName: string, option: any = null) {
 	if(option) {
-		await query("INSERT INTO Friend (UserId, FriendId, FriendName, EventId, Option) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE EnCount=Friend.EnCount+1",[userId, friendId, friendName, evtId, JSON.stringify(option)]);
+		await query("INSERT INTO Friend (UserId, FriendId, FriendName, EventId, Opt) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE EnCount=Friend.EnCount+1",[userId, friendId, friendName, evtId, JSON.stringify(option)]);
 	}else{
 		await query("INSERT INTO Friend (UserId, FriendId, FriendName, EventId) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE EnCount=Friend.EnCount+1",[userId, friendId, friendName, evtId]);
 	}
