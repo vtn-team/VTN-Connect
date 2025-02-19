@@ -1,6 +1,6 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
-import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
+import { MessagePacket, checkMessageAndWrite, recordFriendShip } from "./../vclogic/vcmessage"
 import { getGameSessions, updateArtifact, getArtifactEvent, ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 import { stockEpisode } from "./../vclogic/vcgameInfo"
 import { UserSession, VCGameSession, VCBridgeSession, CMD, TARGET, createMessage, createGameMessage, createdPayload, parsePayload } from "./session"
@@ -397,6 +397,20 @@ export class GameConnect {
 			if(data.EpisodeCode == 200) {
 				//冒険者が会話をしたらアーティファクトカウントを追加
 				execArtifactAppearEvent(ArtifaceEventStack.TALK);
+				
+				//フレンドログにも追加
+				let tgtId = 0;
+				let name = "Unknown"
+				for(let p of data.Payload) {
+					if(p.Description == "TargetId") {
+						tgtId = parseInt(p.Data);
+					}
+					
+					if(p.Description == "会話した相手") {
+						name = p.Data;
+					}
+				}
+				recordFriendShip(200, data.UserId, tgtId, name);
 			}
 		}
 		break;

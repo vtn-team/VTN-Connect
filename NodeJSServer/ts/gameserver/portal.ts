@@ -1,6 +1,6 @@
 import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
-import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
+import { MessagePacket, checkMessageAndWrite, recordFriendShip } from "./../vclogic/vcmessage"
 import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { UserSession, VCUserSession, VCBridgeSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
@@ -194,6 +194,11 @@ export class UserPortal {
 			
 			//応援メッセージが来たらアーティファクトカウントを追加
 			execArtifactAppearEvent(ArtifaceEventStack.CHEER);
+			
+			//フレンド記録
+			//if(data.ToUserId > 999) {
+				recordFriendShip(1001, data.ToUserId, data.FromUserId, data.Data.Name, { Message: data.Data.Message });
+			//}
 		}
 		break;
 		
