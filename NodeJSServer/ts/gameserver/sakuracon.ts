@@ -1,4 +1,3 @@
-import { GameConnect } from "./gamecon";
 import { chat } from "./../lib/chatgpt"
 import { getMaster, getAIRule } from "./../lib/masterDataCache"
 import { CMD, TARGET, createMessage } from "./session"

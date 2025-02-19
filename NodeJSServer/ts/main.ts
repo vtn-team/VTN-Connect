@@ -34,9 +34,23 @@ import { preloadUniqueUsers } from "./vclogic/vcuser"
 	//ユニークユーザの準備
 	await preloadUniqueUsers();
 	
-	//HTTPサーバ起動
-	launch(HTTP_SERVER_PORT);
+	if(flags.indexOf("--gameServer") != -1) {
+		//HTTPサーバ起動
+		launch(HTTP_SERVER_PORT);
+	}
 	
-	//ゲームサーバ起動
-	launchDGS(ServerType.Both, GAME_SERVER_PORT);
+	if(flags.indexOf("--gameServer") != -1 && flags.indexOf("--portalServer") != -1) {
+		//ゲームサーバ起動
+		launchDGS(ServerType.Both, GAME_SERVER_PORT);
+	}
+	
+	if(flags.indexOf("--gameServer") != -1) {
+		//ゲームサーバ起動
+		launchDGS(ServerType.GameConnect, GAME_SERVER_PORT);
+	}
+	
+	if(flags.indexOf("--portalServer") != -1) {
+		//ゲームサーバ起動
+		launchDGS(ServerType.UserPortal, GAME_SERVER_PORT);
+	}
 })();

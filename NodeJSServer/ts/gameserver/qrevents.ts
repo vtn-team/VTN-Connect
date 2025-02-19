@@ -1,12 +1,8 @@
 import { getMaster, getGameInfo, getGameEvent, getQRSheet, getQREvent } from "./../lib/masterDataCache"
 import { getUserFromId, getUserFromHash, getRewardsByEventCode } from "./../vclogic/vcuser"
 import { UserSession, VCUserSession, CMD, TARGET, createdPayload } from "./session"
-import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 
-const QRCodes: any = {
-	"a4cf1e07-cd1a-40ab-9d6f-755d344cf550" : { Pattern: "Rewards" },
-	"810f1f50-6a2b-4a8d-8908-a37b9afe9ec2" : { Pattern: "Link", GameId: 2 },
-};
+import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 
 
 //QRイベント

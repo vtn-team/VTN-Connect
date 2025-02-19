@@ -2,10 +2,11 @@ import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
 import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
-import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 import { UserSession, VCUserSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
 import { SakuraConnect } from "./sakuracon"
+
+import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 
  
 export interface VCActiveUser
