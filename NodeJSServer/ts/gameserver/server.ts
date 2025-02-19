@@ -1,10 +1,10 @@
-import { GameConnect, GameConnectInterface } from "./gamecon"
-import { UserPortal, UserPortalInterface } from "./portal"
+import { GameConnect, GameConnectBridge, GameConnectInterface } from "./gamecon"
+import { UserPortal, UserPortalBridge, UserPortalInterface } from "./portal"
 import { QREventer } from "./qrevents"
 import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
-import { UserSession, CMD, TARGET, createMessage } from "./session"
+import { UserSession, VCBridgeSession, CMD, TARGET, createMessage } from "./session"
 
 
 //サーバキャッシュ
@@ -23,7 +23,7 @@ export enum ServerType {
 //NOTE: ここは特にいじる必要はない部分
 //NOTE: 必要なコンテンツを増やす時はここから増やす
 class Server {
-	
+	protected serverType: ServerType;	//サーバータイプ
 	protected sessions: any;			//各接続のセッション
 	protected server: any;				//WebSocketサーバ本体
 	protected roomCheck: any;			//ルーム監視用のタイマー
@@ -61,6 +61,7 @@ class Server {
 	//コンストラクタ
 	constructor(mode:ServerType, port: number) {
 		this.sessions = {};
+		this.serverType = mode;
 		this.port = port;
 		this.isMaintenance = false;
 		this.server = new WebSocketServer({ port });
@@ -76,13 +77,13 @@ class Server {
 			
 		case ServerType.GameConnect:
 			this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
-			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
+			this.portal = new UserPortalBridge(null);
 			console.log("server content is gameconnect only.");
 			break;
 			
 		case ServerType.UserPortal:
-			this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
-			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
+			this.contents = new GameConnectBridge((data: any)=>{ this.message(data); }, (data: any) => { this.portal.sendAPIEvent(data); });
+			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); this.contents.execMessage(data); });
 			console.log("server content is userportal only.");
 			break;
 		}
@@ -106,33 +107,7 @@ class Server {
 					if(this.isMaintenance) return;
 					
 					if(this.sessions[sessionId]) {
-						//重要なメッセージはここでさばく
-						switch(data["Command"])
-						{
-						case CMD.SEND_JOIN:
-							this.joinGame(data);
-							break;
-							
-						case CMD.SEND_USER_JOIN:
-							this.joinPortal(data);
-							break;
-							
-						case CMD.SEND_EVENT:
-						default:
-							this.contents.execMessage(data);
-							this.portal.execMessage(data);
-							break;
-							
-						case CMD.SEND_QR:
-							{
-								let result:any = await this.qrEventer.execEvent(data);
-								if(result.Status == 1) {
-									this.contents.execMessage(result.Data);
-								}
-								this.portal.execMessage(result.Message);
-							}
-							break;
-						}
+						await this.message(data);
 					}else{
 						console.error("session not found.")
 					}
@@ -170,11 +145,52 @@ class Server {
 		console.log("server launch port on :" + port);
 	}
 	
+	async message(data: any) {
+		//重要なメッセージはここでさばく
+		switch(data["Command"])
+		{
+		case CMD.SEND_JOIN:
+			this.joinGame(data);
+			break;
+			
+		case CMD.SEND_USER_JOIN:
+			this.joinPortal(data);
+			break;
+			
+		case CMD.SEND_EVENT:
+		default:
+			this.contents.execMessage(data);
+			this.portal.execMessage(data);
+			break;
+			
+		case CMD.SEND_QR:
+			{
+				/*
+				if(this.serverType == ServerType.GameConnect)
+					break;
+				*/
+				
+				let result:any = await this.qrEventer.execEvent(data);
+				if(result.Status == 1) {
+					this.contents.execMessage(result.Data);
+				}
+				this.portal.execMessage(result.Message);
+			}
+			break;
+		}
+	}
+	
 	joinGame(data: any) {
 		let sessionId = data["SessionId"];
 		let gameId = parseInt(data.GameId);
 		
 		this.sessions[sessionId] = this.contents.joinGame(gameId, this.sessions[sessionId], data);
+		
+		//UserPortalだけ例外
+		if(gameId == 99) {
+			this.sessions[sessionId] = new VCBridgeSession(this.sessions[sessionId]);
+			this.portal = new UserPortalBridge(this.sessions[sessionId] );
+		}
 	}
 	
 	async joinPortal(data: any) {
@@ -268,7 +284,7 @@ export function launchDGS(mode: ServerType, port: number) {
 	if(gServer != null) return;
 	
 	gServer = new Server(mode, port);
-	gServer.setupGameConnect();
+	//gServer.setupGameConnect();
 }
 
 //(公開関数)アクティブなゲーム数を返す

@@ -26,6 +26,7 @@ export enum SESSION_TYPE {
 	INVALID = 0,
 	USER = 1,
 	GAME = 2,
+	BRIDGE = 3,
 }
 
 export interface VCActiveGame
@@ -151,6 +152,27 @@ export class VCGameSession extends UserSession {
 		case TARGET.SELF: return (this.gameId == senderId);
 		case TARGET.OTHER: return (this.gameId != senderId);
 		}
+	}
+};
+
+//ゲームセッション
+export class VCBridgeSession extends UserSession {
+	//コンストラクタ
+	constructor(us: UserSession) {
+		super("", null);
+		this.setupExtends(us);
+	}
+	
+	public isBridgeSession(sessionId: string) {
+		return this.sessionId == sessionId;
+	}
+	
+	public getSessionType() {
+		return SESSION_TYPE.BRIDGE;
+	}
+	
+	public chkTarget(data: any) {
+		return true;
 	}
 };
 

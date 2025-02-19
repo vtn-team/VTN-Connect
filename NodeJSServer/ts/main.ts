@@ -3,7 +3,7 @@ import { launch } from "./server"
 import { findElasticIP } from "./elasticip"
 import { launchDGS, ServerType } from "./gameserver/server"
 import { connect } from "./lib/database"
-import { HTTP_SERVER_PORT, GAME_SERVER_PORT } from "./config/config"
+import { HTTP_SERVER_PORT, GAME_SERVER_PORT, USER_PORTAL_PORT } from "./config/config"
 import { loadMaster, loadMasterFromCache } from "./lib/masterDataCache"
 import { preloadUniqueUsers } from "./vclogic/vcuser"
 
@@ -39,7 +39,7 @@ import { preloadUniqueUsers } from "./vclogic/vcuser"
 		launch(HTTP_SERVER_PORT);
 	}
 	
-	if(flags.indexOf("--gameServer") != -1 && flags.indexOf("--portalServer") != -1) {
+	if(flags.indexOf("--gameServer") != -1 && flags.indexOf("--userPortal") != -1) {
 		//ゲームサーバ起動
 		launchDGS(ServerType.Both, GAME_SERVER_PORT);
 	}
@@ -49,8 +49,8 @@ import { preloadUniqueUsers } from "./vclogic/vcuser"
 		launchDGS(ServerType.GameConnect, GAME_SERVER_PORT);
 	}
 	
-	if(flags.indexOf("--portalServer") != -1) {
+	if(flags.indexOf("--userPortal") != -1) {
 		//ゲームサーバ起動
-		launchDGS(ServerType.UserPortal, GAME_SERVER_PORT);
+		launchDGS(ServerType.UserPortal, USER_PORTAL_PORT);
 	}
 })();

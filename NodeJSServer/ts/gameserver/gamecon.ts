@@ -3,9 +3,10 @@ import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
 import { getGameSessions, updateArtifact, getArtifactEvent, ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
 import { stockEpisode } from "./../vclogic/vcgameInfo"
-import { UserSession, VCGameSession, CMD, TARGET, createMessage, createGameMessage, createdPayload, parsePayload } from "./session"
+import { UserSession, VCGameSession, VCBridgeSession, CMD, TARGET, createMessage, createGameMessage, createdPayload, parsePayload } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
-
+import { GAME_SERVER_URI } from "../config/config"
+import { WebSocket, WebSocketServer } from 'ws'
 
 export enum SP_EVENT {
 	AI_CHAT = 10000,
@@ -24,6 +25,139 @@ export interface GameConnectInterface {
 	stopRecord(gameHash: string) : void;
 	sendAPIEvent(data: any) : void;
 }
+
+export class GameConnectBridge {
+	protected ws: WebSocket|null;
+	protected client: VCBridgeSession|null;
+	protected msgSender: any;
+	protected apiSender: any;
+	protected games:any;
+	protected sessionId: string;
+	
+	constructor(msgSender: any, apiSender: any) {
+		this.ws = null;
+		this.client = null;
+		this.sessionId = "";
+		this.games = [];
+		this.msgSender = msgSender;
+		this.apiSender = apiSender;
+		this.setup();
+	}
+	
+	async setup() {
+		console.log(`${GAME_SERVER_URI}/vc/getaddr`)
+		const res = await fetch(`http://127.0.0.1:4649/vc/getaddr`, {method: 'GET'});
+		const result = await res.json();
+		
+		let ws = new WebSocket(result.Address);
+		ws.on('error', console.error);
+		ws.on('open', function open() {
+			//ws.send('something');
+		});
+		ws.on('message', (message:string) => {
+			console.log(message.toString());
+			try {
+				let data = JSON.parse(message.toString());
+				
+				if(data.API) {
+					this.apiSender(data);
+					return;
+				}
+				
+				if(data.Data) {
+					data.Data = JSON.parse(data.Data);
+				}
+				
+				data.BridgeMarking = 1;
+				
+				//重要なメッセージはここでさばく
+				switch(data["Command"])
+				{
+				case CMD.WELCOME:
+				{
+					this.sessionId = data.Data.SessionId;
+					//SessionIdをキーにしてJoinを返す
+					let json = {
+						SessionId: data.Data.SessionId,
+						Command: CMD.SEND_JOIN,
+						GameId: 99,
+					};
+					ws.send( JSON.stringify(json) );
+					let us = new UserSession(data.Data.SessionId, ws);
+					this.client = new VCBridgeSession(us);
+					return ;
+				}
+				break;
+				
+				case CMD.GAMESTAT:
+					console.log(data.Data.ActiveGames)
+					this.games = data.Data.ActiveGames;
+					return;
+				}
+				
+				this.msgSender(data);
+			}catch(ex){
+				console.log(ex);
+			}
+		});
+	}
+	
+	public setupGameConnect() {
+		
+	}
+
+	public execMessage(data: any) {
+		if(data.BridgeMarking) {
+			delete data.BridgeMarking;
+			return ;
+		}
+		
+		console.log("execMessage");
+		console.log(data);
+		data.SessionId = this.sessionId;
+		let msg = JSON.stringify(data);
+		this.client?.sendMessage(msg);
+	}
+
+	public joinGame(gameId: number, us: UserSession, data: any) {
+		//ここにきてはいけない
+		console.log("bad case join");
+		return null;
+	}
+	
+	public removeSession(sessionId: string) {
+		//ここにきてはいけない
+		console.log("bad case leave");
+	}
+	
+	public getActiveGames() {
+		return this.games;
+	}
+	
+	public sendAPIEvent(data: any) {
+		if(data.BridgeMarking) {
+			delete data.BridgeMarking;
+			return ;
+		}
+		
+		//ここにきてはいけない
+		console.log("sendAPIEvent");
+		console.log(data);
+		data.SessionId = this.sessionId;
+		let msg = JSON.stringify(data);
+		this.client?.sendMessage(msg);
+	}
+	
+	public startRecord(gameId:number, gameHash: string) {
+		//ここにきてはいけない
+		console.log("bad case record");
+	}
+	
+	public stopRecord(gameHash: string) {
+		//ここにきてはいけない
+		console.log("bad case record");
+	}
+};
 
 class GameContainer {
 	protected gameId: number;
@@ -218,6 +352,15 @@ export class GameConnect {
 		
 		let payload = this.parsePayload(data["Payload"]);
 		let gameId = this.sessionDic[data.SessionId];
+		
+		//portal対応
+		if(gameId == 99) {
+			this.broadcast(data);
+			return;
+		}
+		
+		console.log(gameId);
+		console.log(data);
 		
 		switch(data["Command"])
 		{

@@ -2,7 +2,7 @@ import { chat, chatWithSession } from "./../lib/chatgpt"
 import { getMaster, getGameInfo, getGameEvent } from "./../lib/masterDataCache"
 import { MessagePacket, checkMessageAndWrite } from "./../vclogic/vcmessage"
 import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
-import { UserSession, VCUserSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
+import { UserSession, VCUserSession, VCBridgeSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
 import { SakuraConnect } from "./sakuracon"
 
@@ -23,6 +23,57 @@ export interface UserPortalInterface {
 	getActiveUsers() : any;
 	sendAPIEvent(data: any) : void;
 }
+
+export class UserPortalBridge {
+	protected client: VCBridgeSession|null;
+	
+	constructor(cli: VCBridgeSession|null) {
+		this.client = cli;
+	}
+
+	public execMessage(data: any) {
+		if(this.client?.isBridgeSession(data.SessionId)) {
+			return ;
+		}
+		
+		console.log("execMessage-up");
+		console.log(data);
+		data.BridgeMarking = 1;
+		let msg = JSON.stringify(data);
+		this.client?.sendMessage(msg);
+	}
+
+	async joinRoom(userId: number, us: UserSession, data: any) {
+		//ここにきてはいけない
+		console.log("bad case join");
+		return null;
+	}
+	
+	public removeSession(sessionId: string) {
+		//ここにきてはいけない
+		console.log("bad case leave");
+	}
+	
+	public getActiveUsers() {
+		//TODO
+		//もらってる情報を処理
+		let users:any = [];
+		
+		return users;
+	}
+	
+	public sendAPIEvent(data: any) {
+		if(this.client?.isBridgeSession(data.SessionId)) {
+			return ;
+		}
+		
+		console.log("sendAPIEvent-up");
+		console.log(data);
+		data.BridgeMarking = 1;
+		let msg = JSON.stringify(data);
+		this.client?.sendMessage(msg);
+	}
+};
 
 class UserContainer {
 	protected userId: number;
