@@ -249,7 +249,7 @@ export async function getUserMessages(userId: number, page: number = 0) {
 
 export async function getUserFriends(userId: number, page: number = 0) {
 	let result = await query("SELECT * FROM Friend WHERE UserId = ? ORDER BY CreatedAt DESC LIMIT 0, 10", [userId]);
-	let count = await query("SELECT count(UserId) as Count FROM Message WHERE UserId = ?", [userId]);
+	let count = await query("SELECT count(UserId) as Count FROM Friend WHERE UserId = ?", [userId]);
 	
 	return {
 		Friends: result,
