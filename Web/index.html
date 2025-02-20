@@ -1609,6 +1609,7 @@ function closeMenu() {
 }
 
 function isTutorialNow(pageCode) {
+	if(!saveData.tutorialFlag) return false;
 	return saveData.tutorialFlag[pageCode];
 }
 
