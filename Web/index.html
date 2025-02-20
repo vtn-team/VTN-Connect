@@ -890,7 +890,8 @@ function setupSPA() {
 }
 
 function closePage(pageCode) {
-	elementCache[i].style.display = "none";
+	if(!elementCache[pageCode]) return ;
+	elementCache[pageCode].style.display = "none";
 }
 
 function loadPage(pageCode) {
