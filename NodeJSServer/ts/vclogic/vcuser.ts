@@ -17,7 +17,7 @@ interface UserStatus {
 
 //ユニークユーザをあっためておく
 export async function preloadUniqueUsers() {
-	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?",[999]);
+	let result = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?",[100]);
 	uniqueUsers = result;
 	//console.log(uniqueUsers);
 	let cc:any = await query("SELECT count(Id) as Count FROM User", [0]);
