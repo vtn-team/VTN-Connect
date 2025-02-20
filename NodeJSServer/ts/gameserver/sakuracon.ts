@@ -55,9 +55,14 @@ export class SakuraConnect {
 		this.games = {};
 		this.sessionDic = {};
 		this.msgSender = msgSender;
-		this.sakuraUsers = getAllUniqueUsers();
+		this.sakuraUsers = [];
 		this.sakuraEvents = [];
+		this.setupUser();
 		this.setupMaster();
+	}
+	
+	async setupUser() {
+		this.sakuraUsers = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?", [999]);
 	}
 	
 	setupMaster() {
@@ -106,21 +111,18 @@ export class SakuraConnect {
 	}
 	
     /**
-     * @summary ユニークユーザを取得するメソッド
-     * @param {number} userId 取得したいユニークユーザのID
+     * @summary Unknown系を含めたユニークユーザを取得する
      * @returns ユニークユーザの情報
      */
-    private async getUniqueUsers(userId: number) {
-        try {
-            let botUserData = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?", [999]);
-            let users: any = [];
-            users = botUserData;
-
-            return users[userId];
-        } catch (ex) {
-            console.log(ex);
-        }
-    }
+	private async getAllUniqueUsers() {
+		try {
+			let botUserData = await query("SELECT * FROM User INNER JOIN UserGameStatus ON User.Id = UserGameStatus.UserId WHERE Id < ?", [999]);
+			return botUserData;
+		} catch (ex) {
+			console.log(ex);
+		}
+		return [];
+	}
     
 	getSakuraUser(sendFlag: Array<string>) {
 		let ret = [];
