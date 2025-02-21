@@ -35,7 +35,7 @@ export class UserPortalBridge {
 		}
 		
 		console.log("execMessage-up");
-		console.log(data);
+		//console.log(data);
 		data.BridgeMarking = 1;
 		let msg = JSON.stringify(data);
 		this.client?.sendMessage(msg);
@@ -70,7 +70,7 @@ export class UserPortalBridge {
 		}
 		
 		console.log("sendAPIEvent-up");
-		console.log(data);
+		//console.log(data);
 		data.BridgeMarking = 1;
 		let msg = JSON.stringify(data);
 		this.client?.sendMessage(msg);
@@ -179,14 +179,14 @@ export class UserPortal {
 		case CMD.USERSTAT:
 		{
 			//ユーザステータスの更新
-			console.log(data)
+			//console.log(data)
 			this.broadcast(createMessage(data.UserId, CMD.USERSTAT, TARGET.SELF, data));
 		}
 		break;
 		
 		case CMD.ERROR:
 		{
-			console.log(data)
+			//console.log(data)
 			this.broadcast(createMessage(data.UserId, CMD.ERROR, TARGET.SELF, data));
 		}
 		break;
