@@ -48,9 +48,6 @@ class Server {
 		//let msg = msgpack.pack(data);
 		for(var k in this.sessions) {
 			let us = this.sessions[k];
-			if(!us) {
-				continue;
-			}
 			if(!us.chkTarget(data)) {
 				//console.log("はじかれた:");
 				//console.log(data);
@@ -200,7 +197,12 @@ class Server {
 		let sessionId = data["SessionId"];
 		let userId = parseInt(data.UserId);
 		
-		this.sessions[sessionId] = await this.portal.joinRoom(userId, this.sessions[sessionId], data);
+		let session = await this.portal.joinRoom(userId, this.sessions[sessionId], data);
+		if(session) {
+			this.sessions[sessionId] = session;
+		}else{
+			console.log("見つからないユーザでjoinしました");
+		}
 	}
 	
 	removeSession(uuid: string) {
