@@ -1,5 +1,5 @@
 {
-  "Version": 438,
+  "Version": 450,
   "Data": [
     {
       "Id": "1",
@@ -24,7 +24,7 @@
       "ClearBonusExp": "500",
       "GameOverBonusExp": "50",
       "PlayTime": "600",
-      "IsReplayTarget": "1",
+      "IsReplayTarget": "0",
       "isVCTarget": "1"
     },
     {
@@ -37,7 +37,7 @@
       "ClearBonusExp": "5000",
       "GameOverBonusExp": "500",
       "PlayTime": "600",
-      "IsReplayTarget": "1",
+      "IsReplayTarget": "0",
       "isVCTarget": "1"
     },
     {

@@ -1,5 +1,5 @@
 {
-  "Version": 237,
+  "Version": 247,
   "Data": [
     {
       "Id": "1",
@@ -23,13 +23,13 @@
     },
     {
       "Id": "3",
-      "Description": "適当な応援文がくる",
+      "Description": "UNオウエンから嘘情報が来る",
       "GameId": "1",
       "Trigger": "GameStart",
       "ParamA": "250",
       "ParamB": "1000",
-      "SendFlag": "Random, PS23Users, PS22Users",
-      "SakuraKey": "Message_Cheer"
+      "SendFlag": "Random, Unknown",
+      "SakuraKey": "Message_CheerUN"
     },
     {
       "Id": "4",
@@ -38,7 +38,7 @@
       "Trigger": "GameStart",
       "ParamA": "5000",
       "ParamB": "5000",
-      "SendFlag": "NoMessage",
+      "SendFlag": "NoMessage, PS22Users, PS23Users",
       "SakuraKey": "Message_Cheer"
     },
     {
