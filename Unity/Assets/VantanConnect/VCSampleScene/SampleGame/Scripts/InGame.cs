@@ -54,7 +54,7 @@ namespace VTNConnect
 #endif
             }
 
-            if(_timer > 10.0f)
+            if(_timer > 30.0f)
             {
 #if AIGAME_IMPLEMENT
                 //ゲーム終了

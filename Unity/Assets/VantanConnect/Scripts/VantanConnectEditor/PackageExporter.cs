@@ -12,11 +12,8 @@ public class PackageExporter
     /// パッケージ対象のフォルダ、ファイル
     /// </summary>
     static string[] PackTargets = new string[] {
-        "Assets/ConnectEventAssets",
-        "Assets/Resources",
-        "Assets/Scripts",
+        "Assets/VantanConnect",
         "Assets/ThirdParty",
-        "Assets/VCSampleScene",
     };
 
     /// <summary>
@@ -51,7 +48,7 @@ public class PackageExporter
     }
 
 
-    const string targetPath = "Assets/Scripts/BaseSystem/Dynamic";
+    const string targetPath = "Assets/VantanConnect/Scripts/BaseSystem/Dynamic";
     const string source = @"
 public class BuildState
 {

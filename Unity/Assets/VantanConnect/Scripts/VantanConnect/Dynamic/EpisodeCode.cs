@@ -17,6 +17,8 @@ namespace VTNConnect
         BADefeatBoss = 215,  //ボスを倒した
         BADead = 216,  //死んだ
         SGEnemyLeave = 500,  //敵を取り逃がした
+        VCMainEvent1 = 501,  //ダルドリーシッディ
+        VCMainEvent2 = 502,  //思考盗聴
 
     }
 }

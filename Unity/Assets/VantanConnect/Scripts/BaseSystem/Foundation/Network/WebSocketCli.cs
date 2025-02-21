@@ -40,7 +40,7 @@ public class WebSocketCli
 
         _webSocket.OnMessage += (bytes) =>
         {
-            //Debug.Log("WebSocket Message Data: " + System.Text.Encoding.UTF8.GetString(bytes));
+            Debug.Log("WebSocket Message Data: " + System.Text.Encoding.UTF8.GetString(bytes));
             _callback?.Invoke(bytes);
         };
 

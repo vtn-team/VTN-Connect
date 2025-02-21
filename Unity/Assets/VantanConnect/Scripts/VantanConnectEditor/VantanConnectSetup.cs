@@ -229,7 +229,7 @@ public class VantanConnectSetup : EditorWindow
 
 
 
-    const string targetPath = "Assets/Scripts/VantanConnect/Dynamic";
+    const string targetPath = "Assets/VantanConnect/Scripts/VantanConnect/Dynamic";
     const string source = @"
 //動的生成されます
 namespace VTNConnect

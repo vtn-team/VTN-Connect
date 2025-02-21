@@ -93,6 +93,9 @@ namespace VTNConnect
             {
                 case VC_LinkageEvent.Link:
                     {
+                        if (IsLink) break;
+                        if (VantanConnect.IsInGame) break;
+
                         Debug.Log(JsonUtility.ToJson(data));
                         var gameId = data.GetIntData("GameId");
                         if (gameId != VantanConnect.GameID) break;
@@ -149,9 +152,7 @@ namespace VTNConnect
                             _user = result.UserData;
 
                             await UniTask.SwitchToMainThread();
-                            /*
                             _view.Link(_user.DisplayName);
-                            */
                         }).Forget();
                     }
                     break;

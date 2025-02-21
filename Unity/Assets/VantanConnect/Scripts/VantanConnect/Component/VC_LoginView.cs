@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
+using NUnit.Framework.Internal;
 
 namespace VTNConnect
 {
@@ -13,13 +14,11 @@ namespace VTNConnect
     {
         [SerializeField] GameObject _qrRoot;
         [SerializeField] RawImage _outQRImage;
-        [SerializeField] GameObject _connect;
-        [SerializeField] Text _connectText;
+        [SerializeField] VC_LinkFlash _effect;
 
         private void Start()
         {
             QRCodeSetup();
-            _connect.SetActive(false);
         }
 
         public void QRCodeSetup()
@@ -40,10 +39,7 @@ namespace VTNConnect
 
         public void Link(string displayName)
         {
-            //TODO: 演出
-
-            _connectText.text = "[CONNECT]" + displayName;
-            _connect.SetActive(true);
+            _effect.Play(displayName);
         }
     }
 }
