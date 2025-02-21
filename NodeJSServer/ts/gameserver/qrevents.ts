@@ -78,7 +78,6 @@ export class QREventer {
 			
 			msgData = {
 				Command:CMD.USERSTAT,
-				BridgeMarking: 1,
 				UpdateStat: {
 					GameId: qrMaster.TargetId,
 					UserId : data.UserId
@@ -117,24 +116,16 @@ export class QREventer {
 			
 			console.log(get);
 			
-			if(get.Flag == "Coin" || get.Flag == "Both") {
-				retData.Command = CMD.SEND_EVENT;
-				retData.EventId = 1002;
-				retData.Payload = createdPayload({
-					UserId : data.UserId,
-					GetGold: get.Value
-				});
-			}
-			
-			if(get.Flag == "Event") {
-				retData.Command = CMD.SEND_QR_EVENT;
-				retData.EventId = get.Value;
-				retData.Payload = createdPayload({
-					UserId : data.UserId,
-					QRTargetId: qrMaster.TargetId
-				});
-			}
-			
+			//GCにイベントとして撒いて、GCから派生させる
+			retData.Command = CMD.SEND_QR_EVENT;
+			retData.EventId = 1002;
+			retData.Payload = createdPayload({
+				UserId : data.UserId,
+				QRTargetId: qrMaster.TargetId,
+				QREventId: get.Id,
+				Flag: get.Flag,
+				GetValue: get.Value,
+			});
 			
 			let updateResult = null;
 			switch(get.Flag)
@@ -155,7 +146,6 @@ export class QREventer {
 			if(updateResult) {
 				msgData = {
 					Command:CMD.USERSTAT,
-					BridgeMarking: 1,
 					UpdateStat: updateResult,
 					GameId: 99,
 					UserId: data.UserId

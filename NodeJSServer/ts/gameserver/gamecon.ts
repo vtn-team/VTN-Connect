@@ -358,6 +358,47 @@ export class GameConnect {
 		
 		//portal対応
 		if(gameId == 99) {
+			switch(data["Command"])
+			{
+			case CMD.EVENT:
+			{
+				try {
+					let evt = JSON.parse(data.Data);
+					payload = parsePayload(evt.Payload);
+					
+					if(evt.EventId == 1001) {
+						//応援メッセージが来たらアーティファクトカウントを追加
+						execArtifactAppearEvent(ArtifaceEventStack.CHEER);
+						
+						//フレンド記録
+						recordFriendShip(1001, payload.Target, evt.FromId, payload.Name, { Message: payload.Message });
+					}
+				}catch(ex){
+					
+				}
+			}
+			break;
+			
+			case CMD.SEND_QR_EVENT:
+			{
+				//QR読み込みでアーティファクトカウントを追加
+				execArtifactAppearEvent(ArtifaceEventStack.QRCODE, payload.QRTargetId);
+				
+				//イベントあれば発火
+				let masters = getMaster("QREvent");
+				for(let d of masters) {
+					if(d.Id != payload.QREventId) continue;
+					if(d.Flag != "Event") continue;
+					
+					data = createGameMessage(payload.UserId, 1, CMD.EVENT, TARGET.SELF, {
+						EventId: parseInt(d.Value)
+					});
+					break;
+				}
+			}
+			break;
+			}
+			
 			this.broadcast(data);
 			return;
 		}
@@ -405,25 +446,6 @@ export class GameConnect {
 				}
 				recordFriendShip(200, data.UserId, tgtId, name);
 			}
-		}
-		break;
-		
-		case CMD.SEND_CHEER:
-		{
-			//応援メッセージが来たらアーティファクトカウントを追加
-			execArtifactAppearEvent(ArtifaceEventStack.CHEER);
-			
-			//フレンド記録
-			//if(data.ToUserId > 999) {
-				recordFriendShip(1001, data.ToUserId, data.FromUserId, data.Data.Name, { Message: data.Data.Message });
-			//}
-		}
-		break;
-		
-		case CMD.SEND_QR_EVENT:
-		{
-			//QR読み込みでアーティファクトカウントを追加
-			execArtifactAppearEvent(ArtifaceEventStack.QRCODE, payload.QRTargetId);
 		}
 		break;
 		}
