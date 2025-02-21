@@ -381,12 +381,9 @@ export class GameConnect {
 			
 			case CMD.SEND_EVENT:
 			{
-				switch(data.EventId){
-				case 1000:
-				case 1005:
-					data.EventId = CMD.EVENT;
-					break;
-				}
+				data = this.execCommand(data);
+				this.castEvent(gameId, data);
+				return ;
 			}
 			break;
 			
