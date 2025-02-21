@@ -53,6 +53,38 @@ test("ユーザー取得 Id 型チェック", async () => {
   });
   // console.log(user);
 });
+test("ユーザー取得 Hash 型チェック", async () => {
+  let user = await getUser(null, null, { query: { hash: "423c1220-c2cf-11ef-8d4f-0ea32b56e377" } });
+
+  expect(user.Status).toBe(200);
+
+  expect(user).toMatchObject({
+    UserData: expect.objectContaining({
+      Id: expect.any(Number),
+      UserHash: expect.any(String),
+      Type: expect.any(Number),
+      Name: expect.any(String),
+      Level: expect.any(Number),
+      Exp: expect.any(Number),
+      Karma: expect.any(Number),
+      Gold: expect.any(Number),
+      PlayCount: expect.any(Number),
+      CreatedAt: expect.any(Date),
+      LastPlayedAt: expect.any(Date),
+      UserId: expect.any(Number),
+      DisplayName: expect.any(String),
+      AvatarType: expect.any(Number),
+      Gender: expect.any(String),
+      Age: expect.any(String),
+      Job: expect.any(String),
+      Personality: expect.any(String),
+      Motivation: expect.any(String),
+      Weaknesses: expect.any(String),
+      Background: expect.any(String),
+    }),
+  });
+  // console.log(user);
+});
 
 // 過去のゲーム取得 テスト
 test("過去全てのゲーム取得 型チェック", async () => {
@@ -145,6 +177,28 @@ test("UserId2のユーザー(マルオ)の参加したゲームの情報取得 �
   expect(uhis.Status).toBe(200);
   // console.log(uhis);
 });
+test("UserId30のユーザー(カズマ)の参加したゲームの情報取得 型チェック", async () => {
+  let uhis = await userHistory(null, null, { query: { id: 30 } });
+
+  expect(uhis).toMatchObject({
+    History: expect.arrayContaining([
+      expect.objectContaining({
+        GameHash: expect.any(String),
+        UserId: expect.any(Number),
+        GameId: expect.any(Number),
+        Title: expect.any(String),
+        PlayerName: expect.any(String),
+        Result: expect.any(Number),
+        LogId: expect.any(String),
+        CreatedAt: expect.any(Date),
+      }),
+    ]),
+    Count: expect.any(Number),
+  });
+
+  expect(uhis.Status).toBe(200);
+  // console.log(uhis);
+});
 
 // 応援メッセージ取得 テスト
 test("送信された応援メッセージ取得(webから送信されたid) 型チェック", async () => {
@@ -213,5 +267,8 @@ test("出会いの記録取得 型チェック", async () => {
   //console.log(friend);
 });
 
-//TODO:
-//await gameAsk({ query:{  } }); //quetyの中身
+// ゲームアンケート作成及び取得 テスト
+test("アンケート作成 ", async () => {
+  let ask = await gameAsk(null, null, { query: {} }); //quetyの中身
+  // TODO: データがAPI経由で正常に作成できるかをテストする
+});
