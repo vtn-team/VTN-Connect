@@ -129,7 +129,8 @@ export class QREventer {
 				retData.Command = CMD.SEND_QR_EVENT;
 				retData.EventId = get.Value;
 				retData.Payload = createdPayload({
-					UserId : data.UserId
+					UserId : data.UserId,
+					QRTargetId: qrMaster.TargetId
 				});
 			}
 			

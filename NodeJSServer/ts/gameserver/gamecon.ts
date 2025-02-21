@@ -350,7 +350,7 @@ export class GameConnect {
 		let usePortal = false;
 		if(!data["Command"]) return;
 		
-		let payload = this.parsePayload(data["Payload"]);
+		let payload = parsePayload(data["Payload"]);
 		let gameId = this.sessionDic[data.SessionId];
 		
 		//portal対応
@@ -366,16 +366,6 @@ export class GameConnect {
 		{
 		case CMD.SEND_EVENT:
 		{
-			switch(data.EventId)
-			{
-			case SP_EVENT.AI_CHAT:
-			{
-				let data = payload.data;
-				let result = chatWithSession(data.ThreadId, data.Prompt);
-				return;
-			}
-			}
-			
 			if(this.games[gameId]) {
 				this.games[gameId].recordMessage(gameId, data);
 				data = this.execCommand(data);
@@ -430,7 +420,7 @@ export class GameConnect {
 		case CMD.SEND_QR_EVENT:
 		{
 			//QR読み込みでアーティファクトカウントを追加
-			execArtifactAppearEvent(ArtifaceEventStack.QRCODE, qrMaster.TargetId);
+			execArtifactAppearEvent(ArtifaceEventStack.QRCODE, payload.QRTargetId);
 		}
 		break;
 		}
