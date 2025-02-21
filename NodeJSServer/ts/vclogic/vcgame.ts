@@ -438,8 +438,8 @@ export enum ArtifaceEventStack {
 /*
 - (1) ANY： 5つのQRコードを読み込む
 - (2) アーティファクト1： 会場のゲームを10回遊ぶ
-- (3) アーティファクト2： 冒険者が10回会話する
-- (4) アーティファクト3： 応援メッセージが20通届く(BOT除く)
+- (3) アーティファクト2： 冒険者が15回会話する
+- (4) アーティファクト3： 応援メッセージが50通届く(BOT含む)
 */
 export async function execArtifactAppearEvent(atrifactEventStackId: ArtifaceEventStack, param:number = 0) {
 	if(atrifactEventStackId == 1) {
@@ -497,17 +497,17 @@ export async function execArtifactAppearEvent(atrifactEventStackId: ArtifaceEven
 		
 	case 3:
 		if(flag[2] > 0) break;
-		if(artifactEventStack[atrifactEventStackId] >= 10) {
+		if(artifactEventStack[atrifactEventStackId] >= 15) {
 			artifactEvent = 2;
-			artifactEventStack[atrifactEventStackId] -= 10;
+			artifactEventStack[atrifactEventStackId] -= 15;
 		}
 		break;
 		
 	case 4:
 		if(flag[3] > 0) break;
-		if(artifactEventStack[atrifactEventStackId] >= 20) {
+		if(artifactEventStack[atrifactEventStackId] >= 50) {
 			artifactEvent = 3;
-			artifactEventStack[atrifactEventStackId] -= 20;
+			artifactEventStack[atrifactEventStackId] -= 50;
 		}
 		break;
 	}
