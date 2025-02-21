@@ -54,7 +54,7 @@ export class GameConnectBridge {
 			//ws.send('something');
 		});
 		ws.on('message', (message:string) => {
-			console.log(message.toString());
+			//console.log(message.toString());
 			try {
 				let data = JSON.parse(message.toString());
 				
@@ -93,7 +93,7 @@ export class GameConnectBridge {
 				break;
 				
 				case CMD.GAMESTAT:
-					console.log(data.Data.ActiveGames)
+					//console.log(data.Data.ActiveGames)
 					this.games = data.Data.ActiveGames;
 					return;
 				}
@@ -116,7 +116,7 @@ export class GameConnectBridge {
 		}
 		
 		console.log("execMessage");
-		console.log(data);
+		//console.log(data);
 		data.SessionId = this.sessionId;
 		let msg = JSON.stringify(data);
 		this.client?.sendMessage(msg);
@@ -145,7 +145,7 @@ export class GameConnectBridge {
 		
 		//ここにきてはいけない
 		console.log("sendAPIEvent");
-		console.log(data);
+		//console.log(data);
 		data.SessionId = this.sessionId;
 		let msg = JSON.stringify(data);
 		this.client?.sendMessage(msg);
