@@ -20,10 +20,38 @@ test("apitest launch", async () => {
   //console.log("OK");
 });
 
-test("getUser by id", async () => {
-  let user = await getUser(null, null, { query: { id: 1001 } });
-  console.log(user);
-  //TODO: userの型チェック
+// ユーザー取得 テスト
+test("ユーザー取得 Id 型チェック", async () => {
+  let user = await getUser(null, null, { query: { id: 1030 } });
+
+  expect(user.Status).toBe(200);
+
+  expect(user).toMatchObject({
+    UserData: expect.objectContaining({
+      Id: expect.any(Number),
+      UserHash: expect.any(String),
+      Type: expect.any(Number),
+      Name: expect.any(String),
+      Level: expect.any(Number),
+      Exp: expect.any(Number),
+      Karma: expect.any(Number),
+      Gold: expect.any(Number),
+      PlayCount: expect.any(Number),
+      CreatedAt: expect.any(Date),
+      LastPlayedAt: expect.any(Date),
+      UserId: expect.any(Number),
+      DisplayName: expect.any(String),
+      AvatarType: expect.any(Number),
+      Gender: expect.any(String),
+      Age: expect.any(String),
+      Job: expect.any(String),
+      Personality: expect.any(String),
+      Motivation: expect.any(String),
+      Weaknesses: expect.any(String),
+      Background: expect.any(String),
+    }),
+  });
+  // console.log(user);
 });
 
 // 過去のゲーム取得 テスト
@@ -115,7 +143,7 @@ test("UserId2のユーザー(マルオ)の参加したゲームの情報取得 �
   });
 
   expect(uhis.Status).toBe(200);
-  console.log(uhis);
+  // console.log(uhis);
 });
 
 //TODO:
