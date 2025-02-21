@@ -379,6 +379,17 @@ export class GameConnect {
 			}
 			break;
 			
+			case CMD.SEND_EVENT:
+			{
+				switch(data.EventId){
+				case 1000:
+				case 1005:
+					data.EventId = CMD.EVENT;
+					break;
+				}
+			}
+			break;
+			
 			case CMD.SEND_QR_EVENT:
 			{
 				//QR読み込みでアーティファクトカウントを追加
