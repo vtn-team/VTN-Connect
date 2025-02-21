@@ -201,6 +201,7 @@ class Server {
 		if(session) {
 			this.sessions[sessionId] = session;
 		}else{
+			this.removeSession(sessionId);
 			console.log("見つからないユーザでjoinしました");
 		}
 	}
