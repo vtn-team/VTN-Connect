@@ -274,7 +274,21 @@ export class UserPortal {
 			
 			//Webページにリレーする
 			let result:any = {};
-			if(msg.Emotion) {
+			let skipAICheck = true;
+			let turn = -1;
+			
+			if(msg.Emotion != 0) skipAICheck = true;
+			if(msg.Message.indexOf("【") != -1 && msg.Message.indexOf("】") != -1) {
+				msg.Emotion = 0;
+				skipAICheck = true;
+				turn = 99;
+			}
+			if(msg.Message.indexOf("『") != -1 && msg.Message.indexOf("』") != -1) {
+				msg.Emotion = 0;
+				skipAICheck = true;
+				turn = 20;
+			}
+			if(skipAICheck) {
 				result = {
 					Message: msg.Message,
 					Emotion: msg.Emotion
@@ -291,7 +305,8 @@ export class UserPortal {
 				AvatarType: msg.Avatar,
 				Name: msg.Name,
 				Message: result.Message,
-				Emotion: result.Emotion
+				Emotion: result.Emotion,
+				Turn: turn
 			}
 			let evtData = {
 				EventId: 1001,
