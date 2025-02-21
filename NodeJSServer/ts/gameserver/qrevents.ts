@@ -78,7 +78,7 @@ export class QREventer {
 			
 			msgData = {
 				Command:CMD.USERSTAT,
-				BridgeMarking; 1,
+				BridgeMarking: 1,
 				UpdateStat: {
 					GameId: qrMaster.TargetId,
 					UserId : data.UserId
@@ -155,7 +155,7 @@ export class QREventer {
 			if(updateResult) {
 				msgData = {
 					Command:CMD.USERSTAT,
-					BridgeMarking; 1,
+					BridgeMarking: 1,
 					UpdateStat: updateResult,
 					GameId: 99,
 					UserId: data.UserId
