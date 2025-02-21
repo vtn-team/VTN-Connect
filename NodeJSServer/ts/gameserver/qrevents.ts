@@ -2,8 +2,6 @@ import { getMaster, getGameInfo, getGameEvent, getQRSheet, getQREvent } from "./
 import { getUserFromId, getUserFromHash, getRewardsByEventCode } from "./../vclogic/vcuser"
 import { UserSession, VCUserSession, CMD, TARGET, createdPayload } from "./session"
 
-import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
-
 
 //QRイベント
 //NOTE: シリアルコードを処理する
@@ -128,7 +126,7 @@ export class QREventer {
 			}
 			
 			if(get.Flag == "Event") {
-				retData.Command = CMD.SEND_EVENT;
+				retData.Command = CMD.SEND_QR_EVENT;
 				retData.EventId = get.Value;
 				retData.Payload = createdPayload({
 					UserId : data.UserId
@@ -151,9 +149,6 @@ export class QREventer {
 				updateResult = await getRewardsByEventCode(data.UserId, get.Value, get.Value);
 				break;
 			}
-			
-			//QR読み込みでアーティファクトカウントを追加
-			execArtifactAppearEvent(ArtifaceEventStack.QRCODE, qrMaster.TargetId);
 			
 			if(updateResult) {
 				msgData = {

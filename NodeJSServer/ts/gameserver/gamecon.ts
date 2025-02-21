@@ -414,13 +414,25 @@ export class GameConnect {
 			}
 		}
 		break;
-		/*
+		
 		case CMD.SEND_CHEER:
 		{
-			this.cheerMessage(data);
+			//応援メッセージが来たらアーティファクトカウントを追加
+			execArtifactAppearEvent(ArtifaceEventStack.CHEER);
+			
+			//フレンド記録
+			//if(data.ToUserId > 999) {
+				recordFriendShip(1001, data.ToUserId, data.FromUserId, data.Data.Name, { Message: data.Data.Message });
+			//}
 		}
 		break;
-		*/
+		
+		case CMD.SEND_QR_EVENT:
+		{
+			//QR読み込みでアーティファクトカウントを追加
+			execArtifactAppearEvent(ArtifaceEventStack.QRCODE, qrMaster.TargetId);
+		}
+		break;
 		}
 		
 		return usePortal;

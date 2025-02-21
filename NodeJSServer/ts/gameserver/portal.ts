@@ -6,8 +6,6 @@ import { UserSession, VCUserSession, VCBridgeSession, CMD, TARGET, createMessage
 import { EventRecorder, EventPlayer } from "./eventrec"
 import { SakuraConnect } from "./sakuracon"
 
-import { ArtifaceEventStack, execArtifactAppearEvent } from "./../vclogic/vcgame"
-
  
 export interface VCActiveUser
 {
@@ -191,14 +189,6 @@ export class UserPortal {
 		case CMD.SEND_CHEER:
 		{
 			this.cheerMessage(data);
-			
-			//応援メッセージが来たらアーティファクトカウントを追加
-			execArtifactAppearEvent(ArtifaceEventStack.CHEER);
-			
-			//フレンド記録
-			//if(data.ToUserId > 999) {
-				recordFriendShip(1001, data.ToUserId, data.FromUserId, data.Data.Name, { Message: data.Data.Message });
-			//}
 		}
 		break;
 		
