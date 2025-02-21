@@ -5,6 +5,7 @@ import { chat, chatWithContextsText } from "./../lib/chatgpt"
 import { query } from "./../lib/database"
 import { uploadToS3 } from "./../lib/s3"
 const { v4: uuidv4 } = require('uuid')
+const crypto = require("crypto")
 
 interface Episode {
 	getEpisodePrompt(userInfo: any) : any;
@@ -111,7 +112,8 @@ class EpisodeBook {
 	gameId: number;
 	gameHash: string;
 	userInfo: any;
-	episodes: Array<Episode>
+	episodes: Array<Episode>;
+	talkUsers: Array<number>;
 
 	constructor(gameId: number, gameHash: string, userInfo: any) {
 		this.gameId = gameId;
@@ -121,6 +123,16 @@ class EpisodeBook {
 			new CharacterSetting(gameId),
 			new GameStart(gameId),
 		];
+		this.talkUsers = [];
+	}
+	
+	public getFriendTalkNum() {
+		return this.talkUsers.length;
+	}
+	
+	public addFriendTalkNum(userId: number) {
+		if(this.talkUsers.indexOf(userId) != -1) return;
+		this.talkUsers.push(userId);
 	}
 	
 	public getGameId() {
@@ -252,6 +264,7 @@ export async function saveEpisodeNormalGame(gameHash: string, resultCode: Result
 
 //物語の記録を開始(AIゲーム)
 export function createEpisodeAIGame(gameId: number, gameHash: string, users: any) {
+	if(!users) return;
 	
 	//プレイするユーザの情報を4人分記録
 	for(let u of users) {
@@ -266,6 +279,7 @@ export function createEpisodeAIGame(gameId: number, gameHash: string, users: any
 export async function saveEpisodeAIGame(gameHash: string, title: string, gameResult: any) {
 	//ユーザのリストが入っている
 	let users = getCachedUser(gameHash);
+	if(!users) return;
 	
 	console.log(gameResult);
 	
@@ -288,8 +302,17 @@ export async function saveEpisodeAIGame(gameHash: string, title: string, gameRes
 			prompt += "\n\n# 冒険の結末\n- 成功";
 			resNumber += 10;
 		}else{
-			prompt += "\n\n# 冒険の結末\n- 失敗";
-			resNumber += 20;
+			if(episode.getFriendTalkNum()>0){
+				let rnd = crypto.randomInt(0, episode.getFriendTalkNum());
+				if(rnd >= 2) {
+					prompt += "\n\n# 冒険の結末\n- 失敗したが仲間に救出される";
+					resNumber += 30;
+				}
+			}
+			if(resNumber < 30) {
+				prompt += "\n\n# 冒険の結末\n- 失敗";
+				resNumber += 20;
+			}
 		}
 		if(result.MissionClear) {
 			prompt += "\n\n# 冒険の目的\n- 達成";
