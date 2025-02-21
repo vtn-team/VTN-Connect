@@ -64,7 +64,11 @@ export class GameConnectBridge {
 				}
 				
 				if(data.Data) {
-					data.Data = JSON.parse(data.Data);
+					try {
+						data.Data = JSON.parse(data.Data);
+					}catch(ex){
+						console.log(ex);
+					}
 				}
 				
 				data.BridgeMarking = 1;
