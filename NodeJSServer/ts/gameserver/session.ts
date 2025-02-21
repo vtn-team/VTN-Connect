@@ -173,12 +173,6 @@ export class VCBridgeSession extends UserSession {
 	}
 	
 	public chkTarget(data: any) {
-		switch(data.Command)
-		{
-		case CMD.USERSTAT:
-		case CMD.ERROR:
-			return false;
-		}
 		return true;
 	}
 };

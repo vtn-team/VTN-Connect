@@ -83,7 +83,7 @@ class Server {
 			
 		case ServerType.UserPortal:
 			this.contents = new GameConnectBridge((data: any)=>{ this.message(data); }, (data: any) => { this.portal.sendAPIEvent(data); });
-			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); this.contents.execMessage(data); });
+			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); /*this.contents.execMessage(data);*/ });
 			console.log("server content is userportal only.");
 			break;
 		}
@@ -165,10 +165,8 @@ class Server {
 			
 		case CMD.SEND_QR:
 			{
-				/*
 				if(this.serverType == ServerType.GameConnect)
 					break;
-				*/
 				
 				let result:any = await this.qrEventer.execEvent(data);
 				if(result.Status == 1) {
