@@ -48,7 +48,7 @@ export class QREventer {
 			};
 		}
 		
-		if(this.serialDic[data.UserId] && !data.IsDebug) {
+		if(this.serialDic[data.UserId] && qrMaster.Type == 2 && !data.IsDebug) {
 			let note = this.serialDic[data.UserId];
 			if(note[serialCode]) {
 				let date = note[serialCode];
@@ -77,6 +77,16 @@ export class QREventer {
 				GameId : qrMaster.TargetId,
 				UserId : data.UserId
 			});
+			
+			msgData = {
+				Command:CMD.USERSTAT,
+				UpdateStat: {
+					GameId: qrMaster.TargetId,
+					UserId : data.UserId
+				},
+				GameId: 99,
+				UserId: data.UserId
+			};
 		}
 		
 		//NOTE: リリンク
