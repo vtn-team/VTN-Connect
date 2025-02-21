@@ -4,7 +4,6 @@ import { MessagePacket, checkMessageAndWrite, recordFriendShip } from "./../vclo
 import { getUserFromId, getUserFromHash } from "./../vclogic/vcuser"
 import { UserSession, VCUserSession, VCBridgeSession, CMD, TARGET, createMessage, createGameMessage } from "./session"
 import { EventRecorder, EventPlayer } from "./eventrec"
-import { SakuraConnect } from "./sakuracon"
 
  
 export interface VCActiveUser
@@ -19,6 +18,7 @@ export interface UserPortalInterface {
 	execMessage(data: any) : void;
 	removeSession(sessionId: string) : void;
 	getActiveUsers() : any;
+	cheerMessage(data: any) : void;
 	sendAPIEvent(data: any) : void;
 }
 
@@ -58,6 +58,10 @@ export class UserPortalBridge {
 		let users:any = [];
 		
 		return users;
+	}
+	
+	public cheerMessage(data: any) {
+		//なにもしない
 	}
 	
 	public sendAPIEvent(data: any) {
@@ -105,15 +109,11 @@ export class UserPortal {
 	users: any;
 	sessionDic: any;
 	broadcast: any;
-	sakura: SakuraConnect;
 
 	constructor(bc: any) {
 		this.users = {};
 		this.sessionDic = {};
 		this.broadcast = bc;
-		this.sakura = new SakuraConnect((message: any) => {
-			this.cheerMessage(message)
-		});
 	}
 	
 	parsePayload(payload: any) {
@@ -173,8 +173,6 @@ export class UserPortal {
 		{
 		case CMD.SEND_EVENT:
 		{
-			//イベントフック用
-			this.sakura.eventHook(data.EventId, data)
 		}
 		break;
 		
@@ -183,12 +181,6 @@ export class UserPortal {
 			//ユーザステータスの更新
 			console.log(data)
 			this.broadcast(createMessage(data.UserId, CMD.USERSTAT, TARGET.SELF, data));
-		}
-		break;
-		
-		case CMD.SEND_CHEER:
-		{
-			this.cheerMessage(data);
 		}
 		break;
 		
@@ -252,7 +244,8 @@ export class UserPortal {
 		return false;
 	}
 	
-	async cheerMessage(data: any) {
+	public async cheerMessage(data: any) {
+		let ret = null;
 		try {
 			let to = data.ToUserId;
 			let from = data.FromUserId;
@@ -281,13 +274,12 @@ export class UserPortal {
 			if(msg.Message.indexOf("【") != -1 && msg.Message.indexOf("】") != -1) {
 				msg.Emotion = 0;
 				skipAICheck = true;
-				turn = 99;
 			}
 			if(msg.Message.indexOf("『") != -1 && msg.Message.indexOf("』") != -1) {
 				msg.Emotion = 0;
 				skipAICheck = true;
-				turn = 20;
 			}
+			
 			if(skipAICheck) {
 				result = {
 					Message: msg.Message,
@@ -296,6 +288,18 @@ export class UserPortal {
 			} else {
 				result = await checkMessageAndWrite(message);
 			}
+			
+			if(result.Emotion === undefined) {
+				result.Emotion = 0;
+			}
+			
+			if(result.Message.indexOf("【") != -1 && result.Message.indexOf("】") != -1) {
+				turn = 99;
+			}
+			if(result.Message.indexOf("『") != -1 && result.Message.indexOf("』") != -1) {
+				turn = 20;
+			}
+			
 			data.Data = result.result;
 			this.broadcast(createMessage(to, CMD.CHEER, TARGET.SELF, data));
 			
@@ -305,7 +309,7 @@ export class UserPortal {
 				AvatarType: msg.Avatar,
 				Name: msg.Name,
 				Message: result.Message,
-				Emotion: result.Emotion,
+				Emotion: result.Emotion ? result.Emotion : 0,
 				Turn: turn
 			}
 			let evtData = {
@@ -313,10 +317,11 @@ export class UserPortal {
 				FromId: from,
 				Payload: this.createdPayload(evtPacket)
 			};
-			this.broadcast(createGameMessage(from, parseInt(data.GameId), CMD.EVENT, TARGET.SELF, evtData));
+			ret = createGameMessage(from, parseInt(data.GameId), CMD.EVENT, TARGET.SELF, evtData);
 		}catch(ex){
 			console.log(ex);
 		}
+		return ret;
 	}
 	
 	async execQREvent(data: any) {
@@ -324,8 +329,6 @@ export class UserPortal {
 	}
 	
 	public sendAPIEvent(data: any) {
-		this.sakura.apiHook(data);
-		
 		switch(data.API) {
 		case "createUser":
 		case "gameStartAIGame":

@@ -5,6 +5,7 @@ import { getElasticIP } from "./../elasticip"
 import { WebSocket, WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
 import { UserSession, VCBridgeSession, CMD, TARGET, createMessage } from "./session"
+import { SakuraConnect } from "./sakuracon"
 
 
 //サーバキャッシュ
@@ -33,7 +34,8 @@ class Server {
 	protected contents: GameConnectInterface;	//ゲームコネクター(ゲーム同士をつなげるGameServerの本体)
 	protected portal: UserPortalInterface;		//ユーザールーム(ユーザを管理するGameServerの本体)
 	
-	protected qrEventer: QREventer;		//QR
+	protected sakura: SakuraConnect|null;	//サクラ
+	protected qrEventer: QREventer|null;	//QR
 	protected lastActiveNum: number;	//現在のアクティブ人数キャッシュ
 	protected port: number;				//接続するポート
 	protected isMaintenance: boolean;	//メンテナンス情報
@@ -65,8 +67,10 @@ class Server {
 		this.port = port;
 		this.isMaintenance = false;
 		this.server = new WebSocketServer({ port });
-		this.qrEventer = new QREventer();
+		this.qrEventer = null;
+		this.sakura = null;
 		
+		let createOptions = true;
 		switch(mode) {
 		default:
 		case ServerType.Both:
@@ -79,13 +83,21 @@ class Server {
 			this.contents = new GameConnect((data: any)=>{ this.broadcast(data); });
 			this.portal = new UserPortalBridge(null);
 			console.log("server content is gameconnect only.");
+			createOptions = false;
 			break;
 			
 		case ServerType.UserPortal:
-			this.contents = new GameConnectBridge((data: any)=>{ this.message(data); }, (data: any) => { this.portal.sendAPIEvent(data); });
-			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); /*this.contents.execMessage(data);*/ });
+			this.contents = new GameConnectBridge((data: any)=>{ this.message(data); }, (data: any) => { this.sakura?.apiHook(data); this.portal.sendAPIEvent(data); });
+			this.portal = new UserPortal((data: any)=>{ this.broadcast(data); });
 			console.log("server content is userportal only.");
 			break;
+		}
+		
+		if(createOptions) {
+			this.qrEventer = new QREventer();
+			this.sakura = new SakuraConnect((message: any) => {
+				this.cheer(message);
+			});
 		}
 		
 		this.lastActiveNum = 0;
@@ -158,14 +170,23 @@ class Server {
 			break;
 			
 		case CMD.SEND_EVENT:
+			//イベントフック用
+			this.sakura?.eventHook(data.EventId, data);
+			
 		default:
 			this.contents.execMessage(data);
 			this.portal.execMessage(data);
 			break;
 			
+		case CMD.SEND_CHEER:
+			{
+				this.cheer(data);
+			}
+			break;
+			
 		case CMD.SEND_QR:
 			{
-				if(this.serverType == ServerType.GameConnect)
+				if(!this.qrEventer)
 					break;
 				
 				let result:any = await this.qrEventer.execEvent(data);
@@ -175,6 +196,13 @@ class Server {
 				this.portal.execMessage(result.Message);
 			}
 			break;
+		}
+	}
+	
+	async cheer(data: any) {
+		let packet:any = await this.portal.cheerMessage(data);
+		if(packet) {
+			this.contents.execMessage(packet);
 		}
 	}
 	
