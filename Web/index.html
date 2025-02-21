@@ -2323,7 +2323,7 @@ function urlB64ToUint8Array(base64String) {
 				<h1 class="nes-header checkbg">HELLO WORLD</h1>
 			</div>
 			
-			<div style="height:150px;"></div>
+			<div style="height:80px;"></div>
 			
 			<div id="page-tutorial-hello">
 				<div class="nes-balloon from-left">
@@ -2363,9 +2363,9 @@ function urlB64ToUint8Array(base64String) {
 					<div class="center">
 						これから自分の分身を『召喚』します<br />
 						<br />
-						召喚にあたり、AIがあなたのステータスを勝手に決めてしまいます。<br />
-						一部のステータスについては調整が可能となっていますので、<br />
-						用意された質問事項に回答をお願いします。<br />
+						この世界の神はAI神です。<br />
+						召喚にあたり、AI神があなたのステータスを勝手に決めます。<br />
+						しかし一部のステータスについては調整が可能となっていますので、用意された質問事項に回答をお願いします。<br />
 						<br />
 						ちなみに回答しなくても大丈夫です。回答しない場合は、AIが勝手に決めた設定でキャラクターが生成されます。<br />
 						<br />
@@ -2849,6 +2849,117 @@ function urlB64ToUint8Array(base64String) {
 					</div>
 				</div>
 				
+				
+		
+		<div id="debugitem" class="nes-container with-title leftmenu" style="display:none;">
+			<p class="title">デバッグメニュー</p>
+			
+			<div class="nes-container with-title">
+				<p class="title">機能テスト</p>
+				
+				<div style="height:10px;"></div>
+				GameId<input type="text" id="dbgShutdownId" class="nes-input">
+				<button type="button" class="nes-btn is-primary" onclick="gameShutdown();">ゲーム終了</button>
+				
+				<div style="height:25px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick="playNextVideo();">次の動画</button>
+				
+				<div style="height:10px;"></div>
+
+				<button type="button" id="" class="nes-btn is-primary" onclick="initializePush();">通知登録</button>
+				<div style="height:10px;"></div>
+
+				<button type="button" id="" class="nes-btn is-primary" onclick="sendSubscriptionToServer();">通知送信</button>
+				<div style="height:10px;"></div>
+
+				<button type="button" class="nes-btn is-primary" onclick="reCreateUser();">ユーザ登録やり直す</button><br />
+				NOTE: 作り直すまでデータは消えない<br />
+				
+				<div style="height:10px;"></div>
+				GameId<input type="text" id="dgbUserIdHandOver" class="nes-input">
+				<button type="button" class="nes-btn is-primary" onclick="userIdHandOver();">ユーザID引継ぎ</button>
+				
+				<div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick="resetTutorial();">チュートリアルリセット</button>
+				
+				<div style="height:20px;"></div>
+			</div>
+			
+			<div style="height:50px;"></div>
+				
+			<div class="nes-container with-title">
+				<p class="title">メッセージデバッグ</p>
+				<br />
+				対象を「自分」のままにすると自分にメッセージを送信します。<br />
+				自分以外のプレイヤーにメッセージを送りたい場合は、そのプレイヤーのUserIdを入力してください。<br />
+				<br />
+				対象<input type="text" id="dbgTarget" class="nes-input" value="自分">
+				メッセージ<input type="text" id="dbgMessage" class="nes-input">
+				<button type="button" class="nes-btn is-primary" onclick="dbgMsgSend();">送信</button>
+			</div>
+			
+			<div style="height:50px;"></div>
+			
+			<div class="nes-container with-title">
+				<p class="title">ユーザパラメータ</p>
+				
+				<table class="nes-table is-bordered is-centered">
+				<tbody>
+					<tr>
+						<td>UserId</td>
+						<td id="dbgUserId"></td>
+					</tr>
+					<tr>
+						<td>AvatarType</td>
+						<td id="dbgAvatarType"></td>
+					</tr>
+				</tbody>
+				</table>
+				<button type="button" class="nes-btn is-primary" onclick="levelUp();">レベルアップ</button>
+			</div>
+
+			<div style="height:50px;"></div>
+		</div>
+		
+		<div id="eventtest" class="nes-container with-title leftmenu">
+			<p class="title">テストイベント</p>
+			
+			<div id="cheerDebug" style="display:none;">
+				NOTE: Emotionはそれぞれ50)<br />
+				<button type="button" class="nes-btn is-primary" onclick=goodCheer()>よい応援</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=badCheer()>わるい応援</button><div style="height:10px;"></div>
+			</div>
+			
+			<div style="height:20px;"></div>
+			
+			<label for="error_select">イベントを送信するデバッグ対象のゲーム</label>
+			<div id="dbgEvent" class="nes-select is-normal">
+				<select required id="dbgSelector">
+				<option value="0" disabled selected hidden>選択しましょう...</option>
+				</select>
+			</div>
+			
+			<div style="height:20px;"></div>
+			
+			<div id="eventDebug"></div>
+			
+			<div style="height:20px;"></div>
+			
+			<div id="debugNote">
+				NOTE: 会場イベントは連投できない(ゲームに飛ぶのは10秒に1回のみ)<br />
+				NOTE: アーティファクト出現イベントは、一回の冒険中に1度しか出ない<br />
+			</div>
+		
+			<div style="height:50px;"></div>
+			
+			<div class="nes-container with-title">
+				<p class="title">テストQR</p>
+				<br />
+				<button type="button" class="nes-btn is-primary" onclick="sendQREvent('810f1f50-6a2b-4a8d-8908-a37b9afe9ec2')">リンク1</button><div style="height:10px;"></div>
+				<button type="button" class="nes-btn is-primary" onclick=sendDebugQR()>スクロール</button><div style="height:10px;"></div>
+			</div>
+		</div>
+				
 				<div style="height:150px;"></div>
 			</div>
 			
@@ -3013,6 +3124,13 @@ function urlB64ToUint8Array(base64String) {
 				</div>
 				
 				<div style="height:150px;"></div>
+				
+				<div class="right">
+					<button type="button" class="nes-btn is-error" onclick="reCreateUser();">再度召喚する</button><br />
+					※召喚しなおすまでデータは消えません！<br />
+				</div>
+				
+				<div style="height:150px;"></div>
 			</div>
 			
 			<div id="page-credit" class="main-block right-bottom">
@@ -3091,7 +3209,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 			</div>
 		</div>
 		
-		<div style="height:50px;"></div>
+		<div style="height:150px;"></div>
 	</div>
 	
 	<div id ="mainmenu" class="menubtn" style="display:none">
@@ -3145,115 +3263,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 			</div>
 		</div>
 		 -->
-		
-		<div id="debugitem" class="nes-container with-title leftmenu" style="display:none;">
-			<p class="title">デバッグメニュー</p>
-			
-			<div class="nes-container with-title">
-				<p class="title">機能テスト</p>
-				
-				<div style="height:10px;"></div>
-				GameId<input type="text" id="dbgShutdownId" class="nes-input">
-				<button type="button" class="nes-btn is-primary" onclick="gameShutdown();">ゲーム終了</button>
-				
-				<div style="height:25px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick="playNextVideo();">次の動画</button>
-				
-				<div style="height:10px;"></div>
-
-				<button type="button" id="" class="nes-btn is-primary" onclick="initializePush();">通知登録</button>
-				<div style="height:10px;"></div>
-
-				<button type="button" id="" class="nes-btn is-primary" onclick="sendSubscriptionToServer();">通知送信</button>
-				<div style="height:10px;"></div>
-
-				<button type="button" class="nes-btn is-primary" onclick="reCreateUser();">ユーザ登録やり直す</button><br />
-				NOTE: 作り直すまでデータは消えない<br />
-				
-				<div style="height:10px;"></div>
-				GameId<input type="text" id="dgbUserIdHandOver" class="nes-input">
-				<button type="button" class="nes-btn is-primary" onclick="userIdHandOver();">ユーザID引継ぎ</button>
-				
-				<div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick="resetTutorial();">チュートリアルリセット</button>
-				
-				<div style="height:20px;"></div>
-			</div>
-			
-			<div style="height:50px;"></div>
-				
-			<div class="nes-container with-title">
-				<p class="title">メッセージデバッグ</p>
-				<br />
-				対象を「自分」のままにすると自分にメッセージを送信します。<br />
-				自分以外のプレイヤーにメッセージを送りたい場合は、そのプレイヤーのUserIdを入力してください。<br />
-				<br />
-				対象<input type="text" id="dbgTarget" class="nes-input" value="自分">
-				メッセージ<input type="text" id="dbgMessage" class="nes-input">
-				<button type="button" class="nes-btn is-primary" onclick="dbgMsgSend();">送信</button>
-			</div>
-			
-			<div style="height:50px;"></div>
-			
-			<div class="nes-container with-title">
-				<p class="title">ユーザパラメータ</p>
-				
-				<table class="nes-table is-bordered is-centered">
-				<tbody>
-					<tr>
-						<td>UserId</td>
-						<td id="dbgUserId"></td>
-					</tr>
-					<tr>
-						<td>AvatarType</td>
-						<td id="dbgAvatarType"></td>
-					</tr>
-				</tbody>
-				</table>
-				<button type="button" class="nes-btn is-primary" onclick="levelUp();">レベルアップ</button>
-			</div>
-
-			<div style="height:50px;"></div>
-		</div>
-		
-		<div id="eventtest" class="nes-container with-title leftmenu" style="display:none;">
-			<p class="title">テストイベント</p>
-			
-			<div id="cheerDebug" style="display:none;">
-				NOTE: Emotionはそれぞれ50)<br />
-				<button type="button" class="nes-btn is-primary" onclick=goodCheer()>よい応援</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=badCheer()>わるい応援</button><div style="height:10px;"></div>
-			</div>
-			
-			<div style="height:20px;"></div>
-			
-			<label for="error_select">イベントを送信するデバッグ対象のゲーム</label>
-			<div id="dbgEvent" class="nes-select is-normal">
-				<select required id="dbgSelector">
-				<option value="0" disabled selected hidden>選択しましょう...</option>
-				</select>
-			</div>
-			
-			<div style="height:20px;"></div>
-			
-			<div id="eventDebug"></div>
-			
-			<div style="height:20px;"></div>
-			
-			<div id="debugNote">
-				NOTE: 会場イベントは連投できない(ゲームに飛ぶのは10秒に1回のみ)<br />
-				NOTE: アーティファクト出現イベントは、一回の冒険中に1度しか出ない<br />
-			</div>
-		
-			<div style="height:50px;"></div>
-			
-			<div class="nes-container with-title">
-				<p class="title">テストQR</p>
-				<br />
-				<button type="button" class="nes-btn is-primary" onclick="sendQREvent('810f1f50-6a2b-4a8d-8908-a37b9afe9ec2')">リンク1</button><div style="height:10px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick=sendDebugQR()>スクロール</button><div style="height:10px;"></div>
-			</div>
-		</div>
 					<!--
 					<section style="height:120px;">
 						<div class="nes-container is-rounded with-title" style="height:80px;">
