@@ -26,6 +26,7 @@ test("getUser by id", async () => {
   //TODO: userの型チェック
 });
 
+// 過去のゲーム取得 テスト
 test("過去全てのゲーム取得 型チェック", async () => {
   let history = await gameHistory(null, null, { query: { id: 0 } });
 
@@ -48,7 +49,6 @@ test("過去全てのゲーム取得 型チェック", async () => {
   expect(history.Status).toBe(200);
   //console.log(history);
 });
-
 test("過去全てのゲーム取得 ページ2 型チェック", async () => {
   let history = await gameHistory(null, null, { query: { id: 0, page: 2 } });
 
@@ -71,33 +71,55 @@ test("過去全てのゲーム取得 ページ2 型チェック", async () => {
   expect(history.Status).toBe(200);
   //console.log(history);
 });
-
 test("過去のGameId 1のゲーム 型チェック", async () => {
-	let history = await gameHistory(null, null, { query: { id: 1 } });
-  
-	expect(history).toMatchObject({
-	  History: expect.arrayContaining([
-		expect.objectContaining({
-		  GameHash: expect.any(String),
-		  UserId: expect.any(Number),
-		  GameId: expect.any(Number),
-		  Title: expect.any(String),
-		  PlayerName: expect.any(String),
-		  Result: expect.any(Number),
-		  LogId: expect.any(String),
-		  CreatedAt: expect.any(Date),
-		}),
-	  ]),
-	  Count: expect.any(Number),
-	});
-  
-	expect(history.Status).toBe(200);
-	// console.log(history);
+  let history = await gameHistory(null, null, { query: { id: 1 } });
+
+  expect(history).toMatchObject({
+    History: expect.arrayContaining([
+      expect.objectContaining({
+        GameHash: expect.any(String),
+        UserId: expect.any(Number),
+        GameId: expect.any(Number),
+        Title: expect.any(String),
+        PlayerName: expect.any(String),
+        Result: expect.any(Number),
+        LogId: expect.any(String),
+        CreatedAt: expect.any(Date),
+      }),
+    ]),
+    Count: expect.any(Number),
   });
+
+  expect(history.Status).toBe(200);
+  // console.log(history);
+});
+
+// 過去のゲーム参加ユーザー取得 テスト
+test("UserId2のユーザー(マルオ)の参加したゲームの情報取得 型チェック", async () => {
+  let uhis = await userHistory(null, null, { query: { id: 2 } });
+
+  expect(uhis).toMatchObject({
+    History: expect.arrayContaining([
+      expect.objectContaining({
+        GameHash: expect.any(String),
+        UserId: expect.any(Number),
+        GameId: expect.any(Number),
+        Title: expect.any(String),
+        PlayerName: expect.any(String),
+        Result: expect.any(Number),
+        LogId: expect.any(String),
+        CreatedAt: expect.any(Date),
+      }),
+    ]),
+    Count: expect.any(Number),
+  });
+
+  expect(uhis.Status).toBe(200);
+  console.log(uhis);
+});
 
 //TODO:
 //let user = await getUser(null, null, { query:{  } }); //queryつける
 //let um = await userMessage(null, null, { query:{  } });
-//let uhis = await userHistory(null, null, { query:{  } });
 //let friend = await friendList(null, null, { query:{  } });
 //await gameAsk({ query:{  } }); //quetyの中身
