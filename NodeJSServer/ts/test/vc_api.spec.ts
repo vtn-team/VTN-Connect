@@ -156,9 +156,9 @@ test("送信された応援メッセージ取得(webから送信されたid) 型
         Id: expect.any(Number),
         ToUserId: expect.any(Number),
         FromUserId: expect.any(Number),
-		AvatarType: expect.any(Number),
+        AvatarType: expect.any(Number),
         Message: expect.any(String),
-		Emotion: expect.any(Number),
+        Emotion: expect.any(Number),
         CreatedAt: expect.any(Date),
       }),
     ]),
@@ -169,27 +169,49 @@ test("送信された応援メッセージ取得(webから送信されたid) 型
   //console.log(um);
 });
 test("送信された応援メッセージ取得 型チェック", async () => {
-	let um = await userMessage(null, null, { query: { id: 1094 } });
-  
-	expect(um).toMatchObject({
-	  Messages: expect.arrayContaining([
-		expect.objectContaining({
-		  Id: expect.any(Number),
-		  ToUserId: expect.any(Number),
-		  FromUserId: expect.any(Number),
-		  AvatarType: expect.any(Number),
-		  Message: expect.any(String),
-		  Emotion: expect.any(Number),
-		  CreatedAt: expect.any(Date),
-		}),
-	  ]),
-	  Count: expect.any(Number),
-	});
-  
-	expect(um.Status).toBe(200);
-	//console.log(um);
+  let um = await userMessage(null, null, { query: { id: 1094 } });
+
+  expect(um).toMatchObject({
+    Messages: expect.arrayContaining([
+      expect.objectContaining({
+        Id: expect.any(Number),
+        ToUserId: expect.any(Number),
+        FromUserId: expect.any(Number),
+        AvatarType: expect.any(Number),
+        Message: expect.any(String),
+        Emotion: expect.any(Number),
+        CreatedAt: expect.any(Date),
+      }),
+    ]),
+    Count: expect.any(Number),
   });
 
+  expect(um.Status).toBe(200);
+  //console.log(um);
+});
+
+// 出会いの記録取得 テスト
+test("出会いの記録取得 型チェック", async () => {
+  let friend = await friendList(null, null, { query: { id: 1 } });
+  //TODO: friendListの戻り値が他の関数とちょっと違うので、要確認
+  expect(friend.Friends).toMatchObject({
+    Friends: expect.arrayContaining([
+      expect.objectContaining({
+        UserId: expect.any(Number),
+        FriendId: expect.any(Number),
+        FriendName: expect.any(String),
+        EventId: expect.any(Number),
+        EnCount: expect.any(Number),
+        Option: expect.any(String),
+        CreatedAt: expect.any(Date),
+      }),
+    ]),
+    Count: expect.any(Number),
+  });
+
+  expect(friend.Status).toBe(200);
+  //console.log(friend);
+});
+
 //TODO:
-//let friend = await friendList(null, null, { query:{  } });
 //await gameAsk({ query:{  } }); //quetyの中身
