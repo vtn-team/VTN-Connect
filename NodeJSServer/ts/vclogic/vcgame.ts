@@ -380,24 +380,24 @@ export function getGameUserCache(gameId: number) {
 }
 
 export async function getGameHistory(gameId: number, page: number = 0) {
-	let result = null;
-	let count = null;
-	let limit = 25;
-	
-	if(gameId == 0) {
-		result = await query("SELECT * FROM Adventure ORDER BY CreatedAt DESC LIMIT 0,?", [limit]);
-		count = await query("SELECT count(GameHash) as Count FROM Adventure", []);
-	} else {
-		result = await query("SELECT * FROM Adventure ORDER BY CreatedAt DESC WHERE GameId = ? LIMIT 0, ?", [gameId,limit]);
-		count = await query("SELECT count(GameHash) as Count FROM Adventure WHERE GameId = ?", [gameId]);
-	}
-	
-	console.log(gameId);
-	
-	return {
-		History: result,
-		Count: Number(count[0].Count)
-	};
+    let result = null;
+    let count = null;
+    let limit = 25;
+
+    if (gameId == 0) {
+        result = await query("SELECT * FROM Adventure ORDER BY CreatedAt DESC LIMIT 0,?", [limit]);
+        count = await query("SELECT count(GameHash) as Count FROM Adventure", []);
+    } else {
+        result = await query("SELECT * FROM Adventure WHERE GameId = ? ORDER BY CreatedAt DESC LIMIT 0, ?", [gameId, limit]);
+        count = await query("SELECT count(GameHash) as Count FROM Adventure WHERE GameId = ?", [gameId]);
+    }
+
+    console.log(gameId);
+
+    return {
+        History: result,
+        Count: Number(count[0].Count)
+    };
 }
 
 export async function getArtifactOwners() {
