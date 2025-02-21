@@ -22,6 +22,7 @@
 
 html, body, pre, code, kbd, samp {
   font-family: "PixelMplus12-Regular", serif;
+  overscroll-behavior: none;
 }
 
 body {
@@ -35,14 +36,16 @@ pre {
 
 /* モーダル */
 .modal {
+  overscroll-behavior-y: none;
   display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100svh;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 1;
+  overflow: hidden;
 }
 
 .modal-content {
@@ -50,6 +53,8 @@ pre {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 80%;
+  height: 70svh;
   padding: 20px;
 }
 
@@ -83,11 +88,12 @@ pre {
   height: 100%;
   
   background-image: url('https://www.vtn-game.com/vc/bg.jpg');
-  background-size: auto 100vh;
+  background-size: auto 100lvh;
   background-repeat: no-repeat;
   background-attachment: fixed;
   
   overflow: hidden;
+  overscroll-behavior-y: none;
 }
 .main-content {
   width: 300%;
@@ -95,7 +101,7 @@ pre {
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 100vh;
+  grid-auto-rows: 100svh;
   gap: 8px;
   
   position: relative;
@@ -143,7 +149,7 @@ pre {
 .header {
   /*grid-area: header;*/
   position: sticky;
-  top: 60px;
+  top: 0px;
   display: flex;
   align-items: baseline;
   height: 50px;
@@ -173,8 +179,7 @@ pre {
 }
 
 .status {
-  width: 375px;
-  max-width: 375px;
+  width: 95%;
   margin: 0 auto;
   
   background-color: #eeeeeeee;
@@ -209,7 +214,7 @@ header.nav p {
 .playerLevelGauge { height: 20px; border-width: 1px; }
 .ask-text { width: 240px; height: 120px; }
 .important { grid-area: important; }
-.main { grid-area: main; margin: 0 auto; overflow:hidden; width:100%; max-width: 640px; height:100%; }
+.main { grid-area: main; margin: 0 auto; overflow:hidden; width:100%; height:100%; }
 .menubtn { height: 360px; position: relative; top: -100px; grid-area: menubtn; }
 .debugitem { grid-area: debugitem; }
 .eventtest { grid-area: eventtest; }
@@ -222,8 +227,8 @@ header.nav p {
 .faceicon { float: right; width: 80px; height: 100px; }
 .chatmsg { float: left; width: 200px; }
 .nameplate { top:-25px; left:-8px; }
-.log { max-height:640px; }
-.scrollLog { max-height:512px; overflow-y: scroll; }
+.log { max-height:70svh; }
+.scrollLog { max-height:50svh; overflow-y: scroll; }
 
 #reader { 
   display:none;
@@ -265,15 +270,24 @@ const CMD = {
 
 const PAGE = {
 	LAUNCH: 0,
-	USER_CREATE: 1,
-	MAIN_MENU: 2,
+	HELLO_WORLD: 1,
+	USER_CREATE: 2,
+	MAIN_MENU: 3,
 };
 
 const EFFECT = {
-	SUMMON_EFFECT: 0,
-	ASK_EFFECT: 1,
+	SUMMON: 0,
+	ASK_SEND: 1,
 };
 
+/*
+・そもそもバンコネとは…
+・QR読んでね
+・ゲームリンクと冒険
+・他の人応援しようね、良いことあるよ
+・連動イベントがあるよ
+・冒険(AIゲーム)について
+*/
 const TUTORIAL = {
 	HELLO: 0,
 	FIRST_QR: 1,
@@ -295,15 +309,8 @@ const CONTENTS = {
 	CREDIT: 9
 }
 
-/*
-・そもそもバンコネとはなんぞや(自分を作る)
-・QR読んでね
-・ゲームリンクと冒険
-・他の人応援しようね、良いことあるよ
-・連動イベントがあるよ
-・冒険(AIゲーム)について
-*/
 const movieList = [
+	"HQ40hkN-n10",
 	"TCWxWSPTKNk",
 	"d3ung6yfn6w",
 	"fiwx5iWPG5I",
@@ -330,7 +337,6 @@ let currentPageCode = -1;
 let currentContentCode = -1;
 let callNo = 0;
 let eventQueue = [];
-let tutorialStep = 0;
 
 let ws = null;
 let wsSessionId = "";
@@ -357,7 +363,6 @@ window.addEventListener("load", async (event) => {
 	
 	//セーブデータ取得
 	loadSaveData();
-	tutorialStep = saveData.tutorial;
 	
 	//Youtubeのリンクを生成
 	embedYoutubeLink();
@@ -401,16 +406,6 @@ window.addEventListener("load", async (event) => {
 	
 	console.log(saveData);
 	
-	//チュートリアルメッセージ
-	if(tutorialStep == 0) {
-		if(isRunningAsPWA()) {
-			tutorialStep = 1;
-		}
-		
-		tutorialView();
-		return ;
-	}
-	
 	firstView();
 	
 	if(!isRunningAsPWA()) {
@@ -421,7 +416,7 @@ window.addEventListener("load", async (event) => {
 async function firstView() {
 	if(!saveData.user_hash || saveData.user_hash === "undefined") {
 		//初回登録
-		loadPage(PAGE.USER_CREATE);
+		loadPage(PAGE.HELLO_WORLD);
 	}else{
 		//ログイン
 		await loadUser(saveData.user_hash);
@@ -695,7 +690,6 @@ function execMessage(data) {
 	
 	case CMD.ERROR:
 	{
-		console.log(data);
 		setupErrorDialog(data);
 	}
 	break;
@@ -706,7 +700,9 @@ function execMessage(data) {
 
 function setupErrorDialog(data) {
 	enableUIById("modal-error");
-	getElm("errorMessage").innerHTML = JSON.stringify(data);
+	
+	getElm("errorMessage").innerHTML = data.Message;
+	console.log(data)
 }
 
 function closeError() {
@@ -811,6 +807,7 @@ function sendQREvent(code, isDebug) {
 
 function setupSPA() {
 	elementCache.push(getElm("page-launch"));
+	elementCache.push(getElm("page-hello-world"));
 	elementCache.push(getElm("page-user-create"));
 	elementCache.push(getElm("page-main"));
 	
@@ -820,8 +817,8 @@ function setupSPA() {
 	tutorialCache.push(getElm("page-tutorial-gamelink"));
 	tutorialCache.push(getElm("page-tutorial-gameask"));
 	
-	effectCache.push(getElm("page-summon-effect"));
-	effectCache.push(getElm("page-ask-effect"));
+	effectCache.push(getElm("summon-effect"));
+	effectCache.push(getElm("ask-send-effect"));
 	
 	/*
 	elementCache.push(getElm("page-user-profile"));
@@ -853,6 +850,7 @@ function setupSPA() {
 	});
 	
 	for(let i=0; i < elementCache.length; ++i) {
+		elementCache[i].style.display = "none";
 		elementStatus.push(0);
 	}
 	
@@ -869,7 +867,7 @@ function setupSPA() {
 			]
 		};
 		console.log(data);
-	
+		
 		summonEffect();
 		await createUser(data);
 		userCreateNextPageCheck(1);
@@ -923,6 +921,7 @@ function closePage(pageCode) {
 }
 
 function loadPage(pageCode) {
+	console.log(currentPageCode + "/" + pageCode);
 	if(currentPageCode == pageCode) return;
 	
 	for(let i=0; i < elementStatus.length; ++i) {
@@ -937,6 +936,15 @@ function loadPage(pageCode) {
 	
 	currentPageCode = pageCode;
 	console.log(pageCode);
+}
+
+function closeEffect(effectCode) {
+	if(!effectCache[effectCode]) return ;
+	effectCache[effectCode].style.display = "none";
+}
+
+function loadEffect(effectCode) {
+	effectCache[effectCode].style.display = "block";
 }
 
 function loadContent(contentCode) {
@@ -958,17 +966,6 @@ function loadContent(contentCode) {
 	
 	//スクロール
 	switch(contentCode) {
-		
-	case CONTENTS.USER_CREATE:
-		{
-			var elm = getElm("mainmenu");
-			elm.style.display = "none";
-			
-			var elm2 = getElm("page-main");
-			elm2.style.display = "none";
-		}
-		break;
-		
 	case CONTENTS.GAME_ASK:
 		anime({
 			targets: ".main-content",
@@ -1022,9 +1019,6 @@ function loadContent(contentCode) {
 		{
 			var elm = getElm("mainmenu");
 			elm.style.display = "block";
-			
-			var elm2 = getElm("page-main");
-			elm2.style.display = "block";
 			
 			var elm = getElm("menu-btn-1");
 			elm.classList.remove("is-primary");
@@ -1101,11 +1095,14 @@ function loadContent(contentCode) {
 		}
 		break;
 	}
+	
+	//移動に合わせて消す
+	closeMenu();
 }
 
 //プロフィール
 function showProfile(userId = 0) {
-	if(currentPageCode == PAGE.USER_PROFILE) return;
+	if(currentContentCode == CONTENTS.USER_PROFILE) return;
 	
 	if(userId == 0) {
 		userId = userData.UserId;
@@ -1116,7 +1113,7 @@ function showProfile(userId = 0) {
 
 //QR探索
 function openQRSearch() {
-	if(currentPageCode == PAGE.QR_SEARCH) return;
+	if(currentContentCode == CONTENTS.QR_SEARCH) return;
 	
 	readQR();
 	loadContent(CONTENTS.QR_SEARCH);
@@ -1124,21 +1121,21 @@ function openQRSearch() {
 
 //フレンド
 function showFriends() {
-	if(currentPageCode == PAGE.FRIEND_LIST) return;
+	if(currentContentCode == CONTENTS.FRIEND_LIST) return;
 	
 	openFriendList();
 }
 
 //アンケート
 function showGameAsk(gameId=0) {
-	if(currentPageCode == PAGE.GAME_ASK) return;
+	if(currentContentCode == CONTENTS.GAME_ASK) return;
 	
 	loadContent(CONTENTS.GAME_ASK);
 }
 
 //
 function showGameHistory(gameId = 0) {
-	if(currentPageCode == PAGE.GAME_HISTORY) return;
+	if(currentContentCode == CONTENTS.GAME_HISTORY) return;
 	
 	openGameHistory(gameId);
 }
@@ -1343,8 +1340,8 @@ async function openUserProfile(userId) {
 }
 
 function summonEffect() {
-	closePage(PAGE.USER_CREATE);
-	loadPage(PAGE.SUMMON_EFFECT);
+	//closePage(PAGE.USER_CREATE);
+	loadEffect(EFFECT.SUMMON);
 	
 	anime({
 		targets: getElm("summongauge"),
@@ -1361,7 +1358,7 @@ function summonEffect() {
 }
 
 function sendAskEffect() {
-	loadPage(PAGE.ASK_EFFECT);
+	loadEffect(EFFECT.ASK_SEND);
 	
 	anime({
 		targets: getElm("askgauge"),
@@ -1378,7 +1375,7 @@ function sendAskEffect() {
 }
 
 function userCreateNextPageCheck(no) {
-console.log("no:" + no)
+	console.log("no:" + no)
 	callNo += no;
 	if(callNo >= 3) {
 		userSetup();
@@ -1386,25 +1383,43 @@ console.log("no:" + no)
 	}
 }
 
+function nextTutorial() {
+	loadPage(PAGE.USER_CREATE);
+}
+
+/*
 function tutorialView() {
 	switch(tutorialStep) {
 	case 0:
-		loadPage(PAGE.TUTORIAL_PWA);
-		tutorialStep |= 1;
+		loadPage(PAGE.HELLO_WORLD);
 		break;
 		
 	case 1:
-		loadPage(PAGE.TUTORIAL_HELLO);
-		tutorialStep |= 2;
-		saveSessionData();
+		loadPage(PAGE.USER_CREATE);
 		break;
 	}
+}
+
+function flagTutorial() {
+	console.log("tutorialStep" + tutorialStep)
+	switch(tutorialStep) {
+	case 0:
+		tutorialStep = 1;
+		break;
+		
+	case 1:
+		tutorialStep = 2;
+		break;
+	}
+	
+	tutorialView();
 }
 
 function pwaSkip() {
 	tutorialStep |= 1;
 	tutorialView();
 }
+*/
 
 let youtubeIndex = 0;
 function embedYoutubeLink() {
@@ -1646,7 +1661,7 @@ function saveUserSession() {
 	now.setTime(now.getTime() + limit*24*60*60*1000);
 	var expireDate = now.toGMTString();
 	
-	var cookievalue = "user_hash=" + userData.UserHash + "; tutorial=" + tutorialStep + "; ";
+	var cookievalue = "user_hash=" + userData.UserHash;
 	var expires = "expires=" + expireDate + "; ";
 	var path = "path=/";
 	
@@ -1684,7 +1699,6 @@ function loadSaveData() {
 
 function saveSessionData() {
 	saveData.user_hash = userData.UserHash;
-	saveData.tutorial = tutorialStep;
 	localStorage.setItem("SaveData", JSON.stringify(saveData));
 	saveUserSession(userData.UserHash);
 }
@@ -1922,7 +1936,6 @@ async function gameShutdown() {
 }
 
 function resetTutorial() {
-	tutorialStep = 0;
 	saveSessionData();
 }
 
@@ -2202,11 +2215,13 @@ function urlB64ToUint8Array(base64String) {
 	
 	<div>
 		<div id="page-launch">
+			<!--
 			<div class="nes-container with-title status">
 				<p class="title">ページ準備中</p>
 				
 				しばらく待ってね
 			</div>
+			-->
 		</div>
 	</div>
 	
@@ -2224,12 +2239,16 @@ function urlB64ToUint8Array(base64String) {
 	<//div>
 	-->
 	
-	<div id="page-summon-effect" class="nes-container status" style="display:none;">
-		<p>召喚中！！</p>
-		<progress class="nes-progress is-primary" id="summongauge" value="0" max="100"></progress>
+	<div id="summon-effect" class="modal">
+		<div class="nes-container status" style="display:none;">
+			<br /><br /><br />
+			<p>召喚中！！</p>
+			<br /><br /><br />
+			<progress class="nes-progress is-primary" id="summongauge" value="0" max="100"></progress>
+		</div>
 	</div>
 	
-	<div id="page-ask-effect" class="nes-container status" style="display:none;">
+	<div id="ask-send-effect" class="nes-container status" style="display:none;">
 		<p>アンケート送信…</p>
 		<progress class="nes-progress is-primary" id="askgauge" value="0" max="100"></progress>
 	</div>
@@ -2284,20 +2303,6 @@ function urlB64ToUint8Array(base64String) {
 		</div>
 	</div>
 	
-	<div id="page-tutorial-hello" style="display:none;">
-		<div class="nes-container with-title status">
-			<p class="title">こんにちは</p>
-			
-			バンタンコネクトへようこそ<br />
-			<br /><br />
-			(仮)どんなやつか紹介をするよ<br />
-			<br /><br />
-			<div class="right">
-				<button type="button" class="nes-btn is-primary" onclick="firstView();">ＯＫ</button>
-			</div>
-		</div>
-	</div>
-	
 	<div id="page-cheer" style="display:none;">
 		<div class="nes-container with-title status">
 			<p class="title">オウエン</p>
@@ -2312,112 +2317,166 @@ function urlB64ToUint8Array(base64String) {
 		</div>
 	</div>
 	
-	<div id="page-user-create" class="nes-container with-title status" style="display:none;">
-		<p class="title">冒険の書を作る</p>
-		
-		<br />
-		これから会場に自分の分身を『召喚』します<br />
-		<br />
-		<br />
-		
-		<div class="nes-container with-title">
-			<p class="title">名前</p>
+	<div id="page-hello-world" class="main">
+		<div class="main-block">
+			<div class="header">
+				<h1 class="nes-header checkbg">HELLO WORLD</h1>
+			</div>
 			
-			<div class="nes-field">
-				<input type="text" id="username" class="nes-input">
+			<div style="height:150px;"></div>
+			
+			<div id="page-tutorial-hello">
+				<div class="nes-balloon from-left">
+					<div class="center">
+						バンタン-〇-コネクトへようこそ！<br />
+						<br /><br /><br />
+						バンタンコネクトとは、ソツテンワールド(仮)を楽しむために作られた一日限りのサービスです。<br />
+						<br /><br /><br />
+						会場のゲームに自分の分身を登場<<リンク>>させ、AIにより生成される冒険譚を楽しんだり、<br />
+						遊んでいるプレイヤーを「応援」することで、プレイヤーを助けることができます。<br />
+						自分が遊んだゲームの出来事が、ほかのプレイヤーのゲームに影響することもあるとか…？<br />
+						<br />
+						会場だけで体験可能な、ふだんはできない遊び方を楽しんでいってください。<br />
+						<br />
+						まずは、自分の分身となる冒険者を『召喚』しましょう！<br />
+						<button type="button" class="nes-btn is-success" onclick="nextTutorial()">キャラクリエイトへ</button>
+						<br /><br /><br />
+						召喚された冒険者たちがわちゃわちゃ動くAIゲーム、<br />
+						「いぬのだいぼうけん」もお楽しみに！
+						<br /><br /><br />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="page-user-create" class="main">
+		<div class="main-block">
+			<div class="header">
+				<h1 class="nes-header checkbg">転生の儀</h1>
+			</div>
+			
+			<div style="height:150px;"></div>
+			
+			<div id="page-tutorial-summon">
+				<div class="nes-balloon from-left">
+					<div class="center">
+						これから自分の分身を『召喚』します<br />
+						<br />
+						召喚にあたり、AIがあなたのステータスを勝手に決めてしまいます。<br />
+						一部のステータスについては調整が可能となっていますので、<br />
+						用意された質問事項に回答をお願いします。<br />
+						<br />
+						ちなみに回答しなくても大丈夫です。回答しない場合は、AIが勝手に決めた設定でキャラクターが生成されます。<br />
+						<br />
+					</div>
+				</div>
+			</div>
+			
+			<div class="nes-container with-title status">
+				<p class="title">冒険の書を作る</p>
+				<br /><br /><br />
+				
+				<div class="nes-container with-title">
+					<p class="title">名前</p>
+					
+					<div class="nes-field">
+						<input type="text" id="username" class="nes-input">
+						<br />
+						<b>※ゲーム環境で公開されます。</b><br />
+						本名は避けてもらえると助かります。<br /><br />
+						※記載がない場合はAIが勝手に命名します。<br />
+						<br />
+						長さに応じて愛称または本名が自動生成されます。<br />
+					</div>
+				</div>
+				
 				<br />
-				<b>※ゲーム環境で公開されます。</b><br />
-				本名は避けてもらえると助かります。<br /><br />
-				※記載がない場合はAIが勝手に命名します。<br />
+				いくつか質問をします。<br />
 				<br />
-				長さに応じて愛称または本名が自動生成されます。<br />
+				<br />
+				
+				<div class="nes-container with-title">
+					<p class="title">質問1: 召喚先</p>
+					
+					召喚したキャラはどのような環境で成長しますか？<br />
+					<br />
+					
+					<div class="nes-select is-success">
+						<select required id="question1">
+						<option value="0" disabled selected hidden>選択しましょう...</option>
+						<option value="1">貴族の屋敷</option>
+						<option value="2">馬小屋</option>
+						<option value="3">一般家庭</option>
+						<option value="4">山中(野生児化)</option>
+						</select>
+					</div>
+				</div>
+				
+				<div style="height:20px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">質問2: 成し遂げたいこと</p>
+					
+					召喚したキャラが冒険で目指すこと。<br />
+					<br />
+					
+					<div class="nes-select is-warning">
+						<select required id="question2">
+						<option value="0" disabled selected hidden>選択しましょう...</option>
+						<option value="1">お宝見つけて一攫千金を狙う</option>
+						<option value="2">最強のプレイヤーになる</option>
+						<option value="3">安全に細々と暮らす</option>
+						<option value="4">ワンワン！！ ワオーン！！</option>
+						</select>
+					</div>
+				</div>
+				
+				<div style="height:20px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">質問3: 弱点</p>
+					
+					召喚キャラの弱点を選んでください<br />
+					<br />
+					
+					<div class="nes-select is-error">
+						<select required id="question3">
+						<option value="0" disabled selected hidden>選択しましょう...</option>
+						<option value="1">無謀である</option>
+						<option value="2">承認欲求が強い</option>
+						<option value="3">飽きっぽい</option>
+						<option value="4">ワンワン！！ ワオーン！！</option>
+						</select>
+					</div>
+				</div>
+				
+				<div style="height:20px;"></div>
+				
+				<div class="nes-container with-title">
+					<p class="title">質問4: アドバイス</p>
+					
+					<label for="error_select">召喚キャラにアドバイスしましょう</label>
+					<div class="nes-select is-normal">
+						<select required id="question4">
+						<option value="0" disabled selected hidden>選択しましょう...</option>
+						<option value="1">安全に頑張りましょう</option>
+						<option value="2">命懸けの冒険をしよう</option>
+						<option value="3">友達たくさん作ってね</option>
+						<option value="4">ワンワン！！ ワオーン！！</option>
+						</select>
+					</div>
+				</div>
+				
+				<div style="height:35px;"></div>
+				
+				<div class="center">
+					<button type="button" id="usercreate" class="nes-btn is-primary">召喚する！！</button>
+				</div>
+				
+				<div style="height:50px;"></div>
 			</div>
 		</div>
-		
-		<br />
-		いくつか質問をします。<br />
-		<br />
-		<br />
-		
-		<div class="nes-container with-title">
-			<p class="title">質問1: 召喚先</p>
-			
-			召喚したキャラはどのような環境で成長しますか？<br />
-			<br />
-			
-			<div class="nes-select is-success">
-				<select required id="question1">
-				<option value="0" disabled selected hidden>選択しましょう...</option>
-				<option value="1">貴族の屋敷</option>
-				<option value="2">馬小屋</option>
-				<option value="3">一般家庭</option>
-				<option value="4">山中(野生児化)</option>
-				</select>
-			</div>
-		</div>
-		
-		<div style="height:20px;"></div>
-		
-		<div class="nes-container with-title">
-			<p class="title">質問2: 成し遂げたいこと</p>
-			
-			召喚したキャラが冒険で目指すこと。<br />
-			<br />
-			
-			<div class="nes-select is-warning">
-				<select required id="question2">
-				<option value="0" disabled selected hidden>選択しましょう...</option>
-				<option value="1">お宝見つけて一攫千金を狙う</option>
-				<option value="2">最強のプレイヤーになる</option>
-				<option value="3">安全に細々と暮らす</option>
-				<option value="4">ワンワン！！ ワオーン！！</option>
-				</select>
-			</div>
-		</div>
-		
-		<div style="height:20px;"></div>
-		
-		<div class="nes-container with-title">
-			<p class="title">質問3: 弱点</p>
-			
-			召喚キャラの弱点を選んでください<br />
-			<br />
-			
-			<div class="nes-select is-error">
-				<select required id="question3">
-				<option value="0" disabled selected hidden>選択しましょう...</option>
-				<option value="1">無謀である</option>
-				<option value="2">承認欲求が強い</option>
-				<option value="3">飽きっぽい</option>
-				<option value="4">ワンワン！！ ワオーン！！</option>
-				</select>
-			</div>
-		</div>
-		
-		<div style="height:20px;"></div>
-		
-		<div class="nes-container with-title">
-			<p class="title">質問4: アドバイス</p>
-			
-			<label for="error_select">召喚キャラにアドバイスしましょう</label>
-			<div class="nes-select is-normal">
-				<select required id="question4">
-				<option value="0" disabled selected hidden>選択しましょう...</option>
-				<option value="1">安全に頑張りましょう</option>
-				<option value="2">命懸けの冒険をしよう</option>
-				<option value="3">友達たくさん作ってね</option>
-				<option value="4">ワンワン！！ ワオーン！！</option>
-				</select>
-			</div>
-		</div>
-		
-		<div style="height:35px;"></div>
-		
-		<div class="center">
-			<button type="button" id="usercreate" class="nes-btn is-primary">召喚する！！</button>
-		</div>
-		
-		<div style="height:50px;"></div>
 	</div>
 	
 	<!-- //聖剣3っぽいメニューを作る -->
@@ -2515,10 +2574,6 @@ function urlB64ToUint8Array(base64String) {
 								<select required id="game-ask-0">
 								</select>
 							</div>
-						</div>
-						
-						<div id="askGameNote"><br />
-						<p>※このゲームはバンタンコネクト非対応です</p>
 						</div>
 						
 						<div class="nes-container with-title">
@@ -2756,6 +2811,21 @@ function urlB64ToUint8Array(base64String) {
 				
 				<div style="height:100px;"></div>
 				
+				<div id ="gameinfo" class="nes-container is-rounded with-title status">
+					<p class="title">ゲーム稼働状況</p>
+					
+					<div id="gamelist">確認中…</div>
+				</div>
+				
+				<div style="height:50px;"></div>
+				
+				<div id="main-api-effect" class="nes-container status" style="display:none;">
+					<p>通信中！！</p>
+					<progress class="nes-progress is-primary" id="mainworkgauge" value="0" max="100"></progress>
+				</div>
+				
+				<div style="height:50px;"></div>
+				
 				<div id ="userinfo" class="nes-container is-rounded with-title status" style="display:none;">
 					<p class="title">ステータス</p>
 					<div class="playerName" id="playerName"></div><br />
@@ -2765,25 +2835,8 @@ function urlB64ToUint8Array(base64String) {
 					<br />
 					<div class="playerGold">所持ゴールド: <span id="playerGold"></span></div>
 				</div>
-				
-				<div style="height:50px;"></div>
-				
-				<div>
-					<div id ="gameinfo" class="nes-container is-rounded with-title status">
-						<p class="title">ゲーム稼働状況</p>
-						
-						<div id="gamelist">確認中…</div>
-					</div>
-					
-					<div style="height:50px;"></div>
-					
-					<div id="main-api-effect" class="nes-container status" style="display:none;">
-						<p>通信中！！</p>
-						<progress class="nes-progress is-primary" id="mainworkgauge" value="0" max="100"></progress>
-					</div>
-					
-					<div style="height:250px;"></div>
-				</div>
+								
+				<div style="height:250px;"></div>
 				
 				<div style="height:50px;"></div>
 				
@@ -2811,16 +2864,21 @@ function urlB64ToUint8Array(base64String) {
 				<div id="page-tutorial-qr">
 					<div class="nes-balloon from-left with-title">
 						<p class="title">ＱＲ検索をやってみよう</p>
-						
-						会場内に「マジックスクロール」や「冒険の扉」と呼ばれるものがおかれています。<br />
-						QRコードを読み込んでみましょう<br />
+						<br />
+						このWebページから、ＱＲコードを読み取ることができます。<br />
+						会場を探索し、ＱＲコードを読み込みましょう！<br />
+						<br />
+						具体的には、会場内に「マジックスクロール」や「冒険のトビラ」と書かれた、ＱＲコードが描かれたパネルが置かれているはずです。<br />
+						これらを探しましょう。<br />
+						(この２種のＱＲコードしか対応していません)<br />
+						<br />
+						読み込むと探索魔法が発動し、冒険に有利な効果が発生します。<br />
+						冒険のトビラとマジックスクロールはそれぞれ別の効果となります。<br />
 						<br />
 						<br />
-						冒険の扉とマジックスクロールはそれぞれ別の効果があります。<br />
+						冒険のトビラ： 探索魔法「リンク」を発動します。<b>遊ぶゲームに冒険者の情報を反映させます</b><br />
 						<br />
-						冒険の扉： 遊ぶゲームに冒険者の情報を反映させます<br />
-						<br />
-						マジックスクロール： さまざまな効果がランダムで発生します。何が起きるかはお楽しみに！<br />
+						マジックスクロール： 適当な探索魔法が書かれており、それらを発動します。<b>さまざまな効果がランダムで発生します。何が起きるかはお楽しみに！</b><br />
 						<div class="right">
 							<button type="button" class="nes-btn is-primary" onclick="closeTutorial(TUTORIAL.QR);">ＯＫ</button>
 						</div>
@@ -2830,9 +2888,9 @@ function urlB64ToUint8Array(base64String) {
 				<div class="nes-container is-rounded with-title status">
 					<p class="title">ＱＲ探索</p>
 					<div class="center">
-						会場のQRコードを読み込んで、冒険を有利にしよう！<br /><br />
+						会場のQRコードを読み込もう！<br /><br />
 						※QRの読み取りのために、カメラの許可をお願いします。
-						<button type="button" id="qrscan" class="nes-btn is-primary" onclick="readQR();">QR読み込み</button><br /><br />
+						<button type="button" id="qrscan" class="nes-btn is-primary" onclick="readQR();">ＱＲ読み込み</button><br /><br />
 						<button type="button" id="qrscancancel" class="nes-btn is-primary" onclick="cencelQR();">キャンセル</button>
 					</div>
 					<div id="reader"></div>
@@ -3044,7 +3102,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 			<button type="button" class="nes-btn is-primary" onclick="closeMenu()">メニュー閉じる</button>
 			
 			<div class="nav-menu">
-				<div><button type="button" id="menu-btn-5" class="menu-btn nes-btn is-primary" onclick="loadContent(CONTENTS.PUBLISHING)">バンコネ紹介</button></div>
+				<div><button type="button" id="menu-btn-5" class="menu-btn nes-btn is-primary" onclick="loadContent(CONTENTS.PUBLISHING)">ゲーム紹介</button></div>
 				<div><button type="button" id="menu-btn-4" class="menu-btn nes-btn is-primary" onclick="showGameAsk()">アンケート</button></div>
 				<div><button type="button" id="menu-btn-6" class="menu-btn nes-btn is-primary" onclick="showFriends()">トモダチ</button></div>
 				<div><button type="button" id="menu-btn-2" class="menu-btn nes-btn is-primary" onclick="loadContent(CONTENTS.HOWTOPLAY)">遊び方</button></div>
