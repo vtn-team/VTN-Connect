@@ -45,8 +45,7 @@ export class GameConnectBridge {
 	}
 	
 	async setup() {
-		console.log(`${GAME_SERVER_URI}/vc/getaddr`)
-		const res = await fetch(`http://127.0.0.1:4649/vc/getaddr`, {method: 'GET'});
+		const res = await fetch(`${GAME_SERVER_URI}/vc/getaddr`, {method: 'GET'});
 		const result = await res.json();
 		
 		let ws = new WebSocket(result.Address);
