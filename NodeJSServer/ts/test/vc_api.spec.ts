@@ -146,8 +146,50 @@ test("UserId2のユーザー(マルオ)の参加したゲームの情報取得 �
   // console.log(uhis);
 });
 
+// 応援メッセージ取得 テスト
+test("送信された応援メッセージ取得(webから送信されたid) 型チェック", async () => {
+  let um = await userMessage(null, null, { query: { id: -1 } });
+
+  expect(um).toMatchObject({
+    Messages: expect.arrayContaining([
+      expect.objectContaining({
+        Id: expect.any(Number),
+        ToUserId: expect.any(Number),
+        FromUserId: expect.any(Number),
+		AvatarType: expect.any(Number),
+        Message: expect.any(String),
+		Emotion: expect.any(Number),
+        CreatedAt: expect.any(Date),
+      }),
+    ]),
+    Count: expect.any(Number),
+  });
+
+  expect(um.Status).toBe(200);
+  //console.log(um);
+});
+test("送信された応援メッセージ取得 型チェック", async () => {
+	let um = await userMessage(null, null, { query: { id: 1094 } });
+  
+	expect(um).toMatchObject({
+	  Messages: expect.arrayContaining([
+		expect.objectContaining({
+		  Id: expect.any(Number),
+		  ToUserId: expect.any(Number),
+		  FromUserId: expect.any(Number),
+		  AvatarType: expect.any(Number),
+		  Message: expect.any(String),
+		  Emotion: expect.any(Number),
+		  CreatedAt: expect.any(Date),
+		}),
+	  ]),
+	  Count: expect.any(Number),
+	});
+  
+	expect(um.Status).toBe(200);
+	//console.log(um);
+  });
+
 //TODO:
-//let user = await getUser(null, null, { query:{  } }); //queryつける
-//let um = await userMessage(null, null, { query:{  } });
 //let friend = await friendList(null, null, { query:{  } });
 //await gameAsk({ query:{  } }); //quetyの中身
