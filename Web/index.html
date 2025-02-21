@@ -309,6 +309,7 @@ const TUTORIAL = {
 };
 
 const movieList = [
+	"TCWxWSPTKNk",
 	"d3ung6yfn6w",
 	"fiwx5iWPG5I",
 	"Fk2YpPMcSfA",
@@ -425,8 +426,12 @@ async function firstView() {
 	}else{
 		//ログイン
 		await loadUser(saveData.user_hash);
-		userSetup();
-		loadPage(PAGE.MAIN_MENU);
+		if(userData) {
+			userSetup();
+			loadPage(PAGE.MAIN_MENU);
+		}else{
+			firstView();
+		}
 	}
 }
 
@@ -478,7 +483,11 @@ async function loadUser(userHash) {
 		let result = await req.json();
 		
 		userData = result.UserData;
-		localStorage.setItem("UserData", JSON.stringify(userData));
+		if(userData) {
+			localStorage.setItem("UserData", JSON.stringify(userData));
+		}else{
+			saveData.user_hash = "undefined";
+		}
 	}
 }
 
@@ -554,6 +563,8 @@ async function dontUseAIGameEnd() {
 }
 
 function userSetup() {
+	if(!userData) return ;
+	
 	createUserInfoUI();
 	enableUIById("userinfo");
 	
