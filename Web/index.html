@@ -279,6 +279,7 @@ const CMD = {
 	CHEER: 5,
 	USERSTAT: 6,
 	USERREWARD: 7,
+	LINKFEEDBACK: 8,
 	SEND_JOIN: 100,
 	SEND_EVENT: 101,
 	SEND_EPISODE: 102,
@@ -317,6 +318,7 @@ const TUTORIAL = {
 	GAMEASK: 4,
 	USER_PROFILE: 5,
 	HISTORY: 6,
+	PUBLISH: 7,
 }
 
 const CONTENTS = {
@@ -349,8 +351,803 @@ const movieList = [
 
 let userData = {};
 let saveData = null;
-let gameInfo = {};
+let gameInfo = [
+    {
+      "Id": "1",
+      "ProjectCode": "VCMain",
+      "GameTitle": "いぬのだいぼうけん",
+      "Difficulty": "0",
+      "ClearBonusCoin": "200",
+      "GameOverBonusCoin": "200",
+      "ClearBonusExp": "300",
+      "GameOverBonusExp": "300",
+      "PlayTime": "300",
+      "IsReplayTarget": "1",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "2",
+      "ProjectCode": "Confront",
+      "GameTitle": "Confront",
+      "Difficulty": "10",
+      "ClearBonusCoin": "500",
+      "GameOverBonusCoin": "100",
+      "ClearBonusExp": "500",
+      "GameOverBonusExp": "50",
+      "PlayTime": "600",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "3",
+      "ProjectCode": "BossBattle2D",
+      "GameTitle": "ブルスラアクション！",
+      "Difficulty": "100",
+      "ClearBonusCoin": "5000",
+      "GameOverBonusCoin": "100",
+      "ClearBonusExp": "5000",
+      "GameOverBonusExp": "500",
+      "PlayTime": "600",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "4",
+      "ProjectCode": "ToyBox",
+      "GameTitle": "玩具箱",
+      "Difficulty": "5",
+      "ClearBonusCoin": "500",
+      "GameOverBonusCoin": "100",
+      "ClearBonusExp": "1000",
+      "GameOverBonusExp": "500",
+      "PlayTime": "800",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "5",
+      "ProjectCode": "Nexus",
+      "GameTitle": "NEXUS",
+      "Difficulty": "10",
+      "ClearBonusCoin": "500",
+      "GameOverBonusCoin": "100",
+      "ClearBonusExp": "2000",
+      "GameOverBonusExp": "500",
+      "PlayTime": "600",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "6",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ 1P",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "7",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ 2P",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "8",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ 3P",
+      "Difficulty": "20",
+      "ClearBonusCoin": "1000",
+      "GameOverBonusCoin": "500",
+      "ClearBonusExp": "3000",
+      "GameOverBonusExp": "3000",
+      "PlayTime": "300",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "9",
+      "ProjectCode": "Chenga",
+      "GameTitle": "チェンガ",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "10",
+      "ProjectCode": "GDTeamWork01",
+      "GameTitle": "マグネティックロボ",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "11",
+      "ProjectCode": "GDTeamWork02",
+      "GameTitle": "Figment the Cosmos",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "12",
+      "ProjectCode": "GDTeamWork03",
+      "GameTitle": "Robotics Protocol",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "13",
+      "ProjectCode": "GDTeamWork04",
+      "GameTitle": "クリエイターライフのきおく",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "14",
+      "ProjectCode": "GDTeamWork05",
+      "GameTitle": "Space Exploration",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "15",
+      "ProjectCode": "GDTeamWork06",
+      "GameTitle": "ヒューマニティ オブ ザ デッド",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "16",
+      "ProjectCode": "Team2024_A",
+      "GameTitle": "ルテアとおかしなスプーン",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "17",
+      "ProjectCode": "Team2024_B",
+      "GameTitle": "アストラルアカデミア",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "18",
+      "ProjectCode": "Team2024_C",
+      "GameTitle": "Stuffed  Fairy",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "19",
+      "ProjectCode": "Team2024_D",
+      "GameTitle": "Eclipses -イクリプシーズ-",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "20",
+      "ProjectCode": "Team2024_E",
+      "GameTitle": "NIRVANA",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "21",
+      "ProjectCode": "GDTeamWork07",
+      "GameTitle": "カミゴロシ",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "22",
+      "ProjectCode": "GDWork01",
+      "GameTitle": "Spectral Red Dragon",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "23",
+      "ProjectCode": "GDWork02",
+      "GameTitle": "Guid",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "24",
+      "ProjectCode": "GDWork03",
+      "GameTitle": "Magnet Planet",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "25",
+      "ProjectCode": "GDWork04",
+      "GameTitle": "３つのスマホ",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "26",
+      "ProjectCode": "GDWork05",
+      "GameTitle": "フェイクシェル",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "27",
+      "ProjectCode": "GDWork06",
+      "GameTitle": "Storm Penetrator",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "28",
+      "ProjectCode": "GDWork07",
+      "GameTitle": "Commander of the Dungeon",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "29",
+      "ProjectCode": "GDWork08",
+      "GameTitle": "ワイズマンの修練塔",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "30",
+      "ProjectCode": "GDWork09",
+      "GameTitle": "Abandoned Priso Break",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "31",
+      "ProjectCode": "GDWork10",
+      "GameTitle": "スマートモーニングシュミレーション",
+      "Difficulty": "",
+      "ClearBonusCoin": "",
+      "GameOverBonusCoin": "",
+      "ClearBonusExp": "",
+      "GameOverBonusExp": "",
+      "PlayTime": "",
+      "IsReplayTarget": "",
+      "isVCTarget": ""
+    },
+    {
+      "Id": "99",
+      "ProjectCode": "UserPortal",
+      "GameTitle": "ユーザ接続用アプリ",
+      "Difficulty": "0",
+      "ClearBonusCoin": "0",
+      "GameOverBonusCoin": "0",
+      "ClearBonusExp": "0",
+      "GameOverBonusExp": "0",
+      "PlayTime": "0",
+      "IsReplayTarget": "0",
+      "isVCTarget": "0"
+    },
+    {
+      "Id": "100",
+      "ProjectCode": "SampleGame",
+      "GameTitle": "サンプル",
+      "Difficulty": "1",
+      "ClearBonusCoin": "100",
+      "GameOverBonusCoin": "50",
+      "ClearBonusExp": "100",
+      "GameOverBonusExp": "10",
+      "PlayTime": "10",
+      "IsReplayTarget": "0",
+      "isVCTarget": "1"
+    },
+    {
+      "Id": "101",
+      "ProjectCode": "VCMainUI",
+      "GameTitle": "いぬ大",
+      "Difficulty": "0",
+      "ClearBonusCoin": "200",
+      "GameOverBonusCoin": "100",
+      "ClearBonusExp": "100",
+      "GameOverBonusExp": "100",
+      "PlayTime": "10",
+      "IsReplayTarget": "0",
+      "isVCTarget": "0"
+    }
+  ];
 let levelMaster = {};
+let levelOrigMaster = [
+    {
+      "Level": "1",
+      "NeedExp": "0",
+      "QuestInterval": "10000",
+      "RewardExp": "10",
+      "RewardCoin": "10"
+    },
+    {
+      "Level": "2",
+      "NeedExp": "50",
+      "QuestInterval": "10000",
+      "RewardExp": "20",
+      "RewardCoin": "20"
+    },
+    {
+      "Level": "3",
+      "NeedExp": "80",
+      "QuestInterval": "20000",
+      "RewardExp": "30",
+      "RewardCoin": "30"
+    },
+    {
+      "Level": "4",
+      "NeedExp": "80",
+      "QuestInterval": "30000",
+      "RewardExp": "30",
+      "RewardCoin": "30"
+    },
+    {
+      "Level": "5",
+      "NeedExp": "80",
+      "QuestInterval": "50000",
+      "RewardExp": "30",
+      "RewardCoin": "30"
+    },
+    {
+      "Level": "6",
+      "NeedExp": "100",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "7",
+      "NeedExp": "100",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "8",
+      "NeedExp": "100",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "9",
+      "NeedExp": "150",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "10",
+      "NeedExp": "150",
+      "QuestInterval": "100000",
+      "RewardExp": "50",
+      "RewardCoin": "50"
+    },
+    {
+      "Level": "11",
+      "NeedExp": "180",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "12",
+      "NeedExp": "200",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "13",
+      "NeedExp": "220",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "14",
+      "NeedExp": "250",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "15",
+      "NeedExp": "300",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "16",
+      "NeedExp": "400",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "17",
+      "NeedExp": "500",
+      "QuestInterval": "100000",
+      "RewardExp": "100",
+      "RewardCoin": "100"
+    },
+    {
+      "Level": "18",
+      "NeedExp": "500",
+      "QuestInterval": "200000",
+      "RewardExp": "150",
+      "RewardCoin": "150"
+    },
+    {
+      "Level": "19",
+      "NeedExp": "500",
+      "QuestInterval": "200000",
+      "RewardExp": "150",
+      "RewardCoin": "150"
+    },
+    {
+      "Level": "20",
+      "NeedExp": "800",
+      "QuestInterval": "200000",
+      "RewardExp": "150",
+      "RewardCoin": "150"
+    },
+    {
+      "Level": "21",
+      "NeedExp": "1000",
+      "QuestInterval": "300000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "22",
+      "NeedExp": "1000",
+      "QuestInterval": "300000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "23",
+      "NeedExp": "1500",
+      "QuestInterval": "500000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "24",
+      "NeedExp": "1500",
+      "QuestInterval": "500000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "25",
+      "NeedExp": "1500",
+      "QuestInterval": "500000",
+      "RewardExp": "200",
+      "RewardCoin": "200"
+    },
+    {
+      "Level": "26",
+      "NeedExp": "2000",
+      "QuestInterval": "500000",
+      "RewardExp": "250",
+      "RewardCoin": "250"
+    },
+    {
+      "Level": "27",
+      "NeedExp": "2000",
+      "QuestInterval": "500000",
+      "RewardExp": "250",
+      "RewardCoin": "250"
+    },
+    {
+      "Level": "28",
+      "NeedExp": "2500",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "29",
+      "NeedExp": "2500",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "30",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "31",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "32",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "300",
+      "RewardCoin": "300"
+    },
+    {
+      "Level": "33",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "34",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "35",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "36",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "37",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "350",
+      "RewardCoin": "350"
+    },
+    {
+      "Level": "38",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "39",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "40",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "41",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "42",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "400",
+      "RewardCoin": "400"
+    },
+    {
+      "Level": "43",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "44",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "45",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "46",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "47",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "48",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "49",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    },
+    {
+      "Level": "50",
+      "NeedExp": "3000",
+      "QuestInterval": "1000000",
+      "RewardExp": "500",
+      "RewardCoin": "500"
+    }
+  ];
 let elementCache = [];
 let elementStatus = [];
 
@@ -359,6 +1156,8 @@ let tutorialCache = [];
 let currentPageCode = -1;
 let currentContentCode = -1;
 let callNo = 0;
+let askCallNo = 0;
+let askReward = {};
 let eventQueue = [];
 
 let ws = null;
@@ -378,11 +1177,14 @@ window.addEventListener("load", async (event) => {
 	}
 	
 	//最終的に埋め込む
-	gameInfo = await getMaster("GameInfo");
-	let lm = await getMaster("Level");
-	for(let m of lm) {
+	//for(let m of gameInfoMaster) {
+	//	gameInfo[m.Id] = m;
+	//}
+	for(let m of levelOrigMaster) {
 		levelMaster[m.Level] = m;
 	}
+	// = await getMaster("GameInfo");
+	//let lm = await getMaster("Level");
 	
 	//セーブデータ取得
 	loadSaveData();
@@ -735,6 +1537,19 @@ function execMessage(data) {
 			openReward(type, title, message);
 		}
 		break;
+		
+	case CMD.LINKFEEDBACK:
+		console.log(data);
+		{
+			for(let game of gameInfo) {
+				if(game.Id != data.Data?.UpdateStat?.GameId) continue;
+				getElm("userLinkLogMsg").innerText = game.GameTitle + "とリンクしました。";
+				enableUIById("modal-link-log");
+				showGameAsk(game.Id);
+				break;
+			}
+		}
+		break;
 	
 	case CMD.GAMESTAT:
 		activeGameInfo = data.Data.ActiveGames;
@@ -915,6 +1730,7 @@ function setupSPA() {
 	tutorialCache.push(getElm("page-tutorial-gameask"));
 	tutorialCache.push(getElm("page-tutorial-profile"));
 	tutorialCache.push(getElm("page-tutorial-history"));
+	tutorialCache.push(getElm("page-tutorial-publish"));
 	
 	effectCache.push(getElm("summon-effect"));
 	effectCache.push(getElm("ask-send-effect"));
@@ -961,10 +1777,16 @@ function setupSPA() {
 	
 	elementStatus[0] = 1;
 	
-	getElm("page-main-menu").addEventListener('scrollend', (event) => {
-		console.log("here?");
-		openMenu();
-	});
+	const timeoutFn = () => {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(scrollEndEvent, 100);
+	};
+	const notIos = 'onscrollend' in getElm("page-main-menu");
+	if (notIos) {
+		getElm("page-main-menu").addEventListener('scrollend', scrollEndEvent);
+	} else {
+		getElm("page-main-menu").addEventListener('scroll', timeoutFn);
+	}
 	
 	getElm("usercreate").addEventListener('click', async () => {
 		let data = {
@@ -984,6 +1806,10 @@ function setupSPA() {
 	});
 	
 	let elm = getElm("game-ask-0");
+	var nonselect = document.createElement("option");
+	nonselect.text = "必須項目(タップして選択)";
+	nonselect.value = "0";
+	elm.appendChild(nonselect);
 	for(let game of gameInfo) {
 		if(game.Id >= 6 && game.Id <= 8) continue; //チェンガ対策
 		if(game.Id >= 99) continue;
@@ -1018,11 +1844,19 @@ function setupSPA() {
 			Speciality: getElm("game-ask-8").value,
 			Improvement: getElm("game-ask-9").value,
 		};
+		
 		console.log(data);
+		askCallNo = 0;
 		sendAskEffect();
 		let result = await userGameAsk(data);
 		console.log(result);
+		askReward = result.Reward;
+		askNextPageCheck(1);
 	});
+}
+
+function scrollEndEvent(event) {
+	openMenu();
 }
 
 function closePage(pageCode) {
@@ -1246,6 +2080,20 @@ function showFriends() {
 function showGameAsk(gameId=0) {
 	if(currentContentCode == CONTENTS.GAME_ASK) return;
 	
+	//ゲームを選択する
+	//アンケートの最初の3つはキャッシュするがそれ以外は戻す
+	getElm("game-ask-0").options[0].selected = true;
+	if(gameId != 0) {
+		getElm("game-ask-0").value = gameId;
+	}
+	getElm("game-ask-3").options[0].selected = true;
+	getElm("game-ask-4").options[0].selected = true;
+	getElm("game-ask-5").options[0].selected = true;
+	getElm("game-ask-6").options[0].selected = true;
+	getElm("game-ask-7").options[0].selected = true;
+	getElm("game-ask-8").value = ""
+	getElm("game-ask-9").value = ""
+	
 	loadContent(CONTENTS.GAME_ASK);
 }
 
@@ -1337,6 +2185,10 @@ function closeRewardLog() {
 
 function closeOtherProfile() {
 	disableUIById("modal-other-prof");
+}
+
+function closeLinkLog() {
+	disableUIById("modal-link-log");
 }
 
 function closeFirstTutorial() {
@@ -1526,7 +2378,7 @@ function sendAskEffect() {
 	});
 	
 	setTimeout(() => {
-		firstView();
+		askNextPageCheck(2);
 	}, 3500);
 }
 
@@ -1538,6 +2390,21 @@ function userCreateNextPageCheck(no) {
 		userSetup();
 		loadContent(CONTENTS.MAIN_MENU);
 		loadPage(PAGE.MAIN_MENU);
+	}
+}
+
+function askNextPageCheck(no) {
+	console.log("no:" + no)
+	askCallNo += no;
+	if(askCallNo >= 3) {
+		closeEffect(EFFECT.ASK_SEND);
+		loadContent(CONTENTS.MAIN_MENU);
+		
+		if(askReward.Exp && askReward.Gold) {
+			openReward("Ask", "アンケート報酬！", "アンケートに回答したので経験値とゴールド500をゲット！！");
+		}else{
+			openReward("Ask", "2回目は報酬なし！", "このゲームのアンケート回答は2回目なので、報酬はありませんでした。");
+		}
 	}
 }
 
@@ -2117,6 +2984,21 @@ function badCheer() {
 	cheerMessage(userData.UserId, myGameId, "くたばれ", -50);
 }
 
+async function dbgLinkSend() {
+	if(getElm("dbgLinkGameId").value == "") return;
+	if(getElm("dbgLinkUserId").value == "") return;
+	
+	let req = await fetch(`${baseURI}/vc/gamelink`, {
+		method: 'POST',
+		mode: 'cors',
+		body: JSON.stringify({
+			GameId: getElm("dbgLinkGameId").value,
+			UserId: getElm("dbgLinkUserId").value
+		})
+	});
+	let result = await req.json();
+}
+
 function dbgMsgSend() {
 	let toUserId = userData.UserId;
 	
@@ -2422,9 +3304,17 @@ function urlB64ToUint8Array(base64String) {
 		</div>
 	</div>
 	
-	<div id="ask-send-effect" class="nes-container status" style="display:none;">
-		<p>アンケート送信…</p>
-		<progress class="nes-progress is-primary" id="askgauge" value="0" max="100"></progress>
+	<div id="ask-send-effect" class="modal">
+		<div class="modal-content">
+			<div class="nes-container status">
+				<div class="center">
+					<br /><br /><br />
+					<p>アンケート送信中…</p>
+					<br /><br /><br />
+				</div>
+				<progress class="nes-progress is-primary" id="askgauge" value="0" max="100"></progress>
+			</div>
+		</div>
 	</div>
 
 	<div id="modal-adventure-log" class="modal">
@@ -2460,6 +3350,22 @@ function urlB64ToUint8Array(base64String) {
 			</div>
 			
 			<div id="closeModal" onclick=closeRewardLog()>&times;</div>
+		</div>
+	</div>
+	
+	<div id="modal-link-log" class="modal">
+		<div class="modal-content">
+			<div class="nes-container is-rounded with-title status log">
+				<p class="title">リンク！！</p>
+				
+				<div id="userLinkLogMsg"></div>
+				<div style="height:10px;"></div>
+				<div class="center">
+					<button type="button" class="nes-btn is-primary" onclick="closeLinkLog();">とじる</button>
+				</div>
+			</div>
+			
+			<div id="closeModal" onclick=closeLinkLog()>&times;</div>
 		</div>
 	</div>
 	
@@ -2737,8 +3643,22 @@ function urlB64ToUint8Array(base64String) {
 			
 			<div class="main-block left-top">
 				<div class="header">
-					<h1 class="nes-header checkbg">ゲーム紹介</h1>
-					<button type="button" class="nes-btn is-primary is-rounded" onclick="openTutorial(PAGE.TUTORIAL_PUBLISH)">？</button>
+					<h1 class="nes-header checkbg">作品紹介</h1>
+					<button type="button" class="nes-btn is-primary is-rounded" onclick="openTutorial(PAGE.PUBLISH)">？</button>
+				</div>
+				
+				<div id="page-tutorial-publish">
+					<div class="nes-balloon from-left with-title">
+						<p class="title">バンタンコネクトファミリーの紹介です</p>
+						<br />
+						バンタンコネクトに対応している作品の紹介になります。<br />
+						開発中の動画も載せているので、あわせてぜひご覧ください。<br />
+						<br />
+						<br />
+						<div class="right">
+							<button type="button" class="nes-btn is-primary" onclick="closeTutorial(TUTORIAL.PUBLISH);">ＯＫ</button>
+						</div>
+					</div>
 				</div>
 				
 				<div style="height:80px;"></div>
@@ -3053,7 +3973,7 @@ function urlB64ToUint8Array(base64String) {
 						<div style="height:25px;"></div>
 						
 						<div class="center">
-							<button type="button" id="game-ask-send" class="nes-btn is-primary" onclick=sendGameAsk()>送信</button>
+							<button type="button" id="game-ask-send" class="nes-btn is-primary">送信</button>
 						</div>
 					</div>
 				</div>
@@ -3239,8 +4159,6 @@ function urlB64ToUint8Array(base64String) {
 								
 				<div style="height:250px;"></div>
 				
-				<div style="height:50px;"></div>
-				
 				<div id="main-api-effect" class="nes-container status" style="display:none;">
 					<p>通信中！！</p>
 					<progress class="nes-progress is-primary" id="mainworkgauge" value="0" max="100"></progress>
@@ -3258,59 +4176,21 @@ function urlB64ToUint8Array(base64String) {
 				GameId<input type="text" id="dbgShutdownId" class="nes-input">
 				<button type="button" class="nes-btn is-primary" onclick="gameShutdown();">ゲーム終了</button>
 				
-				<div style="height:25px;"></div>
-				<button type="button" class="nes-btn is-primary" onclick="playNextVideo();">次の動画</button>
-				
-				<div style="height:10px;"></div>
-
-				<button type="button" id="" class="nes-btn is-primary" onclick="initializePush();">通知登録</button>
-				<div style="height:10px;"></div>
-
-				<button type="button" id="" class="nes-btn is-primary" onclick="sendSubscriptionToServer();">通知送信</button>
-				<div style="height:10px;"></div>
-
-				<button type="button" class="nes-btn is-primary" onclick="reCreateUser();">ユーザ登録やり直す</button><br />
-				NOTE: 作り直すまでデータは消えない<br />
-				
-				<div style="height:10px;"></div>
-				GameId<input type="text" id="dgbUserIdHandOver" class="nes-input">
-				<button type="button" class="nes-btn is-primary" onclick="userIdHandOver();">ユーザID引継ぎ</button>
-				
 				<div style="height:10px;"></div>
 				<button type="button" class="nes-btn is-primary" onclick="resetTutorial();">チュートリアルリセット</button>
 				
-				<div style="height:20px;"></div>
-				
-				<div class="nes-container with-title">
-					<p class="title">ユーザパラメータ</p>
-					
-					<table class="nes-table is-bordered is-centered">
-					<tbody>
-						<tr>
-							<td>UserId</td>
-							<td id="dbgUserId"></td>
-						</tr>
-						<tr>
-							<td>AvatarType</td>
-							<td id="dbgAvatarType"></td>
-						</tr>
-					</tbody>
-					</table>
-					<button type="button" class="nes-btn is-primary" onclick="levelUp();">レベルアップ</button>
-				</div>
 			</div>
 			
 			<div style="height:50px;"></div>
 				
 			<div class="nes-container with-title">
-				<p class="title">メッセージデバッグ</p>
+				<p class="title">デバッグリンク</p>
 				<br />
-				対象を「自分」のままにすると自分にメッセージを送信します。<br />
-				自分以外のプレイヤーにメッセージを送りたい場合は、そのプレイヤーのUserIdを入力してください。<br />
+				対象のプレイヤーとゲームをリンクします<br />
 				<br />
-				対象<input type="text" id="dbgTarget" class="nes-input" value="自分">
-				メッセージ<input type="text" id="dbgMessage" class="nes-input">
-				<button type="button" class="nes-btn is-primary" onclick="dbgMsgSend();">送信</button>
+				対象のGameId<input type="text" id="dbgLinkGameId" class="nes-input">
+				対象プレイヤーのUserId<input type="text" id="dbgLinkUserId" class="nes-input" value="">
+				<button type="button" class="nes-btn is-primary" onclick="dbgLinkSend();">送信</button>
 			</div>
 			
 			<div style="height:50px;"></div>
@@ -3349,13 +4229,9 @@ function urlB64ToUint8Array(base64String) {
 			
 			<div class="nes-container with-title">
 				<p class="title">テストQR</p>
-				<br />
-				<button type="button" class="nes-btn is-primary" onclick="sendQREvent('810f1f50-6a2b-4a8d-8908-a37b9afe9ec2')">リンク1</button><div style="height:10px;"></div>
 				<button type="button" class="nes-btn is-primary" onclick=sendDebugQR()>スクロール</button><div style="height:10px;"></div>
 			</div>
 		</div>
-				
-				<div style="height:250px;"></div>
 			</div>
 			
 			<div id="page-qr-search" class="main-block">
@@ -3426,6 +4302,15 @@ function urlB64ToUint8Array(base64String) {
 						<br />
 						<br />
 					</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container is-rounded with-title status">
+					<p class="title">特殊リンク用ユーザ情報</p>
+					
+					UserId: <span id="dbgUserId"></span><br />
+					AvatarType:<span id="dbgAvatarType"></span><br />
 				</div>
 				
 				<div style="height:150px;"></div>
@@ -3684,7 +4569,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 			<button id="mainmenu-close" type="button" class="nes-btn is-primary" onclick="closeMenu()">メニュー閉じる</button>
 			
 			<div class="nav-menu">
-				<div><button type="button" id="menu-btn-5" class="menu-btn nes-btn is-primary" onclick="loadContent(CONTENTS.PUBLISHING)">ゲーム紹介</button></div>
+				<div><button type="button" id="menu-btn-5" class="menu-btn nes-btn is-primary" onclick="loadContent(CONTENTS.PUBLISHING)">作品紹介</button></div>
 				<div><button type="button" id="menu-btn-4" class="menu-btn nes-btn is-primary" onclick="showGameAsk()">アンケート</button></div>
 				<div><button type="button" id="menu-btn-6" class="menu-btn nes-btn is-primary" onclick="showFriends()">トモダチ</button></div>
 				<div><button type="button" id="menu-btn-2" class="menu-btn nes-btn is-primary" onclick="loadContent(CONTENTS.HOWTOPLAY)">遊び方</button></div>
