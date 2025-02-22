@@ -114,7 +114,7 @@ export class QREventer {
 				}
 			}
 			
-			console.log(get);
+			//console.log(get);
 			
 			//GCにイベントとして撒いて、GCから派生させる
 			retData.Command = CMD.SEND_QR_EVENT;
@@ -143,13 +143,17 @@ export class QREventer {
 				break;
 			}
 			
+			msgData = {
+				Command:CMD.USERREWARD,
+				GameId: 99,
+				UserId: data.UserId,
+				QREventId: get.Id,
+				Flag: get.Flag,
+				GetValue: get.Value,
+			};
+			
 			if(updateResult) {
-				msgData = {
-					Command:CMD.USERSTAT,
-					UpdateStat: updateResult,
-					GameId: 99,
-					UserId: data.UserId
-				};
+				msgData.UpdateStat = updateResult;
 			}
 		}
 		
@@ -160,7 +164,6 @@ export class QREventer {
 			Message: msgData,
 		};
 		
-		console.log(ret);
 		return ret;
 	}
 };

@@ -177,10 +177,12 @@ export class UserPortal {
 		break;
 		
 		case CMD.USERSTAT:
+		case CMD.USERREWARD:
 		{
 			//ユーザステータスの更新
+			//リワード
 			//console.log(data)
-			this.broadcast(createMessage(data.UserId, CMD.USERSTAT, TARGET.SELF, data));
+			this.broadcast(createMessage(data.UserId, data["Command"], TARGET.SELF, data));
 		}
 		break;
 		
@@ -333,8 +335,52 @@ export class UserPortal {
 		case "createUser":
 		case "gameStartAIGame":
 		case "gameStartVC":
+		
 		case "gameEndAIGame":
+			/*
+			{
+				API: "gameEndAIGame",
+				GameHash: gameHash,
+				GameResult: gameResult,
+				GameRewards: rewards
+			}
+			*/
+			{
+				for(let i=0; i<data.GameResult?.UserResults.length; ++i) {
+					let userId = data.GameResult?.UserResults[i].UserId;
+					let sendData:any = {
+						UpdateStat: data.GameRewards[i],
+						FromGame: 2,
+						GameId: 1,
+						UserId: userId
+					};
+					
+					this.broadcast(createMessage(data.UserId, CMD.USERSTAT, TARGET.SELF, sendData));
+				}
+			}
+			break;
+			
 		case "gameEndVC":
+			/*
+			{
+				API: "gameEndVC",
+				GameHash: gameHash,
+				GameId: gameId,
+				UserId: userId,
+				GameResult: resultCode,
+				Rewards: rewards
+			}
+			*/
+			{
+				let sendData:any = {
+					UpdateStat: data.Rewards,
+					FromGame: 1,
+					GameId: data.GameId,
+					UserId: data.UserId
+				};
+				this.broadcast(createMessage(data.UserId, CMD.USERREWARD, TARGET.SELF, sendData));
+			}
+			break;
 		}
 	}
 };

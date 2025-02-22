@@ -253,39 +253,45 @@ export async function gameEndVC(gameHash: string, resultCode: ResultCode) {
 	};
 	
 	try {
+		let userId = 0;
+		let gameId = 0;
+		let rewards:any = {}
 		await query("UPDATE Game SET State = ? WHERE GameHash = ?", [resultCode, gameHash]);
 		result.Success = true;
 		
 		stopRecord(gameHash);
 		
-		//DGSにイベントリレー
-		//NOTE: UserInfoは取ろうと思えばとれる
-		sendAPIEvent({
-			API: "gameEndVC",
-			GameHash: gameHash,
-			GameResult: resultCode
-		});
-		
 		//稼働中ログ
 		if(gameHashDic[gameHash]) {
-			let gameId = gameHashDic[gameHash];
+			gameId = gameHashDic[gameHash];
 			
 			//報酬付与
 			let time = ((new Date()).getTime() - gameSessions[gameId].StartTime);
-			let userId = gameSessions[gameId].UserId;
+			userId = gameSessions[gameId].UserId;
 			
 			gameSessions[gameId] = {
 				Status: 0,
 			}
 			delete gameHashDic[gameHash];
 			
-			let rewards:any = await getRewardsByGame(gameId, userId, resultCode, time);
+			rewards = await getRewardsByGame(gameId, userId, resultCode, time);
 			result.Rewards = rewards;
 			
 			//awaitはしない
 			saveEpisodeNormalGame(gameHash, resultCode, rewards);
 			gameUserCache[gameId] = {};
 		}
+		
+		//DGSにイベントリレー
+		//NOTE: UserInfoは取ろうと思えばとれる
+		sendAPIEvent({
+			API: "gameEndVC",
+			GameHash: gameHash,
+			GameId: gameId,
+			UserId: userId,
+			GameResult: resultCode,
+			Rewards: rewards
+		});
 	} catch(ex) {
 		console.log(ex);
 	}
