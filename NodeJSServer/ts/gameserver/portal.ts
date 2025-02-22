@@ -381,6 +381,28 @@ export class UserPortal {
 				this.broadcast(createMessage(data.UserId, CMD.USERREWARD, TARGET.SELF, sendData));
 			}
 			break;
+			
+		case "gameLinkVC":
+			/*
+			{
+				API: "gameLinkVC",
+				GameId: gameId,
+				UserId: userId,
+			}
+			*/
+			{
+				let sendData:any = {
+					UpdateStat: {
+						GameId: data.GameId,
+						UserId : data.UserId
+					},
+					GameId: 99,
+					UserId: data.UserId
+				};
+				
+				this.broadcast(createMessage(data.UserId, CMD.LINKFEEDBACK, TARGET.SELF, sendData));
+			}
+			break;
 		}
 	}
 };

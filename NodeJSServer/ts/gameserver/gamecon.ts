@@ -577,6 +577,8 @@ export class GameConnect {
 		
 		switch(data.API) {
 		case "createUser":
+			break;
+			
 		case "gameStartAIGame":
 			{
 				//アーティファクトが出ていたらアーティファクト送信
@@ -617,6 +619,28 @@ export class GameConnect {
 			
 		case "gameEndAIGame":
 		case "gameEndVC":
+			break;
+			
+		case "gameLinkVC":
+			/*
+			{
+				API: "gameLinkVC",
+				GameId: gameId,
+				UserId: userId,
+			}
+			*/
+			
+			this.execMessage({
+				UserId: data.UserId,
+				GameId: 99,
+				Command: CMD.SEND_EVENT,
+				EventId: 1000,
+				Payload: createdPayload({
+					"GameId": data.GameId,
+					"UserId" : data.UserId
+				})
+			});
+			break;
 		}
 	}
 };

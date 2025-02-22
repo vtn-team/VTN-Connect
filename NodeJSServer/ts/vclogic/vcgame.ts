@@ -357,6 +357,7 @@ export async function gameLink(gameId: number, userId: number) {
 			GameId: gameId,
 			UserId: userId,
 		});
+		result.Success = true;
 	} catch(ex) {
 		console.log(ex);
 	}
