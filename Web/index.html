@@ -108,9 +108,17 @@ pre {
   top: "-100%";
   left: "-100%";
 }
+
 .nav-menu {
   display: grid;
   grid-template-columns: repeat(3, 100px);
+  grid-auto-rows: 100px;
+  gap: 8px;
+}
+
+.history-view {
+  display: grid;
+  grid-template-columns: repeat(2, 150px);
   grid-auto-rows: 100px;
   gap: 8px;
 }
@@ -662,15 +670,62 @@ function execMessage(data) {
 		console.log(data);
 		{
 			//変数によってリワードだし分け
-			
 			let update = data.Data.UpdateStat;
+			let levelUp = null;
 			if(update) {
 				let userLevel = getUserLevel(update.Exp);
+				if(userData.Level != userLevel.Level) {
+					levelUp = {
+						Before: userData.Level,
+						After: userLevel.Level,
+					}
+				}
 				getElm("playerLevel").innerText = "レベル:" + userLevel.Level;
 				getElm("playerNextExp").innerText = userLevel.Next;
 				getElm("nextlv").value = userLevel.ExpGauge;
 				getElm("playerGold").innerText = update.Gold;
 			}
+			
+			//タイトルの決定
+			let title = "ボーナスを獲得！";
+			let message = "";
+			switch(data.Data?.Flag) {
+			case "Exp":
+				type = "Exp";
+				title = "「ランダム：エクスペ」発動！";
+				message = "経験値" + data.Data?.GetValue + "を獲得！！";
+				if(levelUp) {
+					message += "<br /><br />";
+					message += userData.Name + "はレベルが上がった！！";
+					message += levelUp.Before + "から" + levelUp.After;
+				}
+				break;
+				
+			case "Coin":
+				type = "Coin";
+				title = "「ランダム：カネカネ」発動！";
+				message = "ゴールド" + data.Data?.GetValue + "を獲得！！";
+				break;
+				
+			case "Both":
+				type = "Coin";
+				title = "「ランダム：ゴウヨク」発動！";
+				message = "経験値とゴールド" + data.Data?.GetValue + "を獲得！！";
+				if(levelUp) {
+					message += "<br /><br />";
+					message += userData.Name + "はレベルが上がった！！<br />";
+					message += levelUp.Before + "→" + levelUp.After + "レベルになった！";
+				}
+				break;
+				
+			case "Event":
+				type = "Event";
+				title = "「ランダム：ハズレ」発動！";
+				message = "しかしなにもおこらなかった！";
+				break;
+			}
+			
+			openReward(type, title, message);
 		}
 		break;
 	
@@ -738,7 +793,7 @@ function closeError() {
 }
 
 let cheerTarget = null;
-function cheerSetup(tgtGameId, toUserId) {
+function cheerSetup(tgtGameId, toUserId, isAIGame) {
 	let playingUserName = "";
 	for(let game of activeGameInfo) {
 		if(game.GameId == tgtGameId) {
@@ -759,6 +814,14 @@ function cheerSetup(tgtGameId, toUserId) {
 		ToUserId: toUserId,
 		TgtGameId: tgtGameId
 	};
+	
+	if(isAIGame) {
+		getElm("cheerTitle").innerText = "情報を伝える";
+		getElm("cheerText").innerText = "情報を伝える";
+	}else{
+		getElm("cheerTitle").innerText = "オウエン";
+		getElm("cheerText").innerText = "オウエン";
+	}
 	
 	enableUIById("modal-cheer");
 	getElm("cheerUserName").innerHTML = playingUserName;
@@ -885,7 +948,7 @@ function setupSPA() {
 	
 	getElm("usercreate").addEventListener('click', async () => {
 		let data = {
-			Name: getElm("username").value,
+			Name: getElm("vcname").value,
 			Questions: [
 				getElm("question1").value,
 				getElm("question2").value,
@@ -1194,10 +1257,9 @@ async function openGameHistory(gameId) {
 	loadContent(CONTENTS.GAME_HISTORY);
 }
 
-async function openReward(title, rewards) {
+async function openReward(type, title, message) {
 	var elm = getElm("rewardLogMsg");
-	elm.innerHTML = "";
-	//result.StoryBook.replaceAll("\n", "<br />");
+	elm.innerHTML = message;
 	
 	var elm = getElm("rewardLogTitle");
 	elm.innerHTML = title;
@@ -1214,6 +1276,7 @@ async function openFriendList() {
 	console.log(result);
 	
 	createFrienedList(result.Friends.Friends, result.Friends.Count);
+	createUserMessageLog(result.Messages.Messages, result.Messages.MessageCount);
 	loadContent(CONTENTS.FRIEND_LIST);
 }
 
@@ -1266,8 +1329,8 @@ function createGameHistory(history, maxCount) {
 	for(let gameHash in group_by) {
 		if(group_by[gameHash].length == 1) {
 			html += `<<${group_by[gameHash][0].Title}>><br />`;
-			html += `<section class="history" style="height:80px;">`;
-			html += `${group_by[gameHash][0].PlayerName}の冒険　<button type="button" class="nes-btn is-primary readbutton" onclick="readHistory('${group_by[gameHash][0].Title}', '${group_by[gameHash][0].GameHash}', '${group_by[gameHash][0].LogId}')">読む</button>`;
+			html += `<section class="history history-view" style="height:80px;">`;
+			html += `<div>${group_by[gameHash][0].PlayerName}の冒険</div><button type="button" class="nes-btn is-primary readbutton" onclick="readHistory('${group_by[gameHash][0].Title}', '${group_by[gameHash][0].GameHash}', '${group_by[gameHash][0].LogId}')">読む</button>`;
 		}else{
 			html += `<<${group_by[gameHash][0].Title}>><br />`;
 			html += `<section class="history" style="height:240px;">`;
@@ -1361,7 +1424,7 @@ async function openUserProfile(userId) {
 	
 	createUserInfoUI(ud);
 	createUserAdventureHistory(ud.History, ud.HistoryCount);
-	createUserMessageLog(ud.Message, ud.MessageCount);
+	//createUserMessageLog(ud.Message, ud.MessageCount);
 	
 	loadContent(CONTENTS.USER_PROFILE);
 }
@@ -1407,6 +1470,7 @@ function userCreateNextPageCheck(no) {
 	if(callNo >= 3) {
 		closeEffect(EFFECT.SUMMON);
 		userSetup();
+		loadContent(CONTENTS.MAIN_MENU);
 		loadPage(PAGE.MAIN_MENU);
 	}
 }
@@ -1606,7 +1670,7 @@ async function readQR() {
 
 async function cencelQR() {
 	disableUIById("qrscancancel");
-	disableUIById("qrresult");
+	//disableUIById("qrresult");
 	enableUIById("qrscan");
 	
 	if(!qrReader) return;
@@ -1617,17 +1681,19 @@ async function cencelQR() {
 
 async function onScanSuccess(decodedText, decodedResult) {
     // Handle on success condition with the decoded text or result.
-	enableUIById("qrresult");
+	//enableUIById("qrresult");
 	await qrReader.stop();
 	
 	if(!userData || !userData.UserId)
 	{
-		getElm("qrresult").innerText = "ユーザー登録されていません";
+		setupErrorDialog({ Message: "ユーザー登録されていません" });
+		//getElm("qrresult").innerText = "ユーザー登録されていません";
 		return;
 	}
 	
 	if(decodedText.indexOf("VCQR:") == -1) {
-		getElm("qrresult").innerText = "無効なQRです";
+		setupErrorDialog({ Message: "無効なQRです" });
+		//getElm("qrresult").innerText = "無効なQRです";
 		return;
 	}
 	
@@ -1821,31 +1887,32 @@ function parsePayload(payload) {
 }
 
 function updateGameStat(data) {
-	var html="";
+	var aihtml="";
+	var vchtml="";
 	
 	for(let game of data.ActiveGames) {
 		if(game.GameId == 99) continue; //portalは表示しない
+		if(game.GameId == 101) continue; //viewerは表示しない
 		
 		if(game.GameId == 1) {
 			//VCMain
-			html += `
+			aihtml += `
 			<div class="nes-container with-title">
 				<p class="title">${game.Title}</p>`;
 			
 			if(game.Session && game.Session.Status == 1) {
-				html += `<div>冒険中！： ${game.Session.GameTitle}</div>`;
+				aihtml += `<div>冒険中！： ${game.Session.GameTitle}</div><br />`;
 				
 				for(let u of game.Session.GameUsers) {
-					html += `<div>${u.Name}が冒険中！`;
-					html += `<button type="button" id="cheer${game.GameId}" class="nes-btn is-primary" onclick="cheerSetup(${game.GameId}, ${u.UserId})">応援する！</button>`;
-					html += "</div>";
+					aihtml += `<div>${u.Name}が冒険中！<br />`;
+					aihtml += `<button type="button" id="cheer${game.GameId}" class="nes-btn is-success" onclick="cheerSetup(${game.GameId}, ${u.UserId}, true)">情報を伝える</button>`;
+					aihtml += "</div><br />";
 				}
 			}else{
-				html +="<div>冒険の準備中…</div>";
+				aihtml +="<div>冒険の準備中…</div>";
 			}
 			
-			html += `</div>
-			<div style="height:10px;"></div>`;
+			aihtml += `</div><div style="height:10px;"></div>`;
 		}else{
 			let active = "ゲーム台は空いています";
 			let plusOn = "";
@@ -1857,10 +1924,10 @@ function updateGameStat(data) {
 			
 			if(game.Session && game.Session.Status == 1 && game.Session.UserId && game.Session.UserInfo) {
 				active = game.Session.UserInfo.Name + "がプレイ中！";
-				plusOn = `<button type="button" id="cheer${game.GameId}" class="nes-btn is-primary" onclick="cheerSetup(${game.GameId}, ${game.Session.UserId})">応援する！</button>`;
+				plusOn = `<button type="button" id="cheer${game.GameId}" class="nes-btn is-success" onclick="cheerSetup(${game.GameId}, ${game.Session.UserId})">応援する！</button>`;
 			}
 			
-			html += `
+			vchtml += `
 			<div class="nes-container with-title">
 				<p class="title">${game.Title}</p>
 				<div>${active}</div>
@@ -1870,7 +1937,9 @@ function updateGameStat(data) {
 		}
 	}
 	
-	getElm("gamelist").innerHTML = html;
+	getElm("aigameusers").innerHTML = aihtml;
+	getElm("gamelist").innerHTML = vchtml;
+	
 	getElm("ws-state").innerHTML = "接続中"; //のユーザ:" + data.ActiveUsers.length + "人";
 }
 
@@ -2219,7 +2288,7 @@ function urlB64ToUint8Array(base64String) {
 	<div id="modal-cheer" class="modal">
 		<div class="modal-content">
 			<div id="cheer" class="nes-container is-rounded with-title status">
-				<p class="title">オウエン</p>
+				<p id="cheerTitle" class="title">オウエン</p>
 				
 				<div id="cheerMsg">
 				<span id="cheerUserName"></span>サンにメッセージを届けよう！<br /><br />
@@ -2228,7 +2297,7 @@ function urlB64ToUint8Array(base64String) {
 				<br /><br />
 				
 				<div class="nes-field">
-					<label for="name_field">オウエン</label>
+					<label id="cheerText" for="name_field">オウエン</label>
 					<input type="text" id="cheerMessage" class="nes-input">
 				</div>
 				<div style="height:10px;"></div>
@@ -2303,14 +2372,14 @@ function urlB64ToUint8Array(base64String) {
 		</div>
 	</div>
 	
-	<div id="modal-reawrd-log" class="modal">
+	<div id="modal-reward-log" class="modal">
 		<div class="modal-content">
 			<div class="nes-container is-rounded with-title status log">
-				<p class="title">報酬をゲット！</p>
+				<p class="title">報酬ゲット！</p>
 				
-				<div id="reawrdLogTitle"></div>
+				<div id="rewardLogTitle"></div>
 				<br />
-				<div id="reawrdLogMsg"></div>
+				<div id="rewardLogMsg"></div>
 				<div style="height:10px;"></div>
 				<div class="center">
 					<button type="button" class="nes-btn is-primary" onclick="closeRewardLog();">とじる</button>
@@ -2318,20 +2387,6 @@ function urlB64ToUint8Array(base64String) {
 			</div>
 			
 			<div id="closeModal" onclick=closeRewardLog()>&times;</div>
-		</div>
-	</div>
-	
-	<div id="page-tutorial-pwa" style="display:none;">
-		<div class="nes-container with-title status">
-			<p class="title">こんにちは</p>
-			
-			手間だけどPWAで動かしてね<br />
-			<br /><br />
-			(仮)手順の紹介をするよ<br />
-			<br /><br />
-			<div class="right">
-				<button type="button" class="nes-btn is-primary" onclick="pwaSkip();">ＯＫ</button>
-			</div>
 		</div>
 	</div>
 	
@@ -2373,8 +2428,7 @@ function urlB64ToUint8Array(base64String) {
 						まずは、自分の分身となる冒険者を『召喚』しましょう！<br />
 						<button type="button" class="nes-btn is-success" onclick="nextTutorial()">キャラクリエイトへ</button>
 						<br /><br /><br />
-						召喚された冒険者たちがわちゃわちゃ動くAIゲーム、<br />
-						「いぬのだいぼうけん」もお楽しみに！
+						召喚された冒険者たちは、AIで動くゲーム「いぬのだいぼうけん」に登場するよ！
 						<br /><br /><br />
 					</div>
 				</div>
@@ -2395,11 +2449,11 @@ function urlB64ToUint8Array(base64String) {
 					<div class="center">
 						これから自分の分身を『召喚』します<br />
 						<br />
-						この世界の神はAI神です。<br />
-						召喚にあたり、AI神があなたのステータスを勝手に決めます。<br />
-						しかし一部のステータスについては調整が可能となっていますので、用意された質問事項に回答をお願いします。<br />
+						この世界AI神に支配されていますです<br />
+						召喚にあたり、AI神があなたのステータスを勝手に決めてしまいます<br />
+						しかし一部のステータスについては調整が可能となっていますので、用意された質問事項に回答することで、AIに抗うことができます。<br />
 						<br />
-						ちなみに回答しなくても大丈夫です。回答しない場合は、AIが勝手に決めた設定でキャラクターが生成されます。<br />
+						回答しない場合は、AI神を信奉しているということで、AI神が勝手に決めた設定でキャラクターが生成されます。<br />
 						<br />
 					</div>
 				</div>
@@ -2413,13 +2467,12 @@ function urlB64ToUint8Array(base64String) {
 					<p class="title">名前</p>
 					
 					<div class="nes-field">
-						<input type="text" id="username" class="nes-input">
+						<input type="text" id="vcname" class="nes-input">
 						<br />
-						<b>※ゲーム環境で公開されます。</b><br />
-						本名は避けてもらえると助かります。<br /><br />
-						※記載がない場合はAIが勝手に命名します。<br />
+						<b>※AIが改変することがあります</b><br />
+						個人を特定可能な名前はできれば避けてもらえると助かります<br /><br />
+						記載がない場合はAIが勝手に命名します<br />
 						<br />
-						長さに応じて愛称または本名が自動生成されます。<br />
 					</div>
 				</div>
 				
@@ -2517,11 +2570,11 @@ function urlB64ToUint8Array(base64String) {
 			
 			<div class="main-block left-top">
 				<div class="header">
-					<h1 class="nes-header checkbg">ゲーム動画</h1>
-					<button type="button" class="nes-btn is-primary is-rounded" onclick="openTutorial(PAGE.TUTORIAL_PROFILE)">？</button>
+					<h1 class="nes-header checkbg">ゲーム紹介</h1>
+					<button type="button" class="nes-btn is-primary is-rounded" onclick="openTutorial(PAGE.TUTORIAL_PUBLISH)">？</button>
 				</div>
 				
-				<div style="height:150px;"></div>
+				<div style="height:80px;"></div>
 				
 				<div class="nes-container is-rounded with-title video"><p class="title">開発動画</p>
 				<div id="youtubeLive" class="center"></div>
@@ -2529,23 +2582,35 @@ function urlB64ToUint8Array(base64String) {
 				
 				<div style="height:25px;"></div>
 				
-				以下、バンタンコネクト対応ゲームの紹介です。<br />
+				<div class="nes-container is-rounded with-title status">
+					以下、バンタンコネクトファミリー<br />
+					(冒険のトビラ - リンク魔法対応ゲーム)<br />
+					の紹介です。<br />
+				</div>
+				
+				<div style="height:25px;"></div>
 				
 				<div class="nes-container is-rounded with-title status">
 					<p class="title">いぬのだいぼうけん</p>
 					
-					大きいスクリーンに映っているゲームが、かの有名な「いぬのだいぼうけん」、略して「いぬ大」です！<br />
+					<b>犬は好きか？</b><br />
 					<br />
-					主人公「いぬ」が、比較的何もしていない平和な魔王「Tappei」を倒すべく、レベル上げとお宝を見つけるためにダンジョンに潜り、沼ってしまう物語です。<br />
+					大きいスクリーンに映っているゲームが、かの有名な「いぬのだいぼうけん」。<br />
+					略して「いぬ大」です！<br />
+					<br />
+					主人公「いぬ」が、比較的何もしていない平和な魔王「Tappei」を倒すべく、ダンジョンに潜りレベル上げとお宝を見つける快感に溺れ沼ってしまう物語です。<br />
 				</div>
 				
-				//ここから先は当日キャプションをコピペ
 				<div style="height:25px;"></div>
 				
 				<div class="nes-container is-rounded with-title status">
 					<p class="title">Confront</p>
 					
-					戦いは好きか？<br />
+					<b>戦いは好きか？</b><br />
+					<br />
+					移動や戦闘の爽快感を追求した2Dアクションゲームです。<br />
+					特にボス戦では、ザコ敵とは異なる戦略が必要になるため、スリリングな体験を味わえます。<br />
+					今後も開発を継続して、探索やアドベンチャーパート、新しいバトルシステムを模索していこうと考えているのでよろしくお願いします。<br />
 				</div>
 				
 				<div style="height:25px;"></div>
@@ -2553,7 +2618,12 @@ function urlB64ToUint8Array(base64String) {
 				<div class="nes-container is-rounded with-title status">
 					<p class="title">ブルスラアクション</p>
 					
-					高難度ゲーム！<br />
+					<b>高難度ゲームは好きか？</b><br />
+					<br />
+					攻撃を打ち消せる嫌疑でボス妖怪を倒そう！<br />
+					斬撃の飛ぶ剣で敵と戦う2Dアクションゲーム。<br />
+					斬撃で敵の球を打ち消したり、敵の攻撃を中断させたりして、場を有利に持ち運ぼう！<br />
+					<br />
 				</div>
 				
 				<div style="height:25px;"></div>
@@ -2561,7 +2631,9 @@ function urlB64ToUint8Array(base64String) {
 				<div class="nes-container is-rounded with-title status">
 					<p class="title">玩具箱</p>
 					
-					抜け出せるか、この館から…<br />
+					<b>ホラーゲームは好きか？</b><br />
+					<br />
+					
 				</div>
 				
 				<div style="height:25px;"></div>
@@ -2569,8 +2641,12 @@ function urlB64ToUint8Array(base64String) {
 				<div class="nes-container is-rounded with-title status">
 					<p class="title">チェンガ</p>
 					
-					生き残るために変化しろ！<br />
+					<b>ジェンガは好きか？</b><br />
+					<br />
+					
 				</div>
+				
+				<div style="height:250px;"></div>
 			</div>
 			
 			<!-- アンケート -->
@@ -2580,7 +2656,7 @@ function urlB64ToUint8Array(base64String) {
 					<button type="button" class="nes-btn is-primary is-rounded" onclick="openTutorial(TUTORIAL.GAMEASK)">？</button>
 				</div>
 				
-				<div style="height:100px;"></div>
+				<div style="height:80px;"></div>
 				
 				<div id="page-game-ask">
 					<div id="page-tutorial-gameask">
@@ -2801,7 +2877,7 @@ function urlB64ToUint8Array(base64String) {
 					</div>
 				</div>
 				
-				<div style="height:150px;"></div>
+				<div style="height:250px;"></div>
 			</div>
 			
 			<div class="main-block right-top">
@@ -2809,7 +2885,7 @@ function urlB64ToUint8Array(base64String) {
 					<h1 class="nes-header checkbg">仲間との交流</h1>
 				</div>
 				
-				<div style="height:100px;"></div>
+				<div style="height:80px;"></div>
 				
 				<div id ="page-friend-list">
 					<div class="nes-container is-rounded with-title status">
@@ -2819,22 +2895,46 @@ function urlB64ToUint8Array(base64String) {
 					</div>
 				</div>
 				
-				<div style="height:150px;"></div>
+				<div style="height:50px;"></div>
+				
+				<div id ="page-friend-list">
+					<div class="nes-container is-rounded with-title status">
+						<p class="title">オウエン / 情報の記録</p>
+						<div style="height:10px;"></div>
+						<div id="messageList"></div>
+					</div>
+				</div>
+				
+				<div style="height:250px;"></div>
 			</div>
 			
-			<div class="main-block left-center">
+			<div class="main-block">
 				
 				<div class="header">
 					<h1 class="nes-header checkbg">あそびかた</h1>
 				</div>
 				
-				<div style="height:100px;"></div>
+				<div style="height:80px;"></div>
+				
+				<div id ="userinfo" class="nes-container is-rounded with-title status">
+					<p class="title">『いぬ大』を楽しむ！！</p>
+					<br />
+					1. 冒険者の集会場から
+					<br />
+				</div>
+				
+				<div id ="userinfo" class="nes-container is-rounded with-title status">
+					<p class="title">ゲームと『リンク』して楽しむ！！</p>
+					<br />
+					1. 冒険者の集会場から
+					<br />
+				</div>
 				
 				<div style="height:150px;"></div>
 			
 			</div>
 			
-			<div id="page-main-menu" class="main-block true-center">
+			<div id="page-main-menu" class="main-block">
 				
 				<div class="header">
 					<h1 class="nes-header checkbg">冒険者の集会場</h1>
@@ -2843,9 +2943,28 @@ function urlB64ToUint8Array(base64String) {
 				
 				<div style="height:100px;"></div>
 				
+				<div class="nes-container is-rounded with-title status">
+					<p class="title">集会場</p>
+					バンタンコネクト対応ゲームの空き状況や、<br />
+					AIゲーム『いぬのだいぼうけん』の様子を確認できます
+				</div>
+				
+				<div style="height:25px;"></div>
+				
+				<div class="nes-container is-rounded with-title status">
+					<p class="title">『いぬ大のようす』</p>
+					いぬのだいぼうけんに出撃している冒険者に応援メッセージや行動してほしい情報を伝えましょう。
+					
+					<div style="height:25px;"></div>
+					<div id="aigameusers">確認中…</div>
+				</div>
+				
+				<div style="height:25px;"></div>
+				
 				<div id ="gameinfo" class="nes-container is-rounded with-title status">
 					<p class="title">ゲーム稼働状況</p>
 					
+					<div style="height:25px;"></div>
 					<div id="gamelist">確認中…</div>
 				</div>
 				
@@ -2858,7 +2977,7 @@ function urlB64ToUint8Array(base64String) {
 				
 				<div style="height:50px;"></div>
 				
-				<div id ="userinfo" class="nes-container is-rounded with-title status" style="display:none;">
+				<div id ="userinfo" class="nes-container is-rounded with-title status">
 					<p class="title">ステータス</p>
 					<div class="playerName" id="playerName"></div><br />
 					<div class="playerLevel" id="playerLevel"></div>
@@ -2869,17 +2988,6 @@ function urlB64ToUint8Array(base64String) {
 				</div>
 								
 				<div style="height:250px;"></div>
-				
-				<div style="height:50px;"></div>
-				
-				<div>
-					<div class="nes-container is-rounded with-title status">
-						<p class="title">UIデバッグ用</p>
-						
-						メッセージ
-						<button type="button" class="nes-btn is-primary" onclick="cheerSetup(100, 50);">応援</button>
-					</div>
-				</div>
 				
 				
 		
@@ -2995,7 +3103,7 @@ function urlB64ToUint8Array(base64String) {
 				<div style="height:150px;"></div>
 			</div>
 			
-			<div id="page-qr-search" class="main-block right-center">
+			<div id="page-qr-search" class="main-block">
 				
 				<div class="header">
 					<h1 class="nes-header checkbg">ＱＲ検索</h1>
@@ -3009,19 +3117,11 @@ function urlB64ToUint8Array(base64String) {
 						<p class="title">ＱＲ検索をやってみよう</p>
 						<br />
 						このWebページから、ＱＲコードを読み取ることができます。<br />
-						会場を探索し、ＱＲコードを読み込みましょう！<br />
 						<br />
 						具体的には、会場内に「マジックスクロール」や「冒険のトビラ」と書かれた、ＱＲコードが描かれたパネルが置かれているはずです。<br />
-						これらを探しましょう。<br />
-						(この２種のＱＲコードしか対応していません)<br />
+						これらを探し、カメラを近づけて読み込んでみましょう<br />
+						<b>(この２種のＱＲコードは、通常のＱＲコードリーダーでは反応しません)</b><br />
 						<br />
-						読み込むと探索魔法が発動し、冒険に有利な効果が発生します。<br />
-						冒険のトビラとマジックスクロールはそれぞれ別の効果となります。<br />
-						<br />
-						<br />
-						冒険のトビラ： 探索魔法「リンク」を発動します。<b>遊ぶゲームに冒険者の情報を反映させます</b><br />
-						<br />
-						マジックスクロール： 適当な探索魔法が書かれており、それらを発動します。<b>さまざまな効果がランダムで発生します。何が起きるかはお楽しみに！</b><br />
 						<div class="right">
 							<button type="button" class="nes-btn is-primary" onclick="closeTutorial(TUTORIAL.QR);">ＯＫ</button>
 						</div>
@@ -3035,9 +3135,18 @@ function urlB64ToUint8Array(base64String) {
 						※QRの読み取りのために、カメラの許可をお願いします。
 						<button type="button" id="qrscan" class="nes-btn is-primary" onclick="readQR();">ＱＲ読み込み</button><br /><br />
 						<button type="button" id="qrscancancel" class="nes-btn is-primary" onclick="cencelQR();">キャンセル</button>
+						<div id="reader"></div>
 					</div>
-					<div id="reader"></div>
-					<div id="qrresult">読み込み結果</div>
+					
+					ＱＲを読み込むと探索魔法が発動し、冒険に有利な効果が発生します。<br />
+					<br />
+					<br />
+					<b>冒険のトビラ： 探索魔法「リンク」を発動します。</b><br />
+					遊ぶゲームに冒険者の情報を反映させます。冒険の結果により報酬が発生します。冒険譚も作られます。<br />
+					<br />
+					<b>マジックスクロール： 適当な探索魔法が書かれており、それらを発動します。</b><br />
+					さまざまな効果がランダムで発生します。何が起きるかはお楽しみに！<br />
+					<!--<div id="qrresult">読み込み結果</div>-->
 				</div>
 				
 				<div style="height:25px;"></div>
@@ -3169,12 +3278,13 @@ function urlB64ToUint8Array(base64String) {
 				<div style="height:150px;"></div>
 			</div>
 			
-			<div id="page-credit" class="main-block right-bottom">
+			<div id="page-credit">
+				
 				<div class="header">
 					<h1 class="nes-header checkbg">クレジット</h1>
 				</div>
 				
-				<div style="height:100px;"></div>
+				<div style="height:80px;"></div>
 				
 				<div class="nes-container is-rounded with-title status">
 					<p class="title">PixelMplus</p>
@@ -3240,12 +3350,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 					<p class="title">ChatGPT</p>
 					<pre class="">
 					このコンテンツは文章・一部の画像生成にChatGPTを使用しています。
-					<br />
+					</pre>
 				</div>
 			</div>
+			
+			<div style="height:250px;"></div>
 		</div>
-		
-		<div style="height:150px;"></div>
 	</div>
 	
 	<div id ="mainmenu" class="menubtn" style="display:none">
