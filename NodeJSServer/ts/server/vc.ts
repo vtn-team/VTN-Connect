@@ -111,11 +111,13 @@ export async function userMessage(req: any, res: any, route: any) {
 
 //出会いの記録を取得する
 export async function friendList(req: any, res: any, route: any) {
-  let result = await getUserFriends(route.query.id, route.query.page);
+  let friends = await getUserFriends(route.query.id, route.query.page);
+  let messages = await getUserMessages(route.query.id);
 
   return {
     Status: 200,
-    Friends: result,
+    Friends: friends,
+    Messages: messages,
   };
 }
 
