@@ -192,6 +192,14 @@ pre {
   */
 }
 
+.smallStatus {
+  width: 45%;
+  margin: auto 0;
+  align-items: right;
+  
+  background-color: #eeeeeeee;
+}
+
 /* 浮かせるヘッダ */
 header.nav {
   font-size: 0.8rem;
@@ -259,11 +267,13 @@ const CMD = {
 	GAMESTAT: 4,
 	CHEER: 5,
 	USERSTAT: 6,
+	USERREWARD: 7,
 	SEND_JOIN: 100,
 	SEND_EVENT: 101,
 	SEND_EPISODE: 102,
 	SEND_CHEER: 103,
 	SEND_QR: 104,
+	SEND_QR_EVENT: 105,
 	SEND_USER_JOIN: 110,
 	ERROR: 500,
 };
@@ -393,7 +403,7 @@ window.addEventListener("load", async (event) => {
 		
 		//localhostだけ
 		if(document.location.hostname.indexOf("localhost") != -1) {
-			wssURI = "ws://127.01.0.1:3746";//await getaddr();
+			wssURI = "ws://127.01.0.1:3788";//await getaddr();
 		}
 	}
 	
@@ -644,6 +654,23 @@ function execMessage(data) {
 			getElm("playerNextExp").innerText = userLevel.Next;
 			getElm("nextlv").value = userLevel.ExpGauge;
 			getElm("playerGold").innerText = update.Gold;
+		}
+		break;
+	
+	//こちらはダイアログを出して通知する
+	case CMD.USERREWARD:
+		console.log(data);
+		{
+			//変数によってリワードだし分け
+			
+			let update = data.Data.UpdateStat;
+			if(update) {
+				let userLevel = getUserLevel(update.Exp);
+				getElm("playerLevel").innerText = "レベル:" + userLevel.Level;
+				getElm("playerNextExp").innerText = userLevel.Next;
+				getElm("nextlv").value = userLevel.ExpGauge;
+				getElm("playerGold").innerText = update.Gold;
+			}
 		}
 		break;
 	
@@ -1378,6 +1405,7 @@ function userCreateNextPageCheck(no) {
 	console.log("no:" + no)
 	callNo += no;
 	if(callNo >= 3) {
+		closeEffect(EFFECT.SUMMON);
 		userSetup();
 		loadPage(PAGE.MAIN_MENU);
 	}
@@ -2240,11 +2268,15 @@ function urlB64ToUint8Array(base64String) {
 	-->
 	
 	<div id="summon-effect" class="modal">
-		<div class="nes-container status" style="display:none;">
-			<br /><br /><br />
-			<p>召喚中！！</p>
-			<br /><br /><br />
-			<progress class="nes-progress is-primary" id="summongauge" value="0" max="100"></progress>
+		<div class="modal-content">
+			<div class="nes-container status">
+				<div class="center">
+					<br /><br /><br />
+					<p>召喚中！！</p>
+					<br /><br /><br />
+				</div>
+				<progress class="nes-progress is-primary" id="summongauge" value="0" max="100"></progress>
+			</div>
 		</div>
 	</div>
 	
@@ -3125,9 +3157,13 @@ function urlB64ToUint8Array(base64String) {
 				
 				<div style="height:150px;"></div>
 				
-				<div class="right">
-					<button type="button" class="nes-btn is-error" onclick="reCreateUser();">再度召喚する</button><br />
-					※召喚しなおすまでデータは消えません！<br />
+				<div class="right-side">
+					<div class="nes-container is-rounded with-title smallStatus">
+						<p class="title">データ削除</p>
+						
+						<button type="button" class="nes-btn is-error" onclick="reCreateUser();">データを消して再度召喚</button><br />
+						※召喚しなおすまでデータは消えません！ <br />
+					</div>
 				</div>
 				
 				<div style="height:150px;"></div>
