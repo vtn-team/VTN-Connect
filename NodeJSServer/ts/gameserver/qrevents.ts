@@ -77,7 +77,7 @@ export class QREventer {
 			});
 			
 			msgData = {
-				Command:CMD.USERSTAT,
+				Command:CMD.LINKFEEDBACK,
 				UpdateStat: {
 					GameId: qrMaster.TargetId,
 					UserId : data.UserId
