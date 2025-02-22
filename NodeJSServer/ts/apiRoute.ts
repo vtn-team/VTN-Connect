@@ -56,6 +56,7 @@ exports.Routes = {
 		"/login" : "user#login",
 		"/maintain" : "vc#maintenance#             メンテナンス",
 		"/vc" : {
+			"/gamelink" : "vc#glink#               ゲームリンク",
 			"/usercreate" : "vc#createUser#        ユーザ生成(テスト用)",
 			"/gamestart" : "vc#gameStart#          ゲーム開始",
 			"/gameend" : "vc#gameEnd#              ゲーム終了",
@@ -67,7 +68,7 @@ exports.Routes = {
 			"/cheer" : "vc#cheer#                  おうえん(API経由)",
 			"/gameask" : "vc#gameAsk#              アンケート",
 			"/subscribe" : "vc#subscribe#          プッシュ通知登録",
-			"/send" : "vc#send#                  プッシュ通知送信",
+			"/send" : "vc#send#                    プッシュ通知送信",
 		},
 		"/tools" : {
 			"/ephemeralkey" : "ai#ephemeralkey#     エフェメラルキーを取得"

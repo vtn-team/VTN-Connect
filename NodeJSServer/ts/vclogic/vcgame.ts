@@ -334,6 +334,36 @@ export async function gameHandOver(gameId: number, userId: number, option: numbe
 }
 
 
+//ゲームリンク
+export async function gameLink(gameId: number, userId: number) {
+	let result = {
+		Success: false
+	};
+	
+	try {
+		//稼働中であればGameEndする
+		let gameHash = "";
+		for(let k in gameHashDic) {
+			if(gameHashDic[k] == gameId){
+				gameHash = k;
+				break;
+			}
+		}
+		if(gameHash != "") return result;
+		
+		//DGSにイベントリレー
+		sendAPIEvent({
+			API: "gameLinkVC",
+			GameId: gameId,
+			UserId: userId,
+		});
+	} catch(ex) {
+		console.log(ex);
+	}
+	
+	return result;
+}
+
 
 async function choiceAIGameUsers(afEvent:number, owners: any) {
 	let userNum = 3;
